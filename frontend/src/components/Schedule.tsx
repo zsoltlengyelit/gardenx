@@ -25,7 +25,6 @@ import {
   icalAtom,
   weekStartsOn
 } from '../api/events';
-import { CalendarComponent } from 'ical';
 
 const { convertTimestampToArray } = ics;
 const locales = {
@@ -133,7 +132,8 @@ export default function Schedule() {
     }));
   }
 
-  function handleSelectEvent(event: CalendarEvent & { sourceEvent: CalendarEvent }) {
+  function handleSelectEvent(e: object) {
+    const event = e as CalendarEvent & { sourceEvent: CalendarEvent };
     const sourceEvent = event.sourceEvent ? event.sourceEvent : event;
     setSlotInfoDraft(sourceEvent);
   }
