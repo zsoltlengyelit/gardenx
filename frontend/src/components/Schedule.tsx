@@ -17,7 +17,14 @@ import EventEditor, { Draft } from './EventEditor';
 import { randomString } from '../api/random';
 import { axiosInstance } from '../api/axios';
 import useSWR from 'swr';
-import { currentRangeAtom, eventsAtom, eventsInCurrentRangeAtom, icalAtom, weekStartsOn } from '../api/events';
+import {
+  CalendarEvent,
+  currentRangeAtom,
+  eventsAtom,
+  eventsInCurrentRangeAtom,
+  icalAtom,
+  weekStartsOn
+} from '../api/events';
 import { CalendarComponent } from 'ical';
 
 const { convertTimestampToArray } = ics;
@@ -43,7 +50,7 @@ export default function Schedule() {
   const eventsInCurrentRange = useAtomValue(eventsInCurrentRangeAtom);
   const [currentRange, setCurrentRange] = useAtom(currentRangeAtom);
 
-  const [slotInfoDraft, setSlotInfoDraft] = useState<SlotInfo | null>(null);
+  const [slotInfoDraft, setSlotInfoDraft] = useState<SlotInfo | null | CalendarEvent>(null);
 
   const { data: icalData, isLoading, error } = useSWR('/schedule-ical');
 
@@ -55,6 +62,7 @@ export default function Schedule() {
   }, [icalData]);
 
   function saveIcal(content: string) {
+    setIcal(content);
     axiosInstance.post('/schedule-ical', {
       ical: content
     });
@@ -89,9 +97,9 @@ export default function Schedule() {
   }
 
   function handleSave(draft: Draft) {
-    const existingRules = getEventAttributes();
+    const existingEvents = getEventAttributes();
     const parsedIcal = ics.createEvents([
-      ...existingRules,
+      ...existingEvents,
       {
         uid: randomString(32),
         start: convertTimestampToArray(draft.start.valueOf(), 'local'),
@@ -106,7 +114,6 @@ export default function Schedule() {
       throw new Error((parsedIcal.error as any).errors.join('\n'));
     }
 
-    setIcal(parsedIcal.value as string);
     saveIcal(parsedIcal.value as string);
 
     setSlotInfoDraft(null);
@@ -124,6 +131,27 @@ export default function Schedule() {
       ...prev,
       view
     }));
+  }
+
+  function handleSelectEvent(event: CalendarEvent & { sourceEvent: CalendarEvent }) {
+    const sourceEvent = event.sourceEvent ? event.sourceEvent : event;
+    setSlotInfoDraft(sourceEvent);
+  }
+
+  function handleDelete(event: CalendarEvent) {
+    const existingEvents = getEventAttributes();
+    const parsedIcal = ics.createEvents([
+      ...existingEvents.filter(ee => ee.uid !== event.uid)
+    ]);
+
+    if (parsedIcal.error) {
+
+      throw new Error((parsedIcal.error as any).errors.join('\n'));
+    }
+
+    saveIcal(parsedIcal.value as string ?? '');
+
+    setSlotInfoDraft(null);
   }
 
   return (
@@ -146,9 +174,7 @@ export default function Schedule() {
                     style={{ height: '100%' }}
                     onNavigate={handleNavigate}
                     onView={handleView}
-
-                    titleAccessor={event => (event as CalendarComponent).title as string}
-
+                    onSelectEvent={handleSelectEvent}
                 />
             </View>
 
@@ -157,6 +183,7 @@ export default function Schedule() {
                     draft={slotInfoDraft}
                     onClose={() => setSlotInfoDraft(null)}
                     onSave={handleSave}
+                    onDelete={handleDelete}
                 />
             }
 

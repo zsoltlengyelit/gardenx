@@ -11,6 +11,7 @@ import DateTimePicker from 'react-datetime-picker';
 import 'react-datetime-picker/dist/DateTimePicker.css';
 import 'react-calendar/dist/Calendar.css';
 import 'react-clock/dist/Clock.css';
+import { CalendarEvent } from '../api/events';
 
 export type Draft = {
     start: Date;
@@ -20,19 +21,26 @@ export type Draft = {
 };
 
 type Props = {
-    draft: SlotInfo;
+    draft: SlotInfo | CalendarEvent;
     onClose: () => void;
     onSave: (draft: Draft) => void;
+    onDelete: (event: CalendarEvent) => void;
 };
 
-export default function EventEditor({ draft, onClose, onSave }: Props) {
+export default function EventEditor({ draft, onClose, onSave, onDelete }: Props) {
+
+  function isCalendarEvent(draft: SlotInfo | CalendarEvent): draft is CalendarEvent {
+    return !!(draft as CalendarEvent).uid;
+  }
+
+  const isSaved = isCalendarEvent(draft);
 
   const { control, handleSubmit } = useForm({
     defaultValues: {
-      title: '',
+      title: isSaved ? draft.title : '',
       start: draft.start,
       end: draft.end,
-      rrule: ''
+      rrule: isSaved ? draft.rrule?.toString() : ''
     }
   });
 
@@ -129,6 +137,15 @@ export default function EventEditor({ draft, onClose, onSave }: Props) {
                     </Modal.Body>
 
                     <Modal.Footer>
+                        {isSaved &&
+                            <Button
+                                color="danger"
+                                onClick={() => onDelete(draft)}
+                            >
+                                Delete
+                            </Button>
+                        }
+
                         <Button
                             color="primary-inverse"
                             onClick={() => onClose()}
