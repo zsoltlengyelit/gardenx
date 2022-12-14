@@ -1,72 +1,64 @@
 import { useEffect, useState } from 'react';
-import { Calendar, dateFnsLocalizer, SlotInfo } from 'react-big-calendar';
+import { Calendar, dateFnsLocalizer, SlotInfo, Views } from 'react-big-calendar';
 import withDragAndDrop, { withDragAndDropProps } from 'react-big-calendar/lib/addons/dragAndDrop';
 import format from 'date-fns/format';
 import parse from 'date-fns/parse';
 import startOfWeek from 'date-fns/startOfWeek';
 import getDay from 'date-fns/getDay';
-import enUS from 'date-fns/locale/en-US';
+import hu from 'date-fns/locale/hu';
 
 import 'react-big-calendar/lib/addons/dragAndDrop/styles.css';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 
 import { View } from '@instructure/ui';
-import { atom, useAtom, useAtomValue } from 'jotai';
-import ical from 'ical';
+import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import * as ics from 'ics';
 import EventEditor, { Draft } from './EventEditor';
 import { randomString } from '../api/random';
 import { axiosInstance } from '../api/axios';
+import useSWR from 'swr';
+import { currentRangeAtom, eventsAtom, eventsInCurrentRangeAtom, icalAtom, weekStartsOn } from '../api/events';
+import { CalendarComponent } from 'ical';
 
 const { convertTimestampToArray } = ics;
 const locales = {
-  'en-US': enUS,
+  hu,
 };
 // The types here are `object`. Strongly consider making them better as removing `locales` caused a fatal error
 const localizer = dateFnsLocalizer({
-  format,
+  format: (date: Date, formats: string) => {
+    return format(date, formats === 'p' ? 'HH:mm' : formats);
+  },
   parse,
-  startOfWeek,
+  startOfWeek: () => startOfWeek(new Date(), { weekStartsOn }),
   getDay,
   locales,
 });
 // @ts-ignore
 const DnDCalendar = withDragAndDrop(Calendar);
 
-const icalAtom = atom('');
-
-const eventsAtom = atom(get => {
-  const icalContent = get(icalAtom);
-
-  const icalEvents = ical.parseICS(icalContent);
-  return Object.values(icalEvents);
-
-});
-
 export default function Schedule() {
-  const [icalContent, setIcal] = useAtom(icalAtom);
+  const setIcal = useSetAtom(icalAtom);
   const events = useAtomValue(eventsAtom);
+  const eventsInCurrentRange = useAtomValue(eventsInCurrentRangeAtom);
+  const [currentRange, setCurrentRange] = useAtom(currentRangeAtom);
+
   const [slotInfoDraft, setSlotInfoDraft] = useState<SlotInfo | null>(null);
 
-  const [icalInited, setIcalInited] = useState(false);
+  const { data: icalData, isLoading, error } = useSWR('/schedule-ical');
 
   useEffect(() => {
 
-    axiosInstance.get('/schedule-ical').then(res => {
-      setIcal(res.data);
-      setIcalInited(true);
-    });
-  }, []);
-
-  useEffect(() => {
-
-    if (icalInited) {
-      axiosInstance.post('/schedule-ical', {
-        ical: icalContent
-      });
+    if (!error && !isLoading) {
+      setIcal(icalData);
     }
+  }, [icalData]);
 
-  }, [icalContent]);
+  function saveIcal(content: string) {
+    axiosInstance.post('/schedule-ical', {
+      ical: content
+    });
+  }
 
   const onEventResize: withDragAndDropProps['onEventResize'] = () => {
     // const { start, end } = data;
@@ -81,7 +73,7 @@ export default function Schedule() {
     setSlotInfoDraft(slotInfo);
   };
 
-  function toEventAttributes(events: ical.CalendarComponent[]) {
+  function getEventAttributes() {
     return events.map(event => ({
       start: convertTimestampToArray(event.start!.valueOf(), 'local'),
       end: convertTimestampToArray(event.end!.valueOf(), 'local'),
@@ -97,7 +89,7 @@ export default function Schedule() {
   }
 
   function handleSave(draft: Draft) {
-    const existingRules = toEventAttributes(events);
+    const existingRules = getEventAttributes();
     const parsedIcal = ics.createEvents([
       ...existingRules,
       {
@@ -115,8 +107,23 @@ export default function Schedule() {
     }
 
     setIcal(parsedIcal.value as string);
+    saveIcal(parsedIcal.value as string);
 
     setSlotInfoDraft(null);
+  }
+
+  function handleNavigate(date: Date, view: string) {
+    setCurrentRange({
+      date,
+      view
+    });
+  }
+
+  function handleView(view: string) {
+    setCurrentRange(prev => ({
+      ...prev,
+      view
+    }));
   }
 
   return (
@@ -126,8 +133,10 @@ export default function Schedule() {
                 margin="small 0"
             >
                 <DnDCalendar
-                    defaultView='week'
-                    events={events}
+                    date={currentRange.date}
+                    defaultView={Views.WEEK}
+                    views={[Views.WEEK, Views.DAY]}
+                    events={eventsInCurrentRange}
                     localizer={localizer}
                     onEventDrop={onEventDrop}
                     onEventResize={onEventResize}
@@ -135,6 +144,11 @@ export default function Schedule() {
                     onSelectSlot={handleSelectSlot}
                     resizable
                     style={{ height: '100%' }}
+                    onNavigate={handleNavigate}
+                    onView={handleView}
+
+                    titleAccessor={event => (event as CalendarComponent).title as string}
+
                 />
             </View>
 

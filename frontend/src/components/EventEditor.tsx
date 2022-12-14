@@ -115,7 +115,7 @@ export default function EventEditor({ draft, onClose, onSave }: Props) {
                                         value={value}
                                         onChange={(rrule: string) => onChange(rrule)}
                                         config={{
-                                          repeat: ['Weeklt', 'Monthly', 'Daily'],
+                                          repeat: ['Weekly', 'Monthly', 'Daily'],
                                           yearly: 'on the',
                                           monthly: 'on',
                                           end: ['Never', 'On date'],
