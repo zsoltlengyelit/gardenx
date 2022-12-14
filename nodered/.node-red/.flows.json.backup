@@ -1,0 +1,508 @@
+[
+    {
+        "id": "56e1b27d8d230e3f",
+        "type": "tab",
+        "label": "Kert",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "5b1f4133f210d4ec",
+        "type": "tab",
+        "label": "Test Kert",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "6654f6e517e71542",
+        "type": "tab",
+        "label": "Router Engine",
+        "disabled": false,
+        "info": "router",
+        "env": []
+    },
+    {
+        "id": "c4bff4d6e8023886",
+        "type": "websocket-listener",
+        "path": "/ws/io",
+        "wholemsg": "false"
+    },
+    {
+        "id": "4e04a4d03b8d4fb4",
+        "type": "ical-config",
+        "url": "",
+        "caldav": "",
+        "caltype": "ical",
+        "name": "Default",
+        "replacedates": false,
+        "usecache": false,
+        "username": "",
+        "password": "",
+        "calendar": "",
+        "pastWeeks": "0",
+        "futureWeeks": "4"
+    },
+    {
+        "id": "0b45580f21df7c6a",
+        "type": "rpi-gpio out",
+        "z": "56e1b27d8d230e3f",
+        "name": "Csepegtető 1",
+        "pin": "12",
+        "set": true,
+        "level": "0",
+        "freq": "",
+        "out": "out",
+        "bcm": true,
+        "x": 1460,
+        "y": 500,
+        "wires": [],
+        "info": "gpio/1"
+    },
+    {
+        "id": "d26113fdaba366bd",
+        "type": "routing",
+        "z": "56e1b27d8d230e3f",
+        "name": "GPIO router Kert",
+        "rules": [
+            {
+                "v": "gpio/1"
+            },
+            {
+                "v": "gpio/2"
+            }
+        ],
+        "outputs": 2,
+        "x": 1230,
+        "y": 540,
+        "wires": [
+            [
+                "0b45580f21df7c6a"
+            ],
+            [
+                "05e046d8a67ed56c"
+            ]
+        ]
+    },
+    {
+        "id": "05e046d8a67ed56c",
+        "type": "rpi-gpio out",
+        "z": "56e1b27d8d230e3f",
+        "name": "Csepegtető 2",
+        "pin": "16",
+        "set": true,
+        "level": "0",
+        "freq": "",
+        "out": "out",
+        "bcm": true,
+        "x": 1460,
+        "y": 560,
+        "wires": [],
+        "info": "gpio/2"
+    },
+    {
+        "id": "6ed0c7fefce6a48c",
+        "type": "link in",
+        "z": "56e1b27d8d230e3f",
+        "name": "Kert link in",
+        "links": [
+            "fb55055af17a6f6c"
+        ],
+        "x": 1065,
+        "y": 540,
+        "wires": [
+            [
+                "d26113fdaba366bd"
+            ]
+        ]
+    },
+    {
+        "id": "zxl7jen16tkmodwa",
+        "type": "rpi-gpio out",
+        "z": "5b1f4133f210d4ec",
+        "name": "cs4",
+        "pin": "4",
+        "set": true,
+        "level": "0",
+        "freq": "",
+        "out": "out",
+        "bcm": true,
+        "x": 490,
+        "y": 180,
+        "wires": [],
+        "info": "gpio/4"
+    },
+    {
+        "id": "7420abdf45b8e8f9",
+        "type": "link in",
+        "z": "5b1f4133f210d4ec",
+        "name": "Test kert link in",
+        "links": [
+            "fb55055af17a6f6c"
+        ],
+        "x": 135,
+        "y": 180,
+        "wires": [
+            [
+                "d8670e89b0ec43a5"
+            ]
+        ]
+    },
+    {
+        "id": "d8670e89b0ec43a5",
+        "type": "routing",
+        "z": "5b1f4133f210d4ec",
+        "name": "GPIO router Test Kert",
+        "rules": [
+            {
+                "v": "gpio/4"
+            }
+        ],
+        "outputs": 1,
+        "x": 320,
+        "y": 180,
+        "wires": [
+            [
+                "zxl7jen16tkmodwa"
+            ]
+        ]
+    },
+    {
+        "id": "8bc79f15c0a688db",
+        "type": "http in",
+        "z": "6654f6e517e71542",
+        "name": "",
+        "url": "/io",
+        "method": "put",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 490,
+        "y": 340,
+        "wires": [
+            [
+                "79a0d0eb13560a84",
+                "2ea1e99be30211b2"
+            ]
+        ]
+    },
+    {
+        "id": "79a0d0eb13560a84",
+        "type": "function",
+        "z": "6654f6e517e71542",
+        "name": "Body Mapper",
+        "func": "\nmsg.payload = msg.payload.map(state => JSON.stringify(state)).join('\\n');\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 700,
+        "y": 340,
+        "wires": [
+            [
+                "67e4df38392a472a"
+            ]
+        ]
+    },
+    {
+        "id": "2ea1e99be30211b2",
+        "type": "http response",
+        "z": "6654f6e517e71542",
+        "name": "",
+        "statusCode": "200",
+        "headers": {},
+        "x": 700,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "67e4df38392a472a",
+        "type": "split",
+        "z": "6654f6e517e71542",
+        "name": "",
+        "splt": "\\n",
+        "spltType": "str",
+        "arraySplt": 1,
+        "arraySpltType": "len",
+        "stream": false,
+        "addname": "",
+        "x": 870,
+        "y": 340,
+        "wires": [
+            [
+                "c5fcf09098ee0458"
+            ]
+        ]
+    },
+    {
+        "id": "c5fcf09098ee0458",
+        "type": "function",
+        "z": "6654f6e517e71542",
+        "name": "parse JSON",
+        "func": "msg.payload = JSON.parse(msg.payload);\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1030,
+        "y": 340,
+        "wires": [
+            [
+                "3288b51e87c0cf0e",
+                "63308ea7f10df86b"
+            ]
+        ]
+    },
+    {
+        "id": "3288b51e87c0cf0e",
+        "type": "function",
+        "z": "6654f6e517e71542",
+        "name": "set topic",
+        "func": "msg.topic = msg.payload.io;\nmsg.payload = msg.payload.state;\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1200,
+        "y": 340,
+        "wires": [
+            [
+                "fb55055af17a6f6c"
+            ]
+        ]
+    },
+    {
+        "id": "63308ea7f10df86b",
+        "type": "websocket out",
+        "z": "6654f6e517e71542",
+        "name": "Publish state",
+        "server": "c4bff4d6e8023886",
+        "client": "",
+        "x": 1210,
+        "y": 440,
+        "wires": []
+    },
+    {
+        "id": "fb55055af17a6f6c",
+        "type": "link out",
+        "z": "6654f6e517e71542",
+        "name": "link out 1",
+        "mode": "link",
+        "links": [
+            "6ed0c7fefce6a48c",
+            "7420abdf45b8e8f9"
+        ],
+        "x": 1395,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "fb8ad7aea57b6bed",
+        "type": "http in",
+        "z": "6654f6e517e71542",
+        "name": "POST /schedule-ical",
+        "url": "/schedule-ical",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 530,
+        "y": 900,
+        "wires": [
+            [
+                "b60699c0b0671883",
+                "3c19de09d6abd82b"
+            ]
+        ]
+    },
+    {
+        "id": "b60699c0b0671883",
+        "type": "http response",
+        "z": "6654f6e517e71542",
+        "name": "",
+        "statusCode": "200",
+        "headers": {},
+        "x": 780,
+        "y": 900,
+        "wires": []
+    },
+    {
+        "id": "d69e99cb3b05e6b9",
+        "type": "file",
+        "z": "6654f6e517e71542",
+        "name": "Write iCal",
+        "filename": "./schedule.ical/gpio.ical",
+        "filenameType": "str",
+        "appendNewline": true,
+        "createDir": true,
+        "overwriteFile": "true",
+        "encoding": "none",
+        "x": 1480,
+        "y": 960,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "3c19de09d6abd82b",
+        "type": "function",
+        "z": "6654f6e517e71542",
+        "name": "Get ical property",
+        "func": "msg.payload = msg.payload.ical;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 810,
+        "y": 960,
+        "wires": [
+            [
+                "d69e99cb3b05e6b9"
+            ]
+        ]
+    },
+    {
+        "id": "c86891a9cd694b46",
+        "type": "http in",
+        "z": "6654f6e517e71542",
+        "name": "GET /schedule-ical",
+        "url": "/schedule-ical",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 530,
+        "y": 660,
+        "wires": [
+            [
+                "e4d0b3b50d6a3c74"
+            ]
+        ]
+    },
+    {
+        "id": "b293c827d775ebfe",
+        "type": "http response",
+        "z": "6654f6e517e71542",
+        "name": "passffile",
+        "statusCode": "200",
+        "headers": {
+            "Content-Type": "text/calendar"
+        },
+        "x": 1540,
+        "y": 660,
+        "wires": []
+    },
+    {
+        "id": "150cc4f5a92e2036",
+        "type": "file in",
+        "z": "6654f6e517e71542",
+        "name": "read ./schedule.ical/gpio.ical",
+        "filename": "./schedule.ical/gpio.ical",
+        "filenameType": "str",
+        "format": "utf8",
+        "chunk": false,
+        "sendError": false,
+        "encoding": "none",
+        "allProps": false,
+        "x": 1300,
+        "y": 660,
+        "wires": [
+            [
+                "b293c827d775ebfe"
+            ]
+        ]
+    },
+    {
+        "id": "e4d0b3b50d6a3c74",
+        "type": "exec",
+        "z": "6654f6e517e71542",
+        "command": "test -f ./schedule.ical/gpio.ical",
+        "addpay": "",
+        "append": "",
+        "useSpawn": "false",
+        "timer": "",
+        "winHide": false,
+        "oldrc": false,
+        "name": "test -f ./schedule.ical/gpio.ical",
+        "x": 790,
+        "y": 660,
+        "wires": [
+            [],
+            [],
+            [
+                "351bfdb306226ff8"
+            ]
+        ]
+    },
+    {
+        "id": "ef3684694d00fd12",
+        "type": "function",
+        "z": "6654f6e517e71542",
+        "name": "empty content",
+        "func": "msg.payload = '';\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1260,
+        "y": 760,
+        "wires": [
+            [
+                "d69e99cb3b05e6b9"
+            ]
+        ]
+    },
+    {
+        "id": "351bfdb306226ff8",
+        "type": "filter",
+        "z": "6654f6e517e71542",
+        "name": "router code",
+        "property": "payload.code",
+        "propertyType": "msg",
+        "asArray": false,
+        "itemProperty": "payload",
+        "itemPropertyType": "item",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "0",
+                "vt": "str",
+                "output": 1
+            },
+            {
+                "t": "eq",
+                "v": "1",
+                "vt": "str",
+                "output": 2
+            }
+        ],
+        "checkall": "false",
+        "outputs": 2,
+        "x": 1030,
+        "y": 660,
+        "wires": [
+            [
+                "150cc4f5a92e2036"
+            ],
+            [
+                "ef3684694d00fd12"
+            ]
+        ]
+    },
+    {
+        "id": "db52e3808a0e4d48",
+        "type": "http response",
+        "z": "6654f6e517e71542",
+        "name": "passffile 201",
+        "statusCode": "201",
+        "headers": {
+            "Content-Type": "text/calendar"
+        },
+        "x": 1530,
+        "y": 760,
+        "wires": []
+    }
+]
