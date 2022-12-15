@@ -26,6 +26,7 @@ import {
   weekStartsOn
 } from '../api/events';
 import { useTabGpioNodeMap } from '../api/nodered';
+import { RRule, rrulestr } from 'rrule';
 
 const { convertTimestampToArray } = ics;
 const locales = {
@@ -90,9 +91,27 @@ export default function Schedule() {
     return events.map(event => calendarEventToEventAttributes(event));
   }
 
-  function normalizeRrule(rrule: string) {
+  function normalizeRrule(rrule: RRule, start: Date) {
+
+    const rruleClone = rrule.clone();
+
+    rruleClone.options = {
+      ...rruleClone.options,
+      dtstart: start,
+      byhour: [start.getUTCHours()],
+      byminute: [start.getUTCMinutes()]
+    };
+
+    rruleClone.origOptions = {
+      ...rruleClone.origOptions,
+      dtstart: start,
+      byhour: [start.getUTCHours()],
+      byminute: [start.getUTCMinutes()]
+    };
+
+    const rruleString = rruleClone.toString();
     const prefix = 'RRULE:';
-    return rrule.startsWith(prefix) ? rrule.substring(prefix.length) : rrule;
+    return rruleString.startsWith(prefix) ? rruleString.substring(prefix.length) : rruleString;
   }
 
   function handleSave(draft: Draft) {
@@ -104,7 +123,9 @@ export default function Schedule() {
         start: convertTimestampToArray(draft.start.valueOf(), 'local'),
         end: convertTimestampToArray(draft.end.valueOf(), 'local'),
         categories: [draft.flowId, draft.nodeId],
-        recurrenceRule: normalizeRrule(draft.rrule)
+        recurrenceRule: normalizeRrule(rrulestr(draft.rrule, {
+          dtstart: draft.start
+        }), draft.start)
       }
     ]);
 
@@ -159,12 +180,13 @@ export default function Schedule() {
 
     const mappedEvents = existingEvents.map(ee => {
       if (ee.uid === event.uid) {
+        const recurrenceRule = event.rrule ? normalizeRrule(event.rrule as any, event.start!) : undefined;
         return {
           uid: event.uid,
           start: convertTimestampToArray(event.start!.valueOf(), 'local'),
           end: convertTimestampToArray(event.end!.valueOf(), 'local'),
           categories: event.categories,
-          recurrenceRule: event.rrule ? normalizeRrule(event.rrule.toString()) : undefined
+          recurrenceRule
         };
       }
       return ee;
