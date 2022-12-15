@@ -27,6 +27,7 @@ import {
 } from '../api/events';
 import { useTabGpioNodeMap } from '../api/nodered';
 import { RRule, rrulestr } from 'rrule';
+import { setHours, setMinutes } from 'date-fns';
 
 const { convertTimestampToArray } = ics;
 const locales = {
@@ -204,15 +205,16 @@ export default function Schedule() {
   }
 
   const onEventResize: withDragAndDropProps['onEventResize'] = (data) => {
-    const { start, end, event } = data;
+    const { start, end, event } = data as any as { start: Date, end: Date, event: CalendarEvent };
 
-    const calendarEvent = event as CalendarEvent;
+    const calendarEvent = event;
     const sourceEvent: any = calendarEvent.sourceEvent ?? calendarEvent;
+    const isRecurring = !!calendarEvent.rrule;
 
     handleUpdate({
       ...sourceEvent,
-      start: start as Date,
-      end: end as Date,
+      start: isRecurring ? setMinutes(setHours(sourceEvent.start, start.getHours()), start.getMinutes()) : start,
+      end: isRecurring ? setMinutes(setHours(sourceEvent.end, end.getHours()), end.getMinutes()) : end,
     });
   };
 
