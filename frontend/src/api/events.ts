@@ -7,7 +7,7 @@ import { randomString } from './random';
 
 export const weekStartsOn = 1;
 
-export type CalendarEvent = ical.CalendarComponent & {title: string;};
+export type CalendarEvent = ical.CalendarComponent & { flowId: string; nodeId: string; };
 
 export const icalAtom = atom('');
 
@@ -18,7 +18,6 @@ export const eventsAtom = atom<CalendarEvent[]>(get => {
 
   return Object.values(icalEvents).map(event => ({
     ...event,
-    title: event.summary as string
   } as CalendarEvent));
 });
 

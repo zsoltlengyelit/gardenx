@@ -10,7 +10,7 @@ import hu from 'date-fns/locale/hu';
 import 'react-big-calendar/lib/addons/dragAndDrop/styles.css';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 
-import { View } from '@instructure/ui';
+import { Text, View } from '@instructure/ui';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import * as ics from 'ics';
 import EventEditor, { Draft } from './EventEditor';
@@ -25,6 +25,7 @@ import {
   icalAtom,
   weekStartsOn
 } from '../api/events';
+import { useTabGpioNodeMap } from '../api/nodered';
 
 const { convertTimestampToArray } = ics;
 const locales = {
@@ -44,6 +45,7 @@ const localizer = dateFnsLocalizer({
 const DnDCalendar = withDragAndDrop(Calendar);
 
 export default function Schedule() {
+
   const setIcal = useSetAtom(icalAtom);
   const events = useAtomValue(eventsAtom);
   const eventsInCurrentRange = useAtomValue(eventsInCurrentRangeAtom);
@@ -52,6 +54,8 @@ export default function Schedule() {
   const [slotInfoDraft, setSlotInfoDraft] = useState<SlotInfo | null | CalendarEvent>(null);
 
   const { data: icalData, isLoading, error } = useSWR('/schedule-ical');
+
+  const tabMap = useTabGpioNodeMap();
 
   useEffect(() => {
 
@@ -67,27 +71,23 @@ export default function Schedule() {
     });
   }
 
-  const onEventResize: withDragAndDropProps['onEventResize'] = () => {
-    // const { start, end } = data;
-
-  };
-  const onEventDrop: withDragAndDropProps['onEventDrop'] = data => {
-    console.log(data);
-
-  };
-
   const handleSelectSlot = (slotInfo: SlotInfo) => {
     setSlotInfoDraft(slotInfo);
   };
 
-  function getEventAttributes() {
-    return events.map(event => ({
+  function calendarEventToEventAttributes(event: CalendarEvent) {
+    return {
       start: convertTimestampToArray(event.start!.valueOf(), 'local'),
       end: convertTimestampToArray(event.end!.valueOf(), 'local'),
       recurrenceRule: event.rrule?.toString(),
       uid: event.uid,
-      title: event.summary
-    } as ics.EventAttributes));
+      title: event.summary,
+      categories: event.categories
+    } as ics.EventAttributes;
+  }
+
+  function getEventAttributes() {
+    return events.map(event => calendarEventToEventAttributes(event));
   }
 
   function normalizeRrule(rrule: string) {
@@ -103,7 +103,7 @@ export default function Schedule() {
         uid: randomString(32),
         start: convertTimestampToArray(draft.start.valueOf(), 'local'),
         end: convertTimestampToArray(draft.end.valueOf(), 'local'),
-        title: draft.title,
+        categories: [draft.flowId, draft.nodeId],
         recurrenceRule: normalizeRrule(draft.rrule)
       }
     ]);
@@ -154,6 +154,48 @@ export default function Schedule() {
     setSlotInfoDraft(null);
   }
 
+  function handleUpdate(event: CalendarEvent) {
+    const existingEvents = getEventAttributes();
+
+    const mappedEvents = existingEvents.map(ee => {
+      if (ee.uid === event.uid) {
+        return {
+          uid: event.uid,
+          start: convertTimestampToArray(event.start!.valueOf(), 'local'),
+          end: convertTimestampToArray(event.end!.valueOf(), 'local'),
+          categories: event.categories,
+          recurrenceRule: event.rrule ? normalizeRrule(event.rrule.toString()) : undefined
+        };
+      }
+      return ee;
+    });
+    const parsedIcal = ics.createEvents(mappedEvents);
+
+    if (parsedIcal.error) {
+
+      throw new Error((parsedIcal.error as any).errors.join('\n'));
+    }
+
+    saveIcal(parsedIcal.value as string ?? '');
+
+    setSlotInfoDraft(null);
+  }
+
+  const onEventResize: withDragAndDropProps['onEventResize'] = (data) => {
+    const { start, end, event } = data;
+
+    const calendarEvent = event as CalendarEvent;
+    const sourceEvent: any = calendarEvent.sourceEvent ?? calendarEvent;
+
+    handleUpdate({
+      ...sourceEvent,
+      start: start as Date,
+      end: end as Date,
+    });
+  };
+
+  const onEventDrop: withDragAndDropProps['onEventDrop'] = data => onEventResize(data);
+
   return (
         <>
             <View
@@ -175,6 +217,26 @@ export default function Schedule() {
                     onNavigate={handleNavigate}
                     onView={handleView}
                     onSelectEvent={handleSelectEvent}
+                    titleAccessor={event => {
+                      if (tabMap.length === 0) {
+                        return '';
+                      }
+                      const [flowId, nodeId] = (event as CalendarEvent).categories as string[] ?? [null, null];
+
+                      const tab = tabMap.find(tab => tab.tab.id === flowId);
+
+                      if (!tab) {
+                        return `Tab is removed: ${flowId}`;
+                      }
+                      const node = tab.nodes.find(node => node.info === nodeId);
+
+                      if (!node) {
+                        return `${tab.tab.label} - Node is removed: ${nodeId}`;
+                      }
+
+                      return `${tab.tab.label} - ${node.name}`;
+
+                    }}
                 />
             </View>
 
@@ -184,6 +246,7 @@ export default function Schedule() {
                     onClose={() => setSlotInfoDraft(null)}
                     onSave={handleSave}
                     onDelete={handleDelete}
+                    onUpdate={handleUpdate}
                 />
             }
 

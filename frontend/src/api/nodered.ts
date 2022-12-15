@@ -35,7 +35,7 @@ export type Tab = {
     env: any[];
 }
 
-type Flow = {
+export type Flow = {
     nodes: GpioNode[];
 } & Tab;
 
@@ -79,6 +79,42 @@ export async function updateGpioNode(ioName: string, state: boolean) {
   }]);
 }
 
+type TabWithNodes = {
+    tab: Tab,
+    nodes: GpioNode[]
+};
+
+export function useTabGpioNodeMap() {
+  const tabs = useGetTabs();
+
+  const [map, setMap] = useState<TabWithNodes[]>([]);
+
+  useEffect(() => {
+    Promise.all(tabs.map(tab => {
+      const flowP = swrFetcher(`/flow/${tab.id}`) as Promise<Flow>;
+
+      return flowP.then(flow => {
+        return flow.nodes.filter(node => node.type === 'rpi-gpio out');
+      });
+    })).then(flowNodes => {
+
+      const tabMap = tabs.map((tab, index) => {
+        const nodes = flowNodes[index];
+
+        return {
+          tab,
+          nodes
+        };
+      });
+
+      setMap(tabMap);
+    });
+
+  }, [tabs]);
+
+  return map;
+}
+
 const ws = new ReconnectingWebSocket('ws://localhost:1880/ws/io');
 
 export function useGpioNodeStates(flowId: string | null) {
@@ -100,10 +136,11 @@ export function useGpioNodeStates(flowId: string | null) {
 
     ws.addEventListener('message', (event) => {
       const ioUpdate = JSON.parse(event.data) as IoUpdate;
+      const controlAll = ioUpdate.io === 'gpio/*';
 
       setGpioNodes(prev => {
         return [...prev.map(node => {
-          if (node.info === ioUpdate.io) {
+          if (controlAll || node.info === ioUpdate.io) {
             return {
               ...node,
               state: !!ioUpdate.state
@@ -112,7 +149,6 @@ export function useGpioNodeStates(flowId: string | null) {
 
           return node;
         })];
-        // console.log(JSON.stringify(newGpioNodes, null, 4));
       });
 
     });

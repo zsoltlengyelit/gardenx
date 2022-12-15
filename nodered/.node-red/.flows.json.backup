@@ -32,7 +32,7 @@
     {
         "id": "4e04a4d03b8d4fb4",
         "type": "ical-config",
-        "url": "",
+        "url": "./schedule.ical/gpio.ical",
         "caldav": "",
         "caltype": "ical",
         "name": "Default",
@@ -55,8 +55,8 @@
         "freq": "",
         "out": "out",
         "bcm": true,
-        "x": 1460,
-        "y": 500,
+        "x": 700,
+        "y": 440,
         "wires": [],
         "info": "gpio/1"
     },
@@ -71,16 +71,23 @@
             },
             {
                 "v": "gpio/2"
+            },
+            {
+                "v": "gpio/*"
             }
         ],
-        "outputs": 2,
-        "x": 1230,
-        "y": 540,
+        "outputs": 3,
+        "x": 470,
+        "y": 480,
         "wires": [
             [
                 "0b45580f21df7c6a"
             ],
             [
+                "05e046d8a67ed56c"
+            ],
+            [
+                "0b45580f21df7c6a",
                 "05e046d8a67ed56c"
             ]
         ]
@@ -96,8 +103,8 @@
         "freq": "",
         "out": "out",
         "bcm": true,
-        "x": 1460,
-        "y": 560,
+        "x": 700,
+        "y": 500,
         "wires": [],
         "info": "gpio/2"
     },
@@ -109,8 +116,8 @@
         "links": [
             "fb55055af17a6f6c"
         ],
-        "x": 1065,
-        "y": 540,
+        "x": 305,
+        "y": 480,
         "wires": [
             [
                 "d26113fdaba366bd"
@@ -128,7 +135,7 @@
         "freq": "",
         "out": "out",
         "bcm": true,
-        "x": 490,
+        "x": 570,
         "y": 180,
         "wires": [],
         "info": "gpio/4"
@@ -157,12 +164,18 @@
         "rules": [
             {
                 "v": "gpio/4"
+            },
+            {
+                "v": "gpio/*"
             }
         ],
-        "outputs": 1,
+        "outputs": 2,
         "x": 320,
         "y": 180,
         "wires": [
+            [
+                "zxl7jen16tkmodwa"
+            ],
             [
                 "zxl7jen16tkmodwa"
             ]
@@ -177,8 +190,8 @@
         "method": "put",
         "upload": false,
         "swaggerDoc": "",
-        "x": 490,
-        "y": 340,
+        "x": 510,
+        "y": 400,
         "wires": [
             [
                 "79a0d0eb13560a84",
@@ -197,8 +210,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 700,
-        "y": 340,
+        "x": 720,
+        "y": 400,
         "wires": [
             [
                 "67e4df38392a472a"
@@ -212,8 +225,8 @@
         "name": "",
         "statusCode": "200",
         "headers": {},
-        "x": 700,
-        "y": 240,
+        "x": 720,
+        "y": 300,
         "wires": []
     },
     {
@@ -227,8 +240,8 @@
         "arraySpltType": "len",
         "stream": false,
         "addname": "",
-        "x": 870,
-        "y": 340,
+        "x": 890,
+        "y": 400,
         "wires": [
             [
                 "c5fcf09098ee0458"
@@ -246,12 +259,11 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1030,
-        "y": 340,
+        "x": 1050,
+        "y": 400,
         "wires": [
             [
-                "3288b51e87c0cf0e",
-                "63308ea7f10df86b"
+                "3288b51e87c0cf0e"
             ]
         ]
     },
@@ -266,11 +278,13 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1200,
-        "y": 340,
+        "x": 1220,
+        "y": 400,
         "wires": [
             [
-                "fb55055af17a6f6c"
+                "fb55055af17a6f6c",
+                "e435fafcaebcdbb6",
+                "2ed07befb9e49e7c"
             ]
         ]
     },
@@ -281,8 +295,8 @@
         "name": "Publish state",
         "server": "c4bff4d6e8023886",
         "client": "",
-        "x": 1210,
-        "y": 440,
+        "x": 2050,
+        "y": 480,
         "wires": []
     },
     {
@@ -295,8 +309,8 @@
             "6ed0c7fefce6a48c",
             "7420abdf45b8e8f9"
         ],
-        "x": 1395,
-        "y": 340,
+        "x": 1835,
+        "y": 400,
         "wires": []
     },
     {
@@ -309,7 +323,7 @@
         "upload": false,
         "swaggerDoc": "",
         "x": 530,
-        "y": 900,
+        "y": 780,
         "wires": [
             [
                 "b60699c0b0671883",
@@ -325,7 +339,7 @@
         "statusCode": "200",
         "headers": {},
         "x": 780,
-        "y": 900,
+        "y": 780,
         "wires": []
     },
     {
@@ -339,8 +353,8 @@
         "createDir": true,
         "overwriteFile": "true",
         "encoding": "none",
-        "x": 1480,
-        "y": 960,
+        "x": 1520,
+        "y": 840,
         "wires": [
             []
         ]
@@ -357,7 +371,7 @@
         "finalize": "",
         "libs": [],
         "x": 810,
-        "y": 960,
+        "y": 840,
         "wires": [
             [
                 "d69e99cb3b05e6b9"
@@ -390,7 +404,7 @@
         "headers": {
             "Content-Type": "text/calendar"
         },
-        "x": 1540,
+        "x": 1520,
         "y": 660,
         "wires": []
     },
@@ -451,7 +465,8 @@
         "y": 760,
         "wires": [
             [
-                "d69e99cb3b05e6b9"
+                "d69e99cb3b05e6b9",
+                "db52e3808a0e4d48"
             ]
         ]
     },
@@ -503,6 +518,124 @@
         },
         "x": 1530,
         "y": 760,
+        "wires": []
+    },
+    {
+        "id": "1714093af39e1ecf",
+        "type": "ical-sensor",
+        "z": "6654f6e517e71542",
+        "confignode": "4e04a4d03b8d4fb4",
+        "timeout": "2",
+        "timeoutUnits": "seconds",
+        "cron": "",
+        "name": "Calendar sensor",
+        "offsettype": "",
+        "offset": "",
+        "offsetUnitstype": "",
+        "offsetUnits": "",
+        "eventtypes": "events",
+        "eventtypestype": "eventtypes",
+        "calendar": "",
+        "calendartype": "str",
+        "triggertype": "trigger",
+        "trigger": "always",
+        "timezone": "",
+        "timezonetype": "str",
+        "dateformat": "{ \"timeStyle\": \"short\", \"dateStyle\": \"short\" }",
+        "dateformattype": "json",
+        "language": "en",
+        "languagetype": "language",
+        "filterProperty": "summary",
+        "filterPropertytype": "filterProperty",
+        "filterOperator": "between",
+        "filterOperatortype": "filterOperator",
+        "filtertype": "str",
+        "filter2type": "str",
+        "filter2": "",
+        "filter": "",
+        "combineResponse": false,
+        "x": 1480,
+        "y": 1060,
+        "wires": [
+            [
+                "5eef3ad2022205c8"
+            ],
+            [
+                "bf923014cbe15266"
+            ]
+        ]
+    },
+    {
+        "id": "e435fafcaebcdbb6",
+        "type": "debug",
+        "z": "6654f6e517e71542",
+        "name": "debug put io",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1510,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "2ed07befb9e49e7c",
+        "type": "function",
+        "z": "6654f6e517e71542",
+        "name": "Prepare ws",
+        "func": "msg.payload = {\n    state: msg.payload,\n    io: msg.topic\n};\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1890,
+        "y": 480,
+        "wires": [
+            [
+                "63308ea7f10df86b"
+            ]
+        ]
+    },
+    {
+        "id": "5eef3ad2022205c8",
+        "type": "function",
+        "z": "6654f6e517e71542",
+        "name": "control",
+        "func": "\nif (msg.payload.on === false) {\n    msg.payload = 0;\n    msg.topic = 'gpio/*';\n} else {\n    msg.topic = msg.payload.categories[1];\n    msg.payload = 1;\n}\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1670,
+        "y": 1060,
+        "wires": [
+            [
+                "fb55055af17a6f6c",
+                "2ed07befb9e49e7c"
+            ]
+        ]
+    },
+    {
+        "id": "bf923014cbe15266",
+        "type": "debug",
+        "z": "6654f6e517e71542",
+        "name": "debug 1we",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1750,
+        "y": 1140,
         "wires": []
     }
 ]
