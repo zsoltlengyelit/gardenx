@@ -1,5 +1,5 @@
 import { Tab, useGpioNodeStates } from '../api/nodered';
-import { Button, Heading, IconEmptyLine, IconEmptySolid, Tabs, Text, View } from '@instructure/ui';
+import { Button, Flex, Heading, IconEmptyLine, IconEmptySolid, Tabs, Text, View } from '@instructure/ui';
 import { useEffect } from 'react';
 import { atomWithStorage, useUpdateAtom } from 'jotai/utils';
 import { useAtomValue } from 'jotai';
@@ -75,24 +75,45 @@ export default function GpioNodeList({ tabs }: Props) {
                             <View
                                 key={node.id}
                                 as="div"
+                                display="inline-block"
                                 shadow="resting"
-                                margin="medium 0"
+                                margin="small"
                                 padding="medium"
+                                background={node.state ? 'success' : undefined}
 
                             >
-                                <Heading>{node.name}</Heading>
+                                <Heading level="h3">{node.name}</Heading>
 
-                                <Text weight="bold">{node.info}</Text>
+                                <Flex
+                                    margin="medium 0 0 0"
+                                    alignItems="stretch"
+                                    justifyItems="center"
+                                >
+                                    <Flex.Item shouldGrow>
 
-                                <View as="div">
-                                    <Text>{node.pin}</Text>
-                                </View>
+                                        <Text weight="bold">{node.info}</Text>
 
-                                <View as="div">
-                                    <Button onClick={() => handleUpdateState(node.info, !node.state)}>
-                                        {node.state ? <IconEmptySolid color="success"/> : <IconEmptyLine/>}
-                                    </Button>
-                                </View>
+                                        <View as="div">
+                                            <Text>PIN: {node.pin}</Text>
+                                        </View>
+
+                                    </Flex.Item>
+
+                                    <Flex.Item
+                                        shouldGrow
+                                        textAlign="end"
+                                        align="end"
+                                    >
+                                        <Button
+                                            color="primary-inverse"
+                                            onClick={() => handleUpdateState(node.info, !node.state)}
+                                        >
+                                            {node.state ? <IconEmptySolid color="success"/> : <IconEmptyLine/>}
+                                        </Button>
+
+                                    </Flex.Item>
+                                </Flex>
+
                             </View>
                         ))}
                     </Tabs.Panel>

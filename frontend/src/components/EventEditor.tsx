@@ -1,4 +1,4 @@
-import { Button, FormField, Heading, IconCalendarClockLine, Modal, SimpleSelect } from '@instructure/ui';
+import { Button, Flex, FormField, Heading, IconCalendarClockLine, Modal, SimpleSelect } from '@instructure/ui';
 import { SlotInfo } from 'react-big-calendar';
 import { Controller, useForm } from 'react-hook-form';
 
@@ -193,29 +193,36 @@ export default function EventEditor({ draft, onClose, onSave, onDelete, onUpdate
                 </Modal.Body>
 
                 <Modal.Footer>
-                    {isSaved &&
-                        <Button
-                            color="danger"
-                            onClick={() => onDelete(draft)}
-                        >
-                            Delete
-                        </Button>
-                    }
+                    <Flex width="100%">
+                        <Flex.Item shouldGrow>
+                            {isSaved &&
+                                <Button
+                                    color="danger"
+                                    onClick={() => onDelete(draft)}
+                                >
+                                    Delete
+                                </Button>
+                            }
+                        </Flex.Item>
 
-                    <Button
-                        color="primary-inverse"
-                        onClick={() => onClose()}
-                    >
-                        Cancel
-                    </Button>
+                        <Flex.Item>
+                            <Button
+                                color="primary-inverse"
+                                onClick={() => onClose()}
+                                margin="0 small 0 0"
+                            >
+                                Cancel
+                            </Button>
 
-                    <Button
-                        color="primary"
-                        type="submit"
-                        onClick={() => submit()}
-                    >
-                        Save
-                    </Button>
+                            <Button
+                                color="primary"
+                                type="submit"
+                                onClick={() => submit()}
+                            >
+                                Save
+                            </Button>
+                        </Flex.Item>
+                    </Flex>
                 </Modal.Footer>
             </Modal>
 

@@ -6,7 +6,6 @@ import { swrFetcher } from './api/axios';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import Root from './components/Root';
 import Board from './components/Board';
-import Schedule from './components/Schedule';
 
 const router = createBrowserRouter([
   {
@@ -16,10 +15,6 @@ const router = createBrowserRouter([
       {
         index: true,
         element: <Board/>
-      },
-      {
-        path: 'schedule',
-        element: <Schedule/>
       }
     ]
   }
