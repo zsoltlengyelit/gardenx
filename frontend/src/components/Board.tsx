@@ -15,7 +15,7 @@ export default function Board() {
                 >
                     <View
                         as="div"
-                        width={300}
+                        width={400}
                     >
                         <GpioNodeList tabs={tabs}/>
                     </View>

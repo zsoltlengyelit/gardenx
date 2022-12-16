@@ -75,17 +75,16 @@ export default function GpioNodeList({ tabs }: Props) {
                             <View
                                 key={node.id}
                                 as="div"
-                                display="inline-block"
                                 shadow="resting"
                                 margin="small"
-                                padding="medium"
+                                padding="small"
                                 background={node.state ? 'success' : undefined}
 
                             >
                                 <Heading level="h3">{node.name}</Heading>
 
                                 <Flex
-                                    margin="medium 0 0 0"
+                                    margin="small 0 0 0"
                                     alignItems="stretch"
                                     justifyItems="center"
                                 >

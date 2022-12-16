@@ -161,6 +161,10 @@ export default function Schedule() {
   }
 
   function handleDelete(event: CalendarEvent) {
+    if (!confirm('Are you sure you delete?')) {
+      return;
+    }
+
     const existingEvents = getEventAttributes();
     const parsedIcal = ics.createEvents([
       ...existingEvents.filter(ee => ee.uid !== event.uid)

@@ -2,7 +2,7 @@
     {
         "id": "56e1b27d8d230e3f",
         "type": "tab",
-        "label": "Kert",
+        "label": "Home Garden",
         "disabled": false,
         "info": "",
         "env": []
@@ -10,7 +10,7 @@
     {
         "id": "5b1f4133f210d4ec",
         "type": "tab",
-        "label": "Test Kert",
+        "label": "Demo Garden",
         "disabled": false,
         "info": "",
         "env": []
@@ -48,14 +48,14 @@
         "id": "0b45580f21df7c6a",
         "type": "rpi-gpio out",
         "z": "56e1b27d8d230e3f",
-        "name": "Csepegtető 1",
+        "name": "Zone 1",
         "pin": "12",
         "set": true,
         "level": "0",
         "freq": "",
         "out": "out",
         "bcm": true,
-        "x": 700,
+        "x": 680,
         "y": 440,
         "wires": [],
         "info": "gpio/1"
@@ -96,14 +96,14 @@
         "id": "05e046d8a67ed56c",
         "type": "rpi-gpio out",
         "z": "56e1b27d8d230e3f",
-        "name": "Csepegtető 2",
+        "name": "Zone 2",
         "pin": "16",
         "set": true,
         "level": "0",
         "freq": "",
         "out": "out",
         "bcm": true,
-        "x": 700,
+        "x": 680,
         "y": 500,
         "wires": [],
         "info": "gpio/2"
@@ -128,14 +128,14 @@
         "id": "zxl7jen16tkmodwa",
         "type": "rpi-gpio out",
         "z": "5b1f4133f210d4ec",
-        "name": "cs4",
+        "name": "Watering Demo",
         "pin": "4",
         "set": true,
         "level": "0",
         "freq": "",
         "out": "out",
         "bcm": true,
-        "x": 570,
+        "x": 600,
         "y": 180,
         "wires": [],
         "info": "gpio/4"
@@ -525,7 +525,7 @@
         "type": "ical-sensor",
         "z": "6654f6e517e71542",
         "confignode": "4e04a4d03b8d4fb4",
-        "timeout": "2",
+        "timeout": "1",
         "timeoutUnits": "seconds",
         "cron": "",
         "name": "Calendar sensor",
@@ -558,11 +558,10 @@
         "y": 1060,
         "wires": [
             [
-                "5eef3ad2022205c8"
-            ],
-            [
+                "5eef3ad2022205c8",
                 "bf923014cbe15266"
-            ]
+            ],
+            []
         ]
     },
     {
