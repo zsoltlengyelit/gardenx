@@ -1,5 +1,13 @@
 [
     {
+        "id": "6654f6e517e71542",
+        "type": "tab",
+        "label": "Router Engine",
+        "disabled": false,
+        "info": "router",
+        "env": []
+    },
+    {
         "id": "56e1b27d8d230e3f",
         "type": "tab",
         "label": "Home Garden",
@@ -13,14 +21,6 @@
         "label": "Demo Garden",
         "disabled": false,
         "info": "",
-        "env": []
-    },
-    {
-        "id": "6654f6e517e71542",
-        "type": "tab",
-        "label": "Router Engine",
-        "disabled": false,
-        "info": "router",
         "env": []
     },
     {
@@ -45,147 +45,10 @@
         "futureWeeks": "4"
     },
     {
-        "id": "0b45580f21df7c6a",
-        "type": "rpi-gpio out",
-        "z": "56e1b27d8d230e3f",
-        "name": "Zone 1",
-        "pin": "12",
-        "set": true,
-        "level": "0",
-        "freq": "",
-        "out": "out",
-        "bcm": true,
-        "x": 680,
-        "y": 440,
-        "wires": [],
-        "info": "gpio/1"
-    },
-    {
-        "id": "d26113fdaba366bd",
-        "type": "routing",
-        "z": "56e1b27d8d230e3f",
-        "name": "GPIO router Kert",
-        "rules": [
-            {
-                "v": "gpio/1"
-            },
-            {
-                "v": "gpio/2"
-            },
-            {
-                "v": "gpio/*"
-            }
-        ],
-        "outputs": 3,
-        "x": 470,
-        "y": 480,
-        "wires": [
-            [
-                "0b45580f21df7c6a"
-            ],
-            [
-                "05e046d8a67ed56c"
-            ],
-            [
-                "0b45580f21df7c6a",
-                "05e046d8a67ed56c"
-            ]
-        ]
-    },
-    {
-        "id": "05e046d8a67ed56c",
-        "type": "rpi-gpio out",
-        "z": "56e1b27d8d230e3f",
-        "name": "Zone 2",
-        "pin": "16",
-        "set": true,
-        "level": "0",
-        "freq": "",
-        "out": "out",
-        "bcm": true,
-        "x": 680,
-        "y": 500,
-        "wires": [],
-        "info": "gpio/2"
-    },
-    {
-        "id": "6ed0c7fefce6a48c",
-        "type": "link in",
-        "z": "56e1b27d8d230e3f",
-        "name": "Kert link in",
-        "links": [
-            "fb55055af17a6f6c"
-        ],
-        "x": 305,
-        "y": 480,
-        "wires": [
-            [
-                "d26113fdaba366bd"
-            ]
-        ]
-    },
-    {
-        "id": "zxl7jen16tkmodwa",
-        "type": "rpi-gpio out",
-        "z": "5b1f4133f210d4ec",
-        "name": "Watering Demo",
-        "pin": "4",
-        "set": true,
-        "level": "0",
-        "freq": "",
-        "out": "out",
-        "bcm": true,
-        "x": 600,
-        "y": 180,
-        "wires": [],
-        "info": "gpio/4"
-    },
-    {
-        "id": "7420abdf45b8e8f9",
-        "type": "link in",
-        "z": "5b1f4133f210d4ec",
-        "name": "Test kert link in",
-        "links": [
-            "fb55055af17a6f6c"
-        ],
-        "x": 135,
-        "y": 180,
-        "wires": [
-            [
-                "d8670e89b0ec43a5"
-            ]
-        ]
-    },
-    {
-        "id": "d8670e89b0ec43a5",
-        "type": "routing",
-        "z": "5b1f4133f210d4ec",
-        "name": "GPIO router Test Kert",
-        "rules": [
-            {
-                "v": "gpio/4"
-            },
-            {
-                "v": "gpio/*"
-            }
-        ],
-        "outputs": 2,
-        "x": 320,
-        "y": 180,
-        "wires": [
-            [
-                "zxl7jen16tkmodwa"
-            ],
-            [
-                "zxl7jen16tkmodwa"
-            ]
-        ]
-    },
-    {
         "id": "8bc79f15c0a688db",
         "type": "http in",
         "z": "6654f6e517e71542",
-        "name": "",
+        "name": "PUT /io",
         "url": "/io",
         "method": "put",
         "upload": false,
@@ -263,7 +126,8 @@
         "y": 400,
         "wires": [
             [
-                "3288b51e87c0cf0e"
+                "3288b51e87c0cf0e",
+                "2be20fd9fe210b05"
             ]
         ]
     },
@@ -271,20 +135,19 @@
         "id": "3288b51e87c0cf0e",
         "type": "function",
         "z": "6654f6e517e71542",
-        "name": "set topic",
-        "func": "msg.topic = msg.payload.io;\nmsg.payload = msg.payload.state;\n\nreturn msg;",
+        "name": "Normalize message",
+        "func": "msg.topic = msg.payload.io;\nmsg.mode = msg.payload.mode;\n\n// set last\nmsg.payload = msg.payload.state;\n\n\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1220,
+        "x": 1250,
         "y": 400,
         "wires": [
             [
-                "fb55055af17a6f6c",
-                "e435fafcaebcdbb6",
-                "2ed07befb9e49e7c"
+                "644c959c85ef1928",
+                "1ec92144d1e66faf"
             ]
         ]
     },
@@ -295,8 +158,8 @@
         "name": "Publish state",
         "server": "c4bff4d6e8023886",
         "client": "",
-        "x": 2050,
-        "y": 480,
+        "x": 2070,
+        "y": 500,
         "wires": []
     },
     {
@@ -307,7 +170,8 @@
         "mode": "link",
         "links": [
             "6ed0c7fefce6a48c",
-            "7420abdf45b8e8f9"
+            "7420abdf45b8e8f9",
+            "6ce041aa81c333ee"
         ],
         "x": 1835,
         "y": 400,
@@ -525,7 +389,7 @@
         "type": "ical-sensor",
         "z": "6654f6e517e71542",
         "confignode": "4e04a4d03b8d4fb4",
-        "timeout": "1",
+        "timeout": "2",
         "timeoutUnits": "seconds",
         "cron": "",
         "name": "Calendar sensor",
@@ -554,46 +418,28 @@
         "filter2": "",
         "filter": "",
         "combineResponse": false,
-        "x": 1480,
-        "y": 1060,
+        "x": 1040,
+        "y": 500,
         "wires": [
             [
-                "5eef3ad2022205c8",
-                "bf923014cbe15266"
+                "5eef3ad2022205c8"
             ],
             []
         ]
-    },
-    {
-        "id": "e435fafcaebcdbb6",
-        "type": "debug",
-        "z": "6654f6e517e71542",
-        "name": "debug put io",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "payload",
-        "targetType": "msg",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 1510,
-        "y": 320,
-        "wires": []
     },
     {
         "id": "2ed07befb9e49e7c",
         "type": "function",
         "z": "6654f6e517e71542",
         "name": "Prepare ws",
-        "func": "msg.payload = {\n    state: msg.payload,\n    io: msg.topic\n};\nreturn msg;",
+        "func": "msg.payload = {\n    state: msg.payload,\n    io: msg.topic,\n    mode: msg.mode\n};\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
         "x": 1890,
-        "y": 480,
+        "y": 500,
         "wires": [
             [
                 "63308ea7f10df86b"
@@ -611,8 +457,43 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1670,
-        "y": 1060,
+        "x": 1230,
+        "y": 500,
+        "wires": [
+            [
+                "7043f089e62cf40c"
+            ]
+        ]
+    },
+    {
+        "id": "7043f089e62cf40c",
+        "type": "debug",
+        "z": "6654f6e517e71542",
+        "name": "debug 1",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1400,
+        "y": 580,
+        "wires": []
+    },
+    {
+        "id": "644c959c85ef1928",
+        "type": "function",
+        "z": "6654f6e517e71542",
+        "name": "Auto/manual switch",
+        "func": "const stateKey = ('manualstate_' + msg.topic).replaceAll(' ', '_');\n\nconst modes = {\n    auto: 'auto',\n    manual: 'manual'\n};\n\nif (msg.mode === modes.manual) {\n    flow.set(stateKey, msg.payload);\n}\nif (msg.mode === modes.auto) {\n    flow.set(stateKey, undefined);\n}\n\nconst manualState = flow.get(stateKey);\n\nif (manualState !== undefined) {\n    msg.payload = manualState;\n}\n\nnode.warn({\n    payload: msg.payload,\n    mode: msg.mode,\n    topic: msg.topic\n});\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1640,
+        "y": 400,
         "wires": [
             [
                 "fb55055af17a6f6c",
@@ -621,20 +502,173 @@
         ]
     },
     {
-        "id": "bf923014cbe15266",
+        "id": "2be20fd9fe210b05",
         "type": "debug",
         "z": "6654f6e517e71542",
-        "name": "debug 1we",
+        "name": "debug 2",
         "active": true,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
-        "complete": "payload",
-        "targetType": "msg",
+        "complete": "false",
         "statusVal": "",
         "statusType": "auto",
-        "x": 1750,
-        "y": 1140,
+        "x": 1240,
+        "y": 300,
         "wires": []
+    },
+    {
+        "id": "1ec92144d1e66faf",
+        "type": "debug",
+        "z": "6654f6e517e71542",
+        "name": "debug 3",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1440,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "0b45580f21df7c6a",
+        "type": "rpi-gpio out",
+        "z": "56e1b27d8d230e3f",
+        "name": "Zone 1",
+        "pin": "12",
+        "set": true,
+        "level": "0",
+        "freq": "",
+        "out": "out",
+        "bcm": true,
+        "x": 680,
+        "y": 440,
+        "wires": [],
+        "info": "gpio/1"
+    },
+    {
+        "id": "d26113fdaba366bd",
+        "type": "routing",
+        "z": "56e1b27d8d230e3f",
+        "name": "GPIO router Kert",
+        "rules": [
+            {
+                "v": "gpio/1"
+            },
+            {
+                "v": "gpio/2"
+            },
+            {
+                "v": "gpio/*"
+            }
+        ],
+        "outputs": 3,
+        "x": 470,
+        "y": 480,
+        "wires": [
+            [
+                "0b45580f21df7c6a"
+            ],
+            [
+                "05e046d8a67ed56c"
+            ],
+            [
+                "0b45580f21df7c6a",
+                "05e046d8a67ed56c"
+            ]
+        ]
+    },
+    {
+        "id": "05e046d8a67ed56c",
+        "type": "rpi-gpio out",
+        "z": "56e1b27d8d230e3f",
+        "name": "Zone 2",
+        "pin": "16",
+        "set": true,
+        "level": "0",
+        "freq": "",
+        "out": "out",
+        "bcm": true,
+        "x": 680,
+        "y": 500,
+        "wires": [],
+        "info": "gpio/2"
+    },
+    {
+        "id": "6ed0c7fefce6a48c",
+        "type": "link in",
+        "z": "56e1b27d8d230e3f",
+        "name": "Kert link in",
+        "links": [
+            "fb55055af17a6f6c"
+        ],
+        "x": 305,
+        "y": 480,
+        "wires": [
+            [
+                "d26113fdaba366bd"
+            ]
+        ]
+    },
+    {
+        "id": "zxl7jen16tkmodwa",
+        "type": "rpi-gpio out",
+        "z": "5b1f4133f210d4ec",
+        "name": "Watering Demo",
+        "pin": "4",
+        "set": true,
+        "level": "0",
+        "freq": "",
+        "out": "out",
+        "bcm": true,
+        "x": 600,
+        "y": 180,
+        "wires": [],
+        "info": "gpio/4"
+    },
+    {
+        "id": "7420abdf45b8e8f9",
+        "type": "link in",
+        "z": "5b1f4133f210d4ec",
+        "name": "Test kert link in",
+        "links": [
+            "fb55055af17a6f6c"
+        ],
+        "x": 135,
+        "y": 180,
+        "wires": [
+            [
+                "d8670e89b0ec43a5"
+            ]
+        ]
+    },
+    {
+        "id": "d8670e89b0ec43a5",
+        "type": "routing",
+        "z": "5b1f4133f210d4ec",
+        "name": "GPIO router Test Kert",
+        "rules": [
+            {
+                "v": "gpio/4"
+            },
+            {
+                "v": "gpio/*"
+            }
+        ],
+        "outputs": 2,
+        "x": 320,
+        "y": 180,
+        "wires": [
+            [
+                "zxl7jen16tkmodwa"
+            ],
+            [
+                "zxl7jen16tkmodwa"
+            ]
+        ]
     }
 ]

@@ -3,6 +3,20 @@ import useSWR from 'swr';
 import { axiosInstance, swrFetcher } from './axios';
 import ReconnectingWebSocket from 'reconnecting-websocket';
 
+export enum NodeControlMode {
+    // eslint-disable-next-line no-unused-vars
+    AUTO = 'auto',
+    // eslint-disable-next-line no-unused-vars
+    MANUAL = 'manual'
+}
+
+export enum NodeState {
+    // eslint-disable-next-line no-unused-vars
+    OFF = 0,
+    // eslint-disable-next-line no-unused-vars
+    ON = 1
+}
+
 export type GpioNode = {
     'id'?: string;
     'type': 'rpi-gpio out';
@@ -19,11 +33,13 @@ export type GpioNode = {
     'wires': string[][];
     'info': string;
     'state'?: boolean;
+    'mode': NodeControlMode;
 };
 
 type IoUpdate = {
     io: string;
     state: number;
+    mode: NodeControlMode
 };
 
 export type Tab = {
@@ -71,11 +87,26 @@ export function useGetGpioNodes(flowId: string | null) {
   return { flow: data, gpioNodes: filtered };
 }
 
-export async function updateGpioNode(ioName: string, state: boolean) {
+export async function updateGpioNode(node: GpioNode) {
+
+  let state = NodeState.OFF;
+  let mode = NodeControlMode.AUTO;
+
+  if (node.mode === NodeControlMode.AUTO || node.mode === undefined) {
+    mode = NodeControlMode.MANUAL;
+    state = NodeState.ON;
+  } else if (node.mode === NodeControlMode.MANUAL && node.state) {
+    mode = NodeControlMode.MANUAL;
+    state = NodeState.OFF;
+  } else if (node.mode === NodeControlMode.MANUAL && !node.state) {
+    mode = NodeControlMode.AUTO;
+    state = NodeState.OFF;
+  }
 
   await axiosInstance.put('/io', [{
-    io: ioName,
-    state: state ? 1 : 0
+    io: node.info,
+    mode,
+    state
   }]);
 }
 
@@ -143,7 +174,8 @@ export function useGpioNodeStates(flowId: string | null) {
           if (controlAll || node.info === ioUpdate.io) {
             return {
               ...node,
-              state: !!ioUpdate.state
+              state: !!ioUpdate.state,
+              mode: ioUpdate.mode
             };
           }
 
@@ -160,26 +192,5 @@ export function useGpioNodeStates(flowId: string | null) {
     gpioNodes,
     flow,
     updateGpioNode,
-  };
-}
-
-export function useGpioManager(flow: Flow | null) {
-
-  async function createGpioNode(newNode: GpioNode) {
-    if (!flow) return;
-
-    const resp = await axiosInstance.put(`/flow/${flow.id}`, {
-      ...flow,
-      nodes: [
-        ...flow.nodes,
-        newNode
-      ]
-    });
-
-    return resp;
-  }
-
-  return {
-    createGpioNode
   };
 }

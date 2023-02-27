@@ -508,5 +508,41 @@
                 "file": "/Users/zsolt.lengyel/projects/play/gardenx/nodered/.node-red/node_modules/node-red-contrib-ical-events/dist/ical-upcoming.js"
             }
         }
+    },
+    "node-red-contrib-filter": {
+        "name": "node-red-contrib-filter",
+        "version": "0.1.4",
+        "local": true,
+        "user": true,
+        "nodes": {
+            "filter": {
+                "name": "filter",
+                "types": [
+                    "filter"
+                ],
+                "enabled": true,
+                "local": true,
+                "user": false,
+                "module": "node-red-contrib-filter",
+                "file": "/Users/zsolt.lengyel/projects/play/gardenx/nodered/.node-red/node_modules/node-red-contrib-filter/18-filter.js"
+            }
+        }
+    },
+    "node-red-contrib-persistent-global-context": {
+        "name": "node-red-contrib-persistent-global-context",
+        "version": "1.0.1",
+        "local": true,
+        "user": true,
+        "nodes": {
+            "persistent-global-context": {
+                "name": "persistent-global-context",
+                "types": [],
+                "enabled": true,
+                "local": true,
+                "user": false,
+                "module": "node-red-contrib-persistent-global-context",
+                "file": "/Users/zsolt.lengyel/projects/play/gardenx/nodered/.node-red/node_modules/node-red-contrib-persistent-global-context/.\\src\\persistent-global-context.js"
+            }
+        }
     }
 }

@@ -1,4 +1,4 @@
-import { Tab, useGpioNodeStates } from '../api/nodered';
+import { GpioNode, NodeControlMode, Tab, useGpioNodeStates } from '../api/nodered';
 import { Button, Flex, Heading, IconEmptyLine, IconEmptySolid, Tabs, Text, View } from '@instructure/ui';
 import { useEffect } from 'react';
 import { atomWithStorage, useUpdateAtom } from 'jotai/utils';
@@ -46,8 +46,8 @@ export default function GpioNodeList({ tabs }: Props) {
   //   reset();
   // }
 
-  function handleUpdateState(info: string, state: boolean) {
-    updateGpioNode(info, state);
+  function handleUpdateState(node: GpioNode) {
+    updateGpioNode(node);
   }
 
   function handleTabChange(event: any, { index }: { index: number }) {
@@ -81,7 +81,19 @@ export default function GpioNodeList({ tabs }: Props) {
                                 background={node.state ? 'success' : undefined}
 
                             >
+                                <Flex direction="row">
+                                    <Flex.Item shouldGrow>
                                 <Heading level="h3">{node.name}</Heading>
+                                    </Flex.Item>
+                                    <Flex.Item>
+                                <Button
+                                    color={node.mode === NodeControlMode.MANUAL ? 'danger' : 'primary-inverse'}
+                                    disabled
+                                >
+                                    {node.mode === NodeControlMode.MANUAL ? 'M' : 'A'}
+                                </Button>
+                                    </Flex.Item>
+                                </Flex>
 
                                 <Flex
                                     margin="small 0 0 0"
@@ -105,7 +117,7 @@ export default function GpioNodeList({ tabs }: Props) {
                                     >
                                         <Button
                                             color="primary-inverse"
-                                            onClick={() => handleUpdateState(node.info, !node.state)}
+                                            onClick={() => handleUpdateState(node)}
                                         >
                                             {node.state ? <IconEmptySolid color="success"/> : <IconEmptyLine/>}
                                         </Button>
