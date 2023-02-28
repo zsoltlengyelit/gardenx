@@ -39,7 +39,8 @@ export type GpioNode = {
 type IoUpdate = {
     io: string;
     state: number;
-    mode: NodeControlMode
+    mode: NodeControlMode,
+    manualModes?: Record<string, NodeState>;
 };
 
 export type Tab = {
@@ -147,6 +148,7 @@ export function useTabGpioNodeMap() {
 }
 
 const ws = new ReconnectingWebSocket('ws://localhost:1880/ws/io');
+const wildCardGpioName = 'gpio/*';
 
 export function useGpioNodeStates(flowId: string | null) {
 
@@ -167,15 +169,24 @@ export function useGpioNodeStates(flowId: string | null) {
 
     ws.addEventListener('message', (event) => {
       const ioUpdate = JSON.parse(event.data) as IoUpdate;
-      const controlAll = ioUpdate.io === 'gpio/*';
+      const controlAll = ioUpdate.io === wildCardGpioName;
 
       setGpioNodes(prev => {
         return [...prev.map(node => {
-          if (controlAll || node.info === ioUpdate.io) {
+          const nodeGpioId = node.info;
+          if (controlAll || nodeGpioId === ioUpdate.io) {
+
+            let newState = !!ioUpdate.state;
+            let newMode = ioUpdate.mode ?? NodeControlMode.AUTO;
+            if (ioUpdate.manualModes && ioUpdate.manualModes[nodeGpioId] !== undefined) {
+              newState = !!ioUpdate.manualModes[nodeGpioId];
+              newMode = NodeControlMode.MANUAL;
+            }
+
             return {
               ...node,
-              state: !!ioUpdate.state,
-              mode: ioUpdate.mode
+              state: newState,
+              mode: newMode
             };
           }
 

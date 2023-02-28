@@ -389,7 +389,7 @@
         "type": "ical-sensor",
         "z": "6654f6e517e71542",
         "confignode": "4e04a4d03b8d4fb4",
-        "timeout": "2",
+        "timeout": "3",
         "timeoutUnits": "seconds",
         "cron": "",
         "name": "Calendar sensor",
@@ -432,7 +432,7 @@
         "type": "function",
         "z": "6654f6e517e71542",
         "name": "Prepare ws",
-        "func": "msg.payload = {\n    state: msg.payload,\n    io: msg.topic,\n    mode: msg.mode\n};\nreturn msg;",
+        "func": "msg.payload = {\n    state: msg.payload,\n    io: msg.topic,\n    mode: msg.mode,\n    manualModes: msg.manualModes\n};\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -461,7 +461,8 @@
         "y": 500,
         "wires": [
             [
-                "7043f089e62cf40c"
+                "7043f089e62cf40c",
+                "644c959c85ef1928"
             ]
         ]
     },
@@ -486,7 +487,7 @@
         "type": "function",
         "z": "6654f6e517e71542",
         "name": "Auto/manual switch",
-        "func": "const stateKey = ('manualstate_' + msg.topic).replaceAll(' ', '_');\n\nconst modes = {\n    auto: 'auto',\n    manual: 'manual'\n};\n\nif (msg.mode === modes.manual) {\n    flow.set(stateKey, msg.payload);\n}\nif (msg.mode === modes.auto) {\n    flow.set(stateKey, undefined);\n}\n\nconst manualState = flow.get(stateKey);\n\nif (manualState !== undefined) {\n    msg.payload = manualState;\n}\n\nnode.warn({\n    payload: msg.payload,\n    mode: msg.mode,\n    topic: msg.topic\n});\n\nreturn msg;",
+        "func": "\nconst statePrefix = 'manualstate_';\n\n// handle gpio/*\nif (msg.topic === 'gpio/*') {\n\n    const manuals = flow.keys().filter(key => key.startsWith(statePrefix));\n\n    msg.manualModes = manuals.reduce((acc, key) => {\n\n        acc[key.substring(statePrefix.length)] = flow.get(key);\n        return acc;\n    }, {});\n\n    return msg;\n}\n\n\nconst stateKey = (statePrefix + msg.topic).replaceAll(' ', '_');\n\nconst modes = {\n    auto: 'auto',\n    manual: 'manual'\n};\n\nif (msg.mode === modes.manual) {\n    flow.set(stateKey, msg.payload);\n}\nif (msg.mode === modes.auto) {\n    flow.set(stateKey, undefined);\n}\n\nconst manualState = flow.get(stateKey);\n\nif (manualState !== undefined) {\n    msg.payload = manualState;\n}\n\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -522,7 +523,7 @@
         "type": "debug",
         "z": "6654f6e517e71542",
         "name": "debug 3",
-        "active": true,
+        "active": false,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
