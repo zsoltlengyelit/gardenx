@@ -75,16 +75,57 @@ export function useGetTabs() {
   return filtered;
 }
 
+const ws = new ReconnectingWebSocket('ws://localhost:1880/ws/io');
+const wildCardGpioName = 'gpio/*';
+
 export function useGetGpioNodes(flowId: string | null) {
   const { data, error, isLoading } = useGetFlow(flowId);
   const [filtered, setFiltered] = useState<GpioNode[]>([]);
+  const [isConnected, setIsConnected] = useState(ws.readyState === 1);
 
   useEffect(() => {
     if (isLoading || error || !data) return;
     setFiltered(data.nodes.filter(node => node.type === 'rpi-gpio out'));
   }, [data]);
 
-  return { flow: data, gpioNodes: filtered };
+  useEffect(() => {
+
+    ws.addEventListener('open', () => {
+      setIsConnected(true);
+    });
+
+    ws.addEventListener('message', (event) => {
+      const ioUpdate = JSON.parse(event.data) as IoUpdate;
+      const controlAll = ioUpdate.io === wildCardGpioName;
+
+      if (controlAll) {
+        throw new Error('Deprecated gpio/* is used');
+      }
+
+      setFiltered(prev => {
+        return [...prev.map(node => {
+          const nodeGpioId = node.info;
+          if (nodeGpioId === ioUpdate.io) {
+
+            const newState = !!ioUpdate.state;
+            const newMode = ioUpdate.mode ?? NodeControlMode.AUTO;
+
+            return {
+              ...node,
+              state: newState,
+              mode: newMode
+            };
+          }
+
+          return node;
+        })];
+      });
+
+    });
+
+  }, []);
+
+  return { flow: data, gpioNodes: filtered, isConnected };
 }
 
 export async function updateGpioNode(node: GpioNode) {
@@ -146,52 +187,15 @@ export function useTabGpioNodeMap() {
   return map;
 }
 
-const ws = new ReconnectingWebSocket('ws://localhost:1880/ws/io');
-const wildCardGpioName = 'gpio/*';
-
 export function useGpioNodeStates(flowId: string | null) {
 
-  const [isConnected, setIsConnected] = useState(ws.readyState === 1);
   const [gpioNodes, setGpioNodes] = useState<GpioNode[]>([]);
 
-  const { gpioNodes: serverGpioNodes, flow } = useGetGpioNodes(flowId);
+  const { gpioNodes: serverGpioNodes, flow, isConnected } = useGetGpioNodes(flowId);
 
   useEffect(() => {
     setGpioNodes(serverGpioNodes);
   }, [serverGpioNodes]);
-
-  useEffect(() => {
-
-    ws.addEventListener('open', () => {
-      setIsConnected(true);
-    });
-
-    ws.addEventListener('message', (event) => {
-      const ioUpdate = JSON.parse(event.data) as IoUpdate;
-      const controlAll = ioUpdate.io === wildCardGpioName;
-
-      setGpioNodes(prev => {
-        return [...prev.map(node => {
-          const nodeGpioId = node.info;
-          if (controlAll || nodeGpioId === ioUpdate.io) {
-
-            const newState = !!ioUpdate.state;
-            const newMode = ioUpdate.mode ?? NodeControlMode.AUTO;
-
-            return {
-              ...node,
-              state: newState,
-              mode: newMode
-            };
-          }
-
-          return node;
-        })];
-      });
-
-    });
-
-  }, []);
 
   return {
     isConnected,

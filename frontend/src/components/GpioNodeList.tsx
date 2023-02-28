@@ -1,9 +1,10 @@
-import { NodeControlMode, Tab, useGpioNodeStates } from '../api/nodered';
-import { Heading, IconWarningSolid, Tabs, View } from '@instructure/ui';
+import { Tab, useGpioNodeStates } from '../api/nodered';
+import { Tabs, View } from '@instructure/ui';
 import { useEffect } from 'react';
 import { atomWithStorage, useUpdateAtom } from 'jotai/utils';
 import { useAtomValue } from 'jotai';
 import GpioCard from './GpioCard';
+import FlowTabTitle from './FlowTabTitle';
 
 type Props = {
     tabs: Tab[];
@@ -28,17 +29,6 @@ export default function GpioNodeList({ tabs }: Props) {
     setSelectedTab(tabs[index]);
   }
 
-  function renderTabTitle(tab: Tab) {
-    const hasManual = gpioNodes.some(node => node.mode === NodeControlMode.MANUAL);
-    return (
-            <Heading level="h4">
-                {tab.label}
-                {' '}
-                {hasManual && <IconWarningSolid title={'Manual mode on'}/>}
-            </Heading>
-    );
-  }
-
   return (
         <View
             as="div"
@@ -52,7 +42,7 @@ export default function GpioNodeList({ tabs }: Props) {
                     <Tabs.Panel
                         key={tab.id}
                         id={tab.id}
-                        renderTitle={() => renderTabTitle(tab)}
+                        renderTitle={() => <FlowTabTitle tab={tab} />}
                         isSelected={tab.id === selectedTab?.id}
                     >
                         {gpioNodes.map(node => (
