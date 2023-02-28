@@ -1,0 +1,8 @@
+{
+    "node-red": {
+        "spec": "node-red",
+        "module": "node-red",
+        "builtin": false,
+        "known": false
+    }
+}

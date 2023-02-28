@@ -1,0 +1,14 @@
+{
+    "node-red": {
+        "spec": "node-red",
+        "module": "node-red",
+        "builtin": false,
+        "known": false
+    },
+    "axios": {
+        "spec": "axios",
+        "module": "axios",
+        "builtin": false,
+        "known": false
+    }
+}

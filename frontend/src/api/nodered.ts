@@ -39,8 +39,7 @@ export type GpioNode = {
 type IoUpdate = {
     io: string;
     state: number;
-    mode: NodeControlMode,
-    manualModes?: Record<string, NodeState>;
+    mode: NodeControlMode;
 };
 
 export type Tab = {
@@ -176,12 +175,8 @@ export function useGpioNodeStates(flowId: string | null) {
           const nodeGpioId = node.info;
           if (controlAll || nodeGpioId === ioUpdate.io) {
 
-            let newState = !!ioUpdate.state;
-            let newMode = ioUpdate.mode ?? NodeControlMode.AUTO;
-            if (ioUpdate.manualModes && ioUpdate.manualModes[nodeGpioId] !== undefined) {
-              newState = !!ioUpdate.manualModes[nodeGpioId];
-              newMode = NodeControlMode.MANUAL;
-            }
+            const newState = !!ioUpdate.state;
+            const newMode = ioUpdate.mode ?? NodeControlMode.AUTO;
 
             return {
               ...node,

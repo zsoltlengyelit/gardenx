@@ -24,6 +24,32 @@
         "env": []
     },
     {
+        "id": "0acc06ab9565b279",
+        "type": "group",
+        "z": "6654f6e517e71542",
+        "name": "Schedule management",
+        "style": {
+            "label": true
+        },
+        "nodes": [
+            "fb8ad7aea57b6bed",
+            "b60699c0b0671883",
+            "d69e99cb3b05e6b9",
+            "3c19de09d6abd82b",
+            "c86891a9cd694b46",
+            "b293c827d775ebfe",
+            "150cc4f5a92e2036",
+            "e4d0b3b50d6a3c74",
+            "ef3684694d00fd12",
+            "351bfdb306226ff8",
+            "db52e3808a0e4d48"
+        ],
+        "x": 454,
+        "y": 751.5,
+        "w": 1212,
+        "h": 269.5
+    },
+    {
         "id": "c4bff4d6e8023886",
         "type": "websocket-listener",
         "path": "/ws/io",
@@ -146,8 +172,7 @@
         "y": 400,
         "wires": [
             [
-                "644c959c85ef1928",
-                "1ec92144d1e66faf"
+                "644c959c85ef1928"
             ]
         ]
     },
@@ -158,7 +183,7 @@
         "name": "Publish state",
         "server": "c4bff4d6e8023886",
         "client": "",
-        "x": 2070,
+        "x": 1930,
         "y": 500,
         "wires": []
     },
@@ -173,7 +198,7 @@
             "7420abdf45b8e8f9",
             "6ce041aa81c333ee"
         ],
-        "x": 1835,
+        "x": 1695,
         "y": 400,
         "wires": []
     },
@@ -181,13 +206,14 @@
         "id": "fb8ad7aea57b6bed",
         "type": "http in",
         "z": "6654f6e517e71542",
+        "g": "0acc06ab9565b279",
         "name": "POST /schedule-ical",
         "url": "/schedule-ical",
         "method": "post",
         "upload": false,
         "swaggerDoc": "",
-        "x": 530,
-        "y": 780,
+        "x": 570,
+        "y": 920,
         "wires": [
             [
                 "b60699c0b0671883",
@@ -199,17 +225,19 @@
         "id": "b60699c0b0671883",
         "type": "http response",
         "z": "6654f6e517e71542",
+        "g": "0acc06ab9565b279",
         "name": "",
         "statusCode": "200",
         "headers": {},
-        "x": 780,
-        "y": 780,
+        "x": 820,
+        "y": 920,
         "wires": []
     },
     {
         "id": "d69e99cb3b05e6b9",
         "type": "file",
         "z": "6654f6e517e71542",
+        "g": "0acc06ab9565b279",
         "name": "Write iCal",
         "filename": "./schedule.ical/gpio.ical",
         "filenameType": "str",
@@ -217,8 +245,8 @@
         "createDir": true,
         "overwriteFile": "true",
         "encoding": "none",
-        "x": 1520,
-        "y": 840,
+        "x": 1560,
+        "y": 980,
         "wires": [
             []
         ]
@@ -227,6 +255,7 @@
         "id": "3c19de09d6abd82b",
         "type": "function",
         "z": "6654f6e517e71542",
+        "g": "0acc06ab9565b279",
         "name": "Get ical property",
         "func": "msg.payload = msg.payload.ical;\nreturn msg;",
         "outputs": 1,
@@ -234,8 +263,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 810,
-        "y": 840,
+        "x": 850,
+        "y": 980,
         "wires": [
             [
                 "d69e99cb3b05e6b9"
@@ -246,13 +275,14 @@
         "id": "c86891a9cd694b46",
         "type": "http in",
         "z": "6654f6e517e71542",
+        "g": "0acc06ab9565b279",
         "name": "GET /schedule-ical",
         "url": "/schedule-ical",
         "method": "get",
         "upload": false,
         "swaggerDoc": "",
-        "x": 530,
-        "y": 660,
+        "x": 570,
+        "y": 800,
         "wires": [
             [
                 "e4d0b3b50d6a3c74"
@@ -263,19 +293,21 @@
         "id": "b293c827d775ebfe",
         "type": "http response",
         "z": "6654f6e517e71542",
+        "g": "0acc06ab9565b279",
         "name": "passffile",
         "statusCode": "200",
         "headers": {
             "Content-Type": "text/calendar"
         },
-        "x": 1520,
-        "y": 660,
+        "x": 1560,
+        "y": 800,
         "wires": []
     },
     {
         "id": "150cc4f5a92e2036",
         "type": "file in",
         "z": "6654f6e517e71542",
+        "g": "0acc06ab9565b279",
         "name": "read ./schedule.ical/gpio.ical",
         "filename": "./schedule.ical/gpio.ical",
         "filenameType": "str",
@@ -284,8 +316,8 @@
         "sendError": false,
         "encoding": "none",
         "allProps": false,
-        "x": 1300,
-        "y": 660,
+        "x": 1340,
+        "y": 800,
         "wires": [
             [
                 "b293c827d775ebfe"
@@ -296,6 +328,7 @@
         "id": "e4d0b3b50d6a3c74",
         "type": "exec",
         "z": "6654f6e517e71542",
+        "g": "0acc06ab9565b279",
         "command": "test -f ./schedule.ical/gpio.ical",
         "addpay": "",
         "append": "",
@@ -304,8 +337,8 @@
         "winHide": false,
         "oldrc": false,
         "name": "test -f ./schedule.ical/gpio.ical",
-        "x": 790,
-        "y": 660,
+        "x": 830,
+        "y": 800,
         "wires": [
             [],
             [],
@@ -318,6 +351,7 @@
         "id": "ef3684694d00fd12",
         "type": "function",
         "z": "6654f6e517e71542",
+        "g": "0acc06ab9565b279",
         "name": "empty content",
         "func": "msg.payload = '';\nreturn msg;",
         "outputs": 1,
@@ -325,8 +359,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1260,
-        "y": 760,
+        "x": 1300,
+        "y": 900,
         "wires": [
             [
                 "d69e99cb3b05e6b9",
@@ -338,6 +372,7 @@
         "id": "351bfdb306226ff8",
         "type": "filter",
         "z": "6654f6e517e71542",
+        "g": "0acc06ab9565b279",
         "name": "router code",
         "property": "payload.code",
         "propertyType": "msg",
@@ -360,8 +395,8 @@
         ],
         "checkall": "false",
         "outputs": 2,
-        "x": 1030,
-        "y": 660,
+        "x": 1070,
+        "y": 800,
         "wires": [
             [
                 "150cc4f5a92e2036"
@@ -375,13 +410,14 @@
         "id": "db52e3808a0e4d48",
         "type": "http response",
         "z": "6654f6e517e71542",
+        "g": "0acc06ab9565b279",
         "name": "passffile 201",
         "statusCode": "201",
         "headers": {
             "Content-Type": "text/calendar"
         },
-        "x": 1530,
-        "y": 760,
+        "x": 1570,
+        "y": 900,
         "wires": []
     },
     {
@@ -432,17 +468,18 @@
         "type": "function",
         "z": "6654f6e517e71542",
         "name": "Prepare ws",
-        "func": "msg.payload = {\n    state: msg.payload,\n    io: msg.topic,\n    mode: msg.mode,\n    manualModes: msg.manualModes\n};\nreturn msg;",
+        "func": "msg.payload = {\n    state: msg.payload,\n    io: msg.topic,\n    mode: msg.mode\n};\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1890,
+        "x": 1750,
         "y": 500,
         "wires": [
             [
-                "63308ea7f10df86b"
+                "63308ea7f10df86b",
+                "1ec92144d1e66faf"
             ]
         ]
     },
@@ -479,7 +516,7 @@
         "statusVal": "",
         "statusType": "auto",
         "x": 1400,
-        "y": 580,
+        "y": 500,
         "wires": []
     },
     {
@@ -487,13 +524,18 @@
         "type": "function",
         "z": "6654f6e517e71542",
         "name": "Auto/manual switch",
-        "func": "\nconst statePrefix = 'manualstate_';\n\n// handle gpio/*\nif (msg.topic === 'gpio/*') {\n\n    const manuals = flow.keys().filter(key => key.startsWith(statePrefix));\n\n    msg.manualModes = manuals.reduce((acc, key) => {\n\n        acc[key.substring(statePrefix.length)] = flow.get(key);\n        return acc;\n    }, {});\n\n    return msg;\n}\n\n\nconst stateKey = (statePrefix + msg.topic).replaceAll(' ', '_');\n\nconst modes = {\n    auto: 'auto',\n    manual: 'manual'\n};\n\nif (msg.mode === modes.manual) {\n    flow.set(stateKey, msg.payload);\n}\nif (msg.mode === modes.auto) {\n    flow.set(stateKey, undefined);\n}\n\nconst manualState = flow.get(stateKey);\n\nif (manualState !== undefined) {\n    msg.payload = manualState;\n}\n\nreturn msg;",
+        "func": "const statePrefix = 'manualstate_';\n\nconst modes = {\n    auto: 'auto',\n    manual: 'manual'\n};\n\n// handle gpio/*\nif (msg.topic === 'gpio/*') {\n\n    const manuals = flow.keys().filter(key => key.startsWith(statePrefix));\n\n    const manualModes = manuals.reduce((acc, key) => {\n        acc[key.substring(statePrefix.length)] = flow.get(key);\n        return acc;\n    }, {});\n\n    axios.get('http://localhost:1880/flows')\n        .then(function (response) {\n            const gpioNodes = response.data.filter(n => n.type === 'rpi-gpio out');\n\n            gpioNodes.map(node => {\n                return {\n                    topic: node.info,\n                    payload: manualModes[node.info] === undefined ? msg.payload : manualModes[node.info],\n                    mode: manualModes[node.info] === undefined ? modes.auto : modes.manual\n                }\n            }).forEach(message => node.send(message));\n\n            node.done();\n        });\n\n    return;\n}\n\n\nconst stateKey = (statePrefix + msg.topic).replaceAll(' ', '_');\n\n\nif (msg.mode === modes.manual) {\n    flow.set(stateKey, msg.payload);\n}\nif (msg.mode === modes.auto) {\n    flow.set(stateKey, undefined);\n}\n\nconst manualState = flow.get(stateKey);\n\nif (manualState !== undefined) {\n    msg.payload = manualState;\n}\n\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
-        "libs": [],
-        "x": 1640,
+        "libs": [
+            {
+                "var": "axios",
+                "module": "axios"
+            }
+        ],
+        "x": 1520,
         "y": 400,
         "wires": [
             [
@@ -523,7 +565,7 @@
         "type": "debug",
         "z": "6654f6e517e71542",
         "name": "debug 3",
-        "active": false,
+        "active": true,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
@@ -531,8 +573,8 @@
         "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
-        "x": 1440,
-        "y": 300,
+        "x": 1840,
+        "y": 420,
         "wires": []
     },
     {
@@ -562,12 +604,9 @@
             },
             {
                 "v": "gpio/2"
-            },
-            {
-                "v": "gpio/*"
             }
         ],
-        "outputs": 3,
+        "outputs": 2,
         "x": 470,
         "y": 480,
         "wires": [
@@ -575,10 +614,6 @@
                 "0b45580f21df7c6a"
             ],
             [
-                "05e046d8a67ed56c"
-            ],
-            [
-                "0b45580f21df7c6a",
                 "05e046d8a67ed56c"
             ]
         ]
@@ -655,18 +690,12 @@
         "rules": [
             {
                 "v": "gpio/4"
-            },
-            {
-                "v": "gpio/*"
             }
         ],
-        "outputs": 2,
+        "outputs": 1,
         "x": 320,
         "y": 180,
         "wires": [
-            [
-                "zxl7jen16tkmodwa"
-            ],
             [
                 "zxl7jen16tkmodwa"
             ]
