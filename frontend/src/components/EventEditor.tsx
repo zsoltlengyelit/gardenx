@@ -1,4 +1,13 @@
-import { Button, Flex, FormField, Heading, IconCalendarClockLine, Modal, SimpleSelect } from '@instructure/ui';
+import {
+  Button,
+  Flex,
+  FormField,
+  FormFieldGroup,
+  Heading,
+  IconCalendarClockLine,
+  Modal,
+  SimpleSelect
+} from '@instructure/ui';
 import { SlotInfo } from 'react-big-calendar';
 import { Controller, useForm } from 'react-hook-form';
 
@@ -78,118 +87,125 @@ export default function EventEditor({ draft, onClose, onSave, onDelete, onUpdate
                 open={true}
                 size="medium"
             >
-                <Modal.Header><Heading level="h3">Schedule</Heading></Modal.Header>
-                <Modal.Body>
+                <Modal.Header>
+                    <Heading level="h3">Schedule</Heading>
+                </Modal.Header>
 
-                    <Controller
-                        name="flowId"
-                        control={control}
-                        render={({ field: { onChange, value }, fieldState: { error } }) => {
-                          return (
+                <Modal.Body>
+                    <FormFieldGroup
+                        description={''}
+                        rowSpacing="small"
+                    >
+                        <Controller
+                            name="flowId"
+                            control={control}
+                            render={({ field: { onChange, value } }) => {
+                              return (
+                                    <SimpleSelect
+                                        renderLabel={'Flow'}
+                                        value={value ?? ''}
+                                        onChange={(e, data) => {
+                                          onChange(data.value);
+                                        }}
+                                    >
+                                        {tabMap.map(tab => (
+                                            <SimpleSelect.Option
+                                                key={tab.tab.id}
+                                                id={tab.tab.id}
+                                                value={tab.tab.id}
+                                            >
+                                                {tab.tab.label}
+                                            </SimpleSelect.Option>
+                                        ))}
+                                    </SimpleSelect>
+                              );
+                            }}
+                        />
+
+                        <Controller
+                            name="nodeId"
+                            control={control}
+                            render={({ field: { onChange, value } }) => (
                                 <SimpleSelect
-                                    renderLabel={'Flow'}
-                                    value={value ?? ''}
-                                    onChange={(e, data) => {
-                                      onChange(data.value);
-                                    }}
+                                    renderLabel={'Node'}
+                                    defaultValue={value}
+                                    onChange={(e, data) => onChange(data.value)}
                                 >
-                                    {tabMap.map(tab => (
+                                    {gpioNodes.gpioNodes.map(node => (
                                         <SimpleSelect.Option
-                                            key={tab.tab.id}
-                                            id={tab.tab.id}
-                                            value={tab.tab.id}
+                                            key={node.id as string}
+                                            id={node.id as string}
+                                            value={node.info as string}
                                         >
-                                            {tab.tab.label}
+                                            {node.name}
                                         </SimpleSelect.Option>
                                     ))}
                                 </SimpleSelect>
-                          );
-                        }}
-                    />
-
-                    <Controller
-                        name="nodeId"
-                        control={control}
-                        render={({ field: { onChange, value }, fieldState: { error } }) => (
-                            <SimpleSelect
-                                renderLabel={'Node'}
-                                defaultValue={value}
-                                onChange={(e, data) => onChange(data.value)}
-                            >
-                                {gpioNodes.gpioNodes.map(node => (
-                                    <SimpleSelect.Option
-                                        key={node.id as string}
-                                        id={node.id as string}
-                                        value={node.info as string}
-                                    >
-                                        {node.name}
-                                    </SimpleSelect.Option>
-                                ))}
-                            </SimpleSelect>
-                        )}
-                    />
-
-                    <FormField
-                        label={'start'}
-                        id={'start'}
-                    >
-                        <Controller
-                            name="start"
-                            control={control}
-                            render={({ field: { onChange, value } }) => (
-                                <DateTimePicker
-                                    value={value}
-                                    calendarIcon={<IconCalendarClockLine/>}
-                                    onChange={(newValue) => {
-                                      onChange(newValue);
-                                    }}
-                                />
                             )}
                         />
-                    </FormField>
 
-                    <FormField
-                        label={'end'}
-                        id={'end'}
-                    >
-                        <Controller
-                            name="end"
-                            control={control}
-                            render={({ field: { onChange, value } }) => (
-                                <DateTimePicker
-                                    calendarIcon={<IconCalendarClockLine/>}
-                                    value={value}
-                                    onChange={(newValue) => {
-                                      onChange(newValue);
-                                    }}
-                                />
-                            )}
-                        />
-                    </FormField>
+                        <FormField
+                            label={'Start'}
+                            id={'start'}
+                        >
+                            <Controller
+                                name="start"
+                                control={control}
+                                render={({ field: { onChange, value } }) => (
+                                    <DateTimePicker
+                                        value={value}
+                                        calendarIcon={<IconCalendarClockLine/>}
+                                        onChange={(newValue) => {
+                                          onChange(newValue);
+                                        }}
+                                    />
+                                )}
+                            />
+                        </FormField>
 
-                    <FormField
-                        label={'rrule'}
-                        id={'rrule'}
-                    >
-                        <Controller
-                            name="rrule"
-                            control={control}
-                            render={({ field: { onChange, value } }) => (
-                                <RRuleGenerator
-                                    value={value}
-                                    onChange={(rrule: string) => onChange(rrule)}
-                                    config={{
-                                      repeat: ['Weekly', 'Monthly', 'Daily'],
-                                      yearly: 'on the',
-                                      monthly: 'on',
-                                      end: ['Never', 'On date'],
-                                      weekStartsOnSunday: false,
-                                      hideError: true,
-                                    }}
-                                />
-                            )}
-                        />
-                    </FormField>
+                        <FormField
+                            label={'End'}
+                            id={'end'}
+                        >
+                            <Controller
+                                name="end"
+                                control={control}
+                                render={({ field: { onChange, value } }) => (
+                                    <DateTimePicker
+                                        calendarIcon={<IconCalendarClockLine/>}
+                                        value={value}
+                                        onChange={(newValue) => {
+                                          onChange(newValue);
+                                        }}
+                                    />
+                                )}
+                            />
+                        </FormField>
+
+                        <FormField
+                            label={''}
+                            id={'rrule'}
+                        >
+                            <Controller
+                                name="rrule"
+                                control={control}
+                                render={({ field: { onChange, value } }) => (
+                                    <RRuleGenerator
+                                        value={value}
+                                        onChange={(rrule: string) => onChange(rrule)}
+                                        config={{
+                                          repeat: ['Weekly', 'Monthly', 'Daily'],
+                                          yearly: 'on the',
+                                          monthly: 'on',
+                                          end: ['Never', 'On date'],
+                                          weekStartsOnSunday: false,
+                                          hideError: true,
+                                        }}
+                                    />
+                                )}
+                            />
+                        </FormField>
+                    </FormFieldGroup>
                 </Modal.Body>
 
                 <Modal.Footer>

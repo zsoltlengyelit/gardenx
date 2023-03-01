@@ -10,7 +10,7 @@ import hu from 'date-fns/locale/hu';
 import 'react-big-calendar/lib/addons/dragAndDrop/styles.css';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 
-import { Text, View } from '@instructure/ui';
+import { View } from '@instructure/ui';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import * as ics from 'ics';
 import EventEditor, { Draft } from './EventEditor';
@@ -124,9 +124,11 @@ export default function Schedule() {
         start: convertTimestampToArray(draft.start.valueOf(), 'local'),
         end: convertTimestampToArray(draft.end.valueOf(), 'local'),
         categories: [draft.flowId, draft.nodeId],
-        recurrenceRule: normalizeRrule(rrulestr(draft.rrule, {
-          dtstart: draft.start
-        }), draft.start)
+        recurrenceRule: draft.rrule
+          ? normalizeRrule(rrulestr(draft.rrule, {
+            dtstart: draft.start
+          }), draft.start)
+          : undefined
       }
     ]);
 
