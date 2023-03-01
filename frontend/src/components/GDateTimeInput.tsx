@@ -1,13 +1,15 @@
 import { DateTimeInput } from '@instructure/ui';
+import type { FormMessage } from '@instructure/ui-form-field';
 
 type Props = {
     value: Date;
     onChange: (value: Date | null) => void;
     label: string;
+    messages?: FormMessage[];
 };
 
 export default function GDateTimeInput({
-  value, onChange, label
+  value, onChange, label, messages
 }: Props) {
 
   return (
@@ -21,7 +23,7 @@ export default function GDateTimeInput({
                 nextMonthLabel="Next month"
                 timeRenderLabel=""
                 dateRenderLabel=""
-                dateFormat="yyyy MMMM D"
+                dateFormat="yyyy MMMM D, dddd"
                 timeFormat="HH:mm"
                 isRequired={true}
                 timeStep={10}
@@ -29,6 +31,7 @@ export default function GDateTimeInput({
                   onChange(value ? new Date(value) : null);
                 }
                 }
+                messages={messages}
             />
         </>
   );

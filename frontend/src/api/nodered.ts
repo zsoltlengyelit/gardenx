@@ -163,7 +163,7 @@ type TabWithNodes = {
     nodes: GpioNode[]
 };
 
-export function useTabGpioNodeMap() {
+export function useTabGpioNodeMap(): TabWithNodes[] {
   const tabs = useGetTabs();
 
   const [map, setMap] = useState<TabWithNodes[]>([]);

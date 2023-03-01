@@ -22,7 +22,6 @@ export default function GpioCard({ node, flowId }: Props) {
             margin="small"
             padding="small"
             background={node.state ? 'success' : undefined}
-
         >
             <Flex direction="row">
                 <Flex.Item shouldGrow>
@@ -40,7 +39,7 @@ export default function GpioCard({ node, flowId }: Props) {
             </Flex>
 
             <Flex
-                margin="small 0 0 0"
+                margin="xx-small 0 0 0"
                 alignItems="stretch"
                 justifyItems="center"
             >

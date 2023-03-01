@@ -24,8 +24,9 @@ export default function Board() {
                             <Heading level="h1">
                                 <IconCalendarClockLine
                                     size="medium"
-                                    color="primary"
+                                    color="success"
                                 />
+                                {' '}
                                 GardenX
                             </Heading>
                         </View>
@@ -34,7 +35,10 @@ export default function Board() {
                     </View>
                 </Flex.Item>
 
-                <Flex.Item shouldGrow>
+                <Flex.Item
+                    shouldGrow
+                    padding="0 small 0 0"
+                >
                     <Schedule/>
                 </Flex.Item>
             </Flex>

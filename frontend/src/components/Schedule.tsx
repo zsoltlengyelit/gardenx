@@ -13,7 +13,7 @@ import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { View } from '@instructure/ui';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import * as ics from 'ics';
-import EventEditor, { Draft } from './EventEditor';
+import EventEditor, { EventEditorFormFields } from './EventEditor';
 import { randomString } from '../api/random';
 import { axiosInstance } from '../api/axios';
 import useSWR from 'swr';
@@ -115,7 +115,7 @@ export default function Schedule() {
     return rruleString.startsWith(prefix) ? rruleString.substring(prefix.length) : rruleString;
   }
 
-  function handleSave(draft: Draft) {
+  function handleSave(draft: EventEditorFormFields) {
     const existingEvents = getEventAttributes();
     const parsedIcal = ics.createEvents([
       ...existingEvents,
@@ -163,10 +163,6 @@ export default function Schedule() {
   }
 
   function handleDelete(event: CalendarEvent) {
-    if (!confirm('Are you sure you delete?')) {
-      return;
-    }
-
     const existingEvents = getEventAttributes();
     const parsedIcal = ics.createEvents([
       ...existingEvents.filter(ee => ee.uid !== event.uid)
