@@ -32,7 +32,6 @@ export default function GpioNodeList({ tabs }: Props) {
   return (
         <View
             as="div"
-            margin="medium"
         >
 
             <Tabs
@@ -42,7 +41,7 @@ export default function GpioNodeList({ tabs }: Props) {
                     <Tabs.Panel
                         key={tab.id}
                         id={tab.id}
-                        renderTitle={() => <FlowTabTitle tab={tab} />}
+                        renderTitle={() => <FlowTabTitle tab={tab}/>}
                         isSelected={tab.id === selectedTab?.id}
                     >
                         {gpioNodes.map(node => (
