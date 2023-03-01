@@ -1,13 +1,4 @@
-import {
-  Button,
-  Flex,
-  FormField,
-  FormFieldGroup,
-  Heading,
-  IconCalendarClockLine,
-  Modal,
-  SimpleSelect
-} from '@instructure/ui';
+import { Button, Flex, FormField, FormFieldGroup, Heading, Modal, SimpleSelect } from '@instructure/ui';
 import { SlotInfo } from 'react-big-calendar';
 import { Controller, useForm } from 'react-hook-form';
 
@@ -15,14 +6,15 @@ import 'bootstrap/dist/css/bootstrap.css'; // this lib uses boostrap (v. 4.0.0-b
 import 'react-rrule-generator/build/styles.css'; // react-rrule-generator's custom CSS
 // @ts-ignore
 import RRuleGenerator from 'react-rrule-generator';
-import DateTimePicker from 'react-datetime-picker';
 
-import 'react-datetime-picker/dist/DateTimePicker.css';
 import 'react-calendar/dist/Calendar.css';
 import 'react-clock/dist/Clock.css';
 import { CalendarEvent } from '../api/events';
 import { RRule, rrulestr } from 'rrule';
 import { useGetGpioNodes, useTabGpioNodeMap } from '../api/nodered';
+import { useAtomValue } from 'jotai';
+import { selectedTabAtom } from '../atoms';
+import GDateTimeInput from './GDateTimeInput';
 
 export type Draft = {
     start: Date;
@@ -47,6 +39,7 @@ export default function EventEditor({ draft, onClose, onSave, onDelete, onUpdate
   }
 
   const tabMap = useTabGpioNodeMap();
+  const selectedTab = useAtomValue(selectedTabAtom);
 
   const isSaved = isCalendarEvent(draft);
 
@@ -54,7 +47,7 @@ export default function EventEditor({ draft, onClose, onSave, onDelete, onUpdate
 
   const { control, handleSubmit, watch } = useForm({
     defaultValues: {
-      flowId: isSaved ? flowId : undefined,
+      flowId: isSaved ? flowId : (selectedTab?.id ?? undefined),
       nodeId: isSaved ? nodeId : undefined,
       start: draft.start,
       end: draft.end,
@@ -103,7 +96,8 @@ export default function EventEditor({ draft, onClose, onSave, onDelete, onUpdate
                               return (
                                     <SimpleSelect
                                         renderLabel={'Flow'}
-                                        value={value ?? ''}
+                                        defaultValue={value ?? null}
+                                        value={value ?? null}
                                         onChange={(e, data) => {
                                           onChange(data.value);
                                         }}
@@ -144,43 +138,29 @@ export default function EventEditor({ draft, onClose, onSave, onDelete, onUpdate
                             )}
                         />
 
-                        <FormField
-                            label={'Start'}
-                            id={'start'}
-                        >
-                            <Controller
-                                name="start"
-                                control={control}
-                                render={({ field: { onChange, value } }) => (
-                                    <DateTimePicker
-                                        value={value}
-                                        calendarIcon={<IconCalendarClockLine/>}
-                                        onChange={(newValue) => {
-                                          onChange(newValue);
-                                        }}
-                                    />
-                                )}
-                            />
-                        </FormField>
+                        <Controller
+                            name="start"
+                            control={control}
+                            render={({ field: { onChange, value } }) => (
+                                <GDateTimeInput
+                                    value={value}
+                                    onChange={onChange}
+                                    label="Start"
+                                />
+                            )}
+                        />
 
-                        <FormField
-                            label={'End'}
-                            id={'end'}
-                        >
-                            <Controller
-                                name="end"
-                                control={control}
-                                render={({ field: { onChange, value } }) => (
-                                    <DateTimePicker
-                                        calendarIcon={<IconCalendarClockLine/>}
-                                        value={value}
-                                        onChange={(newValue) => {
-                                          onChange(newValue);
-                                        }}
-                                    />
-                                )}
-                            />
-                        </FormField>
+                        <Controller
+                            name="end"
+                            control={control}
+                            render={({ field: { onChange, value } }) => (
+                                <GDateTimeInput
+                                    value={value}
+                                    onChange={onChange}
+                                    label="End"
+                                />
+                            )}
+                        />
 
                         <FormField
                             label={''}

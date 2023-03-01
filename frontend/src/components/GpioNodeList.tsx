@@ -1,16 +1,15 @@
 import { Tab, useGpioNodeStates } from '../api/nodered';
 import { Tabs, View } from '@instructure/ui';
 import { useEffect } from 'react';
-import { atomWithStorage, useUpdateAtom } from 'jotai/utils';
+import { useUpdateAtom } from 'jotai/utils';
 import { useAtomValue } from 'jotai';
 import GpioCard from './GpioCard';
 import FlowTabTitle from './FlowTabTitle';
+import { selectedTabAtom } from '../atoms';
 
 type Props = {
     tabs: Tab[];
 };
-
-const selectedTabAtom = atomWithStorage<Tab | null>('selectedTab', null);
 
 export default function GpioNodeList({ tabs }: Props) {
 
@@ -25,7 +24,6 @@ export default function GpioNodeList({ tabs }: Props) {
   }, [tabs]);
 
   function handleTabChange(event: any, { index }: { index: number }) {
-    // setCreatingNewGpioNode(false);
     setSelectedTab(tabs[index]);
   }
 
@@ -36,6 +34,7 @@ export default function GpioNodeList({ tabs }: Props) {
 
             <Tabs
                 onRequestTabChange={handleTabChange}
+
             >
                 {tabs.map(tab => (
                     <Tabs.Panel
