@@ -44,8 +44,8 @@
             "351bfdb306226ff8",
             "db52e3808a0e4d48"
         ],
-        "x": 454,
-        "y": 751.5,
+        "x": 14,
+        "y": 671.5,
         "w": 1212,
         "h": 269.5
     },
@@ -79,7 +79,7 @@
         "method": "put",
         "upload": false,
         "swaggerDoc": "",
-        "x": 510,
+        "x": 770,
         "y": 400,
         "wires": [
             [
@@ -99,7 +99,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 720,
+        "x": 980,
         "y": 400,
         "wires": [
             [
@@ -114,7 +114,7 @@
         "name": "",
         "statusCode": "200",
         "headers": {},
-        "x": 720,
+        "x": 980,
         "y": 300,
         "wires": []
     },
@@ -129,7 +129,7 @@
         "arraySpltType": "len",
         "stream": false,
         "addname": "",
-        "x": 890,
+        "x": 1150,
         "y": 400,
         "wires": [
             [
@@ -148,7 +148,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1050,
+        "x": 1310,
         "y": 400,
         "wires": [
             [
@@ -168,7 +168,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1250,
+        "x": 1510,
         "y": 400,
         "wires": [
             [
@@ -183,8 +183,8 @@
         "name": "Publish state",
         "server": "c4bff4d6e8023886",
         "client": "",
-        "x": 1930,
-        "y": 500,
+        "x": 2110,
+        "y": 560,
         "wires": []
     },
     {
@@ -198,7 +198,7 @@
             "7420abdf45b8e8f9",
             "6ce041aa81c333ee"
         ],
-        "x": 1695,
+        "x": 1955,
         "y": 400,
         "wires": []
     },
@@ -212,8 +212,8 @@
         "method": "post",
         "upload": false,
         "swaggerDoc": "",
-        "x": 570,
-        "y": 920,
+        "x": 130,
+        "y": 840,
         "wires": [
             [
                 "b60699c0b0671883",
@@ -229,8 +229,8 @@
         "name": "",
         "statusCode": "200",
         "headers": {},
-        "x": 820,
-        "y": 920,
+        "x": 380,
+        "y": 840,
         "wires": []
     },
     {
@@ -245,10 +245,12 @@
         "createDir": true,
         "overwriteFile": "true",
         "encoding": "none",
-        "x": 1560,
-        "y": 980,
+        "x": 1120,
+        "y": 900,
         "wires": [
-            []
+            [
+                "8f3387aa9461f0b0"
+            ]
         ]
     },
     {
@@ -263,8 +265,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 850,
-        "y": 980,
+        "x": 410,
+        "y": 900,
         "wires": [
             [
                 "d69e99cb3b05e6b9"
@@ -281,8 +283,8 @@
         "method": "get",
         "upload": false,
         "swaggerDoc": "",
-        "x": 570,
-        "y": 800,
+        "x": 130,
+        "y": 720,
         "wires": [
             [
                 "e4d0b3b50d6a3c74"
@@ -299,8 +301,8 @@
         "headers": {
             "Content-Type": "text/calendar"
         },
-        "x": 1560,
-        "y": 800,
+        "x": 1120,
+        "y": 720,
         "wires": []
     },
     {
@@ -316,8 +318,8 @@
         "sendError": false,
         "encoding": "none",
         "allProps": false,
-        "x": 1340,
-        "y": 800,
+        "x": 900,
+        "y": 720,
         "wires": [
             [
                 "b293c827d775ebfe"
@@ -337,8 +339,8 @@
         "winHide": false,
         "oldrc": false,
         "name": "test -f ./schedule.ical/gpio.ical",
-        "x": 830,
-        "y": 800,
+        "x": 390,
+        "y": 720,
         "wires": [
             [],
             [],
@@ -359,8 +361,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1300,
-        "y": 900,
+        "x": 860,
+        "y": 820,
         "wires": [
             [
                 "d69e99cb3b05e6b9",
@@ -395,8 +397,8 @@
         ],
         "checkall": "false",
         "outputs": 2,
-        "x": 1070,
-        "y": 800,
+        "x": 630,
+        "y": 720,
         "wires": [
             [
                 "150cc4f5a92e2036"
@@ -416,8 +418,8 @@
         "headers": {
             "Content-Type": "text/calendar"
         },
-        "x": 1570,
-        "y": 900,
+        "x": 1130,
+        "y": 820,
         "wires": []
     },
     {
@@ -454,7 +456,7 @@
         "filter2": "",
         "filter": "",
         "combineResponse": false,
-        "x": 1040,
+        "x": 1300,
         "y": 500,
         "wires": [
             [
@@ -474,12 +476,11 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1750,
+        "x": 2110,
         "y": 500,
         "wires": [
             [
-                "63308ea7f10df86b",
-                "1ec92144d1e66faf"
+                "63308ea7f10df86b"
             ]
         ]
     },
@@ -494,7 +495,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1230,
+        "x": 1490,
         "y": 500,
         "wires": [
             [
@@ -515,7 +516,7 @@
         "complete": "false",
         "statusVal": "",
         "statusType": "auto",
-        "x": 1220,
+        "x": 1480,
         "y": 460,
         "wires": []
     },
@@ -524,7 +525,7 @@
         "type": "function",
         "z": "6654f6e517e71542",
         "name": "Auto/manual switch",
-        "func": "const statePrefix = 'manualstate_';\n\nconst modes = {\n    auto: 'auto',\n    manual: 'manual'\n};\n\n// handle gpio/*\nif (msg.topic === 'gpio/*') {\n\n    const manuals = flow.keys().filter(key => key.startsWith(statePrefix));\n\n    const manualModes = manuals.reduce((acc, key) => {\n        acc[key.substring(statePrefix.length)] = flow.get(key);\n        return acc;\n    }, {});\n\n    axios.get('http://localhost:1880/flows')\n        .then(function (response) {\n            const gpioNodes = response.data.filter(n => n.type === 'rpi-gpio out');\n\n            gpioNodes.map(node => {\n                return {\n                    topic: node.info,\n                    payload: manualModes[node.info] === undefined ? msg.payload : manualModes[node.info],\n                    mode: manualModes[node.info] === undefined ? modes.auto : modes.manual\n                }\n            }).forEach(message => node.send(message));\n\n            node.done();\n        });\n\n    return;\n}\n\n\nconst stateKey = (statePrefix + msg.topic).replaceAll(' ', '_');\n\n\nif (msg.mode === modes.manual) {\n    flow.set(stateKey, msg.payload);\n}\nif (msg.mode === modes.auto) {\n    flow.set(stateKey, undefined);\n}\n\nconst manualState = flow.get(stateKey);\n\nif (manualState !== undefined) {\n    msg.payload = manualState;\n}\n\nreturn msg;",
+        "func": "const statePrefix = 'manualstate_';\n\nconst modes = {\n    auto: 'auto',\n    manual: 'manual'\n};\n\n// handle gpio/*\nif (msg.topic === 'gpio/*') {\n\n    const manuals = flow.keys().filter(key => key.startsWith(statePrefix));\n\n    const manualModes = manuals.reduce((acc, key) => {\n        acc[key.substring(statePrefix.length)] = flow.get(key);\n        return acc;\n    }, {});\n\n    axios.get('http://localhost:1880/flows')\n        .then(function (response) {\n            const gpioNodes = response.data.filter(n => n.type === 'rpi-gpio out');\n\n            gpioNodes.map(node => {\n                return {\n                    topic: node.info,\n                    payload: manualModes[node.info] === undefined ? msg.payload : manualModes[node.info],\n                    mode: manualModes[node.info] === undefined ? modes.auto : modes.manual\n                }\n            }).forEach(message => node.send(message));\n\n            node.done();\n        });\n\n    return;\n}\n\n\nconst stateKey = (statePrefix + msg.topic).replaceAll(' ', '_');\n\nif (msg.mode === modes.manual) {\n    flow.set(stateKey, msg.payload);\n}\nif (msg.mode === modes.auto) {\n    flow.set(stateKey, undefined);\n}\n\nconst manualState = flow.get(stateKey);\n\nif (manualState !== undefined) {\n    msg.payload = manualState;\n    msg.mode = modes.manual;\n}\n\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -535,12 +536,13 @@
                 "module": "axios"
             }
         ],
-        "x": 1520,
+        "x": 1780,
         "y": 400,
         "wires": [
             [
                 "fb55055af17a6f6c",
-                "2ed07befb9e49e7c"
+                "2ed07befb9e49e7c",
+                "1ec92144d1e66faf"
             ]
         ]
     },
@@ -556,7 +558,7 @@
         "complete": "false",
         "statusVal": "",
         "statusType": "auto",
-        "x": 1240,
+        "x": 1500,
         "y": 300,
         "wires": []
     },
@@ -565,7 +567,7 @@
         "type": "debug",
         "z": "6654f6e517e71542",
         "name": "debug 3",
-        "active": false,
+        "active": true,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
@@ -573,8 +575,8 @@
         "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
-        "x": 1840,
-        "y": 420,
+        "x": 1900,
+        "y": 520,
         "wires": []
     },
     {
@@ -586,7 +588,7 @@
         "method": "get",
         "upload": false,
         "swaggerDoc": "",
-        "x": 1010,
+        "x": 1270,
         "y": 600,
         "wires": [
             [
@@ -606,7 +608,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1230,
+        "x": 1490,
         "y": 600,
         "wires": [
             [
@@ -621,8 +623,18 @@
         "name": "",
         "statusCode": "200",
         "headers": {},
-        "x": 1220,
+        "x": 1480,
         "y": 560,
+        "wires": []
+    },
+    {
+        "id": "f9cff9ae712a9da6",
+        "type": "comment",
+        "z": "6654f6e517e71542",
+        "name": "Force reset all state after calendar update",
+        "info": "",
+        "x": 1420,
+        "y": 740,
         "wires": []
     },
     {
@@ -642,31 +654,6 @@
         "info": "gpio/1"
     },
     {
-        "id": "d26113fdaba366bd",
-        "type": "routing",
-        "z": "56e1b27d8d230e3f",
-        "name": "GPIO router Kert",
-        "rules": [
-            {
-                "v": "gpio/1"
-            },
-            {
-                "v": "gpio/2"
-            }
-        ],
-        "outputs": 2,
-        "x": 470,
-        "y": 480,
-        "wires": [
-            [
-                "0b45580f21df7c6a"
-            ],
-            [
-                "05e046d8a67ed56c"
-            ]
-        ]
-    },
-    {
         "id": "05e046d8a67ed56c",
         "type": "rpi-gpio out",
         "z": "56e1b27d8d230e3f",
@@ -678,7 +665,7 @@
         "out": "out",
         "bcm": true,
         "x": 680,
-        "y": 500,
+        "y": 520,
         "wires": [],
         "info": "gpio/2"
     },
@@ -694,7 +681,40 @@
         "y": 480,
         "wires": [
             [
-                "d26113fdaba366bd"
+                "64fee8339fb62dc2"
+            ]
+        ]
+    },
+    {
+        "id": "64fee8339fb62dc2",
+        "type": "switch",
+        "z": "56e1b27d8d230e3f",
+        "name": "GPIO router",
+        "property": "topic",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "gpio/1",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "gpio/2",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 450,
+        "y": 480,
+        "wires": [
+            [
+                "0b45580f21df7c6a"
+            ],
+            [
+                "05e046d8a67ed56c"
             ]
         ]
     },
@@ -726,22 +746,28 @@
         "y": 180,
         "wires": [
             [
-                "d8670e89b0ec43a5"
+                "d5b45fabb0a0d1c1"
             ]
         ]
     },
     {
-        "id": "d8670e89b0ec43a5",
-        "type": "routing",
+        "id": "d5b45fabb0a0d1c1",
+        "type": "switch",
         "z": "5b1f4133f210d4ec",
-        "name": "GPIO router Test Kert",
+        "name": "GPIO router",
+        "property": "topic",
+        "propertyType": "msg",
         "rules": [
             {
-                "v": "gpio/4"
+                "t": "eq",
+                "v": "gpio/4",
+                "vt": "str"
             }
         ],
+        "checkall": "true",
+        "repair": false,
         "outputs": 1,
-        "x": 320,
+        "x": 350,
         "y": 180,
         "wires": [
             [

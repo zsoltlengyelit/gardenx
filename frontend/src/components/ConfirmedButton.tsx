@@ -22,9 +22,13 @@ export default function ConfirmedButton({ onClick, ...buttonProps }: Props) {
                 />
             }
             {clicked && (
-                <View as="div">
+                <View
+                    as="div"
+                    display="inline"
+                >
                     <Button onClick={() => setClicked(false)}>Cancel</Button>
                     <Button
+                        margin="0 0 0 small"
                         color="danger"
                         onClick={handleConfirm}
                     >I&apos;m sure
