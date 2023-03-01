@@ -86,6 +86,7 @@ export default function EventEditor({ draft, onClose, onSave, onDelete, onUpdate
       onUpdate({
         ...(draft as CalendarEvent),
         ...data,
+        categories: [data.flowId, data.nodeId],
         rrule: data.rrule ? rrulestr(data.rrule) as RRule : null
       } as CalendarEvent);
     } else {

@@ -44,10 +44,47 @@
             "351bfdb306226ff8",
             "db52e3808a0e4d48"
         ],
-        "x": 454,
-        "y": 751.5,
+        "x": 14,
+        "y": 671.5,
         "w": 1212,
         "h": 269.5
+    },
+    {
+        "id": "ba76f4d28d46e2dc",
+        "type": "group",
+        "z": "6654f6e517e71542",
+        "style": {
+            "stroke": "#999999",
+            "stroke-opacity": "1",
+            "fill": "none",
+            "fill-opacity": "1",
+            "label": true,
+            "label-position": "nw",
+            "color": "#a4a4a4"
+        },
+        "nodes": [
+            "8bc79f15c0a688db",
+            "79a0d0eb13560a84",
+            "2ea1e99be30211b2",
+            "67e4df38392a472a",
+            "c5fcf09098ee0458",
+            "3288b51e87c0cf0e",
+            "fb55055af17a6f6c",
+            "1714093af39e1ecf",
+            "2ed07befb9e49e7c",
+            "5eef3ad2022205c8",
+            "7043f089e62cf40c",
+            "644c959c85ef1928",
+            "2be20fd9fe210b05",
+            "1ec92144d1e66faf",
+            "0655c63f03be8248",
+            "8f3387aa9461f0b0",
+            "bcb3d789004b5e9d"
+        ],
+        "x": 694,
+        "y": 259,
+        "w": 1512,
+        "h": 382
     },
     {
         "id": "c4bff4d6e8023886",
@@ -74,12 +111,13 @@
         "id": "8bc79f15c0a688db",
         "type": "http in",
         "z": "6654f6e517e71542",
+        "g": "ba76f4d28d46e2dc",
         "name": "PUT /io",
         "url": "/io",
         "method": "put",
         "upload": false,
         "swaggerDoc": "",
-        "x": 510,
+        "x": 770,
         "y": 400,
         "wires": [
             [
@@ -92,6 +130,7 @@
         "id": "79a0d0eb13560a84",
         "type": "function",
         "z": "6654f6e517e71542",
+        "g": "ba76f4d28d46e2dc",
         "name": "Body Mapper",
         "func": "\nmsg.payload = msg.payload.map(state => JSON.stringify(state)).join('\\n');\n\nreturn msg;",
         "outputs": 1,
@@ -99,7 +138,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 720,
+        "x": 980,
         "y": 400,
         "wires": [
             [
@@ -111,10 +150,11 @@
         "id": "2ea1e99be30211b2",
         "type": "http response",
         "z": "6654f6e517e71542",
+        "g": "ba76f4d28d46e2dc",
         "name": "",
         "statusCode": "200",
         "headers": {},
-        "x": 720,
+        "x": 980,
         "y": 300,
         "wires": []
     },
@@ -122,6 +162,7 @@
         "id": "67e4df38392a472a",
         "type": "split",
         "z": "6654f6e517e71542",
+        "g": "ba76f4d28d46e2dc",
         "name": "",
         "splt": "\\n",
         "spltType": "str",
@@ -129,7 +170,7 @@
         "arraySpltType": "len",
         "stream": false,
         "addname": "",
-        "x": 890,
+        "x": 1150,
         "y": 400,
         "wires": [
             [
@@ -141,6 +182,7 @@
         "id": "c5fcf09098ee0458",
         "type": "function",
         "z": "6654f6e517e71542",
+        "g": "ba76f4d28d46e2dc",
         "name": "parse JSON",
         "func": "msg.payload = JSON.parse(msg.payload);\nreturn msg;",
         "outputs": 1,
@@ -148,7 +190,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1050,
+        "x": 1310,
         "y": 400,
         "wires": [
             [
@@ -161,6 +203,7 @@
         "id": "3288b51e87c0cf0e",
         "type": "function",
         "z": "6654f6e517e71542",
+        "g": "ba76f4d28d46e2dc",
         "name": "Normalize message",
         "func": "msg.topic = msg.payload.io;\nmsg.mode = msg.payload.mode;\n\n// set last\nmsg.payload = msg.payload.state;\n\n\nreturn msg;",
         "outputs": 1,
@@ -168,7 +211,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1250,
+        "x": 1510,
         "y": 400,
         "wires": [
             [
@@ -191,6 +234,7 @@
         "id": "fb55055af17a6f6c",
         "type": "link out",
         "z": "6654f6e517e71542",
+        "g": "ba76f4d28d46e2dc",
         "name": "link out 1",
         "mode": "link",
         "links": [
@@ -198,7 +242,7 @@
             "7420abdf45b8e8f9",
             "6ce041aa81c333ee"
         ],
-        "x": 1695,
+        "x": 1955,
         "y": 400,
         "wires": []
     },
@@ -212,8 +256,8 @@
         "method": "post",
         "upload": false,
         "swaggerDoc": "",
-        "x": 570,
-        "y": 920,
+        "x": 130,
+        "y": 840,
         "wires": [
             [
                 "b60699c0b0671883",
@@ -229,8 +273,8 @@
         "name": "",
         "statusCode": "200",
         "headers": {},
-        "x": 820,
-        "y": 920,
+        "x": 380,
+        "y": 840,
         "wires": []
     },
     {
@@ -245,10 +289,12 @@
         "createDir": true,
         "overwriteFile": "true",
         "encoding": "none",
-        "x": 1560,
-        "y": 980,
+        "x": 1120,
+        "y": 900,
         "wires": [
-            []
+            [
+                "8f3387aa9461f0b0"
+            ]
         ]
     },
     {
@@ -263,8 +309,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 850,
-        "y": 980,
+        "x": 410,
+        "y": 900,
         "wires": [
             [
                 "d69e99cb3b05e6b9"
@@ -281,8 +327,8 @@
         "method": "get",
         "upload": false,
         "swaggerDoc": "",
-        "x": 570,
-        "y": 800,
+        "x": 130,
+        "y": 720,
         "wires": [
             [
                 "e4d0b3b50d6a3c74"
@@ -299,8 +345,8 @@
         "headers": {
             "Content-Type": "text/calendar"
         },
-        "x": 1560,
-        "y": 800,
+        "x": 1120,
+        "y": 720,
         "wires": []
     },
     {
@@ -316,8 +362,8 @@
         "sendError": false,
         "encoding": "none",
         "allProps": false,
-        "x": 1340,
-        "y": 800,
+        "x": 900,
+        "y": 720,
         "wires": [
             [
                 "b293c827d775ebfe"
@@ -337,8 +383,8 @@
         "winHide": false,
         "oldrc": false,
         "name": "test -f ./schedule.ical/gpio.ical",
-        "x": 830,
-        "y": 800,
+        "x": 390,
+        "y": 720,
         "wires": [
             [],
             [],
@@ -359,8 +405,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1300,
-        "y": 900,
+        "x": 860,
+        "y": 820,
         "wires": [
             [
                 "d69e99cb3b05e6b9",
@@ -395,8 +441,8 @@
         ],
         "checkall": "false",
         "outputs": 2,
-        "x": 1070,
-        "y": 800,
+        "x": 630,
+        "y": 720,
         "wires": [
             [
                 "150cc4f5a92e2036"
@@ -416,14 +462,15 @@
         "headers": {
             "Content-Type": "text/calendar"
         },
-        "x": 1570,
-        "y": 900,
+        "x": 1130,
+        "y": 820,
         "wires": []
     },
     {
         "id": "1714093af39e1ecf",
         "type": "ical-sensor",
         "z": "6654f6e517e71542",
+        "g": "ba76f4d28d46e2dc",
         "confignode": "4e04a4d03b8d4fb4",
         "timeout": "2",
         "timeoutUnits": "seconds",
@@ -454,7 +501,7 @@
         "filter2": "",
         "filter": "",
         "combineResponse": false,
-        "x": 1040,
+        "x": 1300,
         "y": 500,
         "wires": [
             [
@@ -467,6 +514,7 @@
         "id": "2ed07befb9e49e7c",
         "type": "function",
         "z": "6654f6e517e71542",
+        "g": "ba76f4d28d46e2dc",
         "name": "Prepare ws",
         "func": "msg.payload = {\n    state: msg.payload,\n    io: msg.topic,\n    mode: msg.mode\n};\nreturn msg;",
         "outputs": 1,
@@ -474,7 +522,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1750,
+        "x": 2010,
         "y": 500,
         "wires": [
             [
@@ -487,6 +535,7 @@
         "id": "5eef3ad2022205c8",
         "type": "function",
         "z": "6654f6e517e71542",
+        "g": "ba76f4d28d46e2dc",
         "name": "control",
         "func": "\nif (msg.payload.on === false) {\n    msg.payload = 0;\n    msg.topic = 'gpio/*';\n} else {\n    msg.topic = msg.payload.categories[1];\n    msg.payload = 1;\n}\nreturn msg;\n",
         "outputs": 1,
@@ -494,7 +543,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1230,
+        "x": 1490,
         "y": 500,
         "wires": [
             [
@@ -507,6 +556,7 @@
         "id": "7043f089e62cf40c",
         "type": "debug",
         "z": "6654f6e517e71542",
+        "g": "ba76f4d28d46e2dc",
         "name": "debug 1",
         "active": false,
         "tosidebar": true,
@@ -515,7 +565,7 @@
         "complete": "false",
         "statusVal": "",
         "statusType": "auto",
-        "x": 1220,
+        "x": 1480,
         "y": 460,
         "wires": []
     },
@@ -523,6 +573,7 @@
         "id": "644c959c85ef1928",
         "type": "function",
         "z": "6654f6e517e71542",
+        "g": "ba76f4d28d46e2dc",
         "name": "Auto/manual switch",
         "func": "const statePrefix = 'manualstate_';\n\nconst modes = {\n    auto: 'auto',\n    manual: 'manual'\n};\n\n// handle gpio/*\nif (msg.topic === 'gpio/*') {\n\n    const manuals = flow.keys().filter(key => key.startsWith(statePrefix));\n\n    const manualModes = manuals.reduce((acc, key) => {\n        acc[key.substring(statePrefix.length)] = flow.get(key);\n        return acc;\n    }, {});\n\n    axios.get('http://localhost:1880/flows')\n        .then(function (response) {\n            const gpioNodes = response.data.filter(n => n.type === 'rpi-gpio out');\n\n            gpioNodes.map(node => {\n                return {\n                    topic: node.info,\n                    payload: manualModes[node.info] === undefined ? msg.payload : manualModes[node.info],\n                    mode: manualModes[node.info] === undefined ? modes.auto : modes.manual\n                }\n            }).forEach(message => node.send(message));\n\n            node.done();\n        });\n\n    return;\n}\n\n\nconst stateKey = (statePrefix + msg.topic).replaceAll(' ', '_');\n\n\nif (msg.mode === modes.manual) {\n    flow.set(stateKey, msg.payload);\n}\nif (msg.mode === modes.auto) {\n    flow.set(stateKey, undefined);\n}\n\nconst manualState = flow.get(stateKey);\n\nif (manualState !== undefined) {\n    msg.payload = manualState;\n}\n\nreturn msg;",
         "outputs": 1,
@@ -535,7 +586,7 @@
                 "module": "axios"
             }
         ],
-        "x": 1520,
+        "x": 1780,
         "y": 400,
         "wires": [
             [
@@ -548,6 +599,7 @@
         "id": "2be20fd9fe210b05",
         "type": "debug",
         "z": "6654f6e517e71542",
+        "g": "ba76f4d28d46e2dc",
         "name": "debug 2",
         "active": false,
         "tosidebar": true,
@@ -556,7 +608,7 @@
         "complete": "false",
         "statusVal": "",
         "statusType": "auto",
-        "x": 1240,
+        "x": 1500,
         "y": 300,
         "wires": []
     },
@@ -564,6 +616,7 @@
         "id": "1ec92144d1e66faf",
         "type": "debug",
         "z": "6654f6e517e71542",
+        "g": "ba76f4d28d46e2dc",
         "name": "debug 3",
         "active": false,
         "tosidebar": true,
@@ -573,7 +626,7 @@
         "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
-        "x": 1840,
+        "x": 2100,
         "y": 420,
         "wires": []
     },
@@ -581,12 +634,13 @@
         "id": "0655c63f03be8248",
         "type": "http in",
         "z": "6654f6e517e71542",
+        "g": "ba76f4d28d46e2dc",
         "name": "",
         "url": "/send-io-state",
         "method": "get",
         "upload": false,
         "swaggerDoc": "",
-        "x": 1010,
+        "x": 1270,
         "y": 600,
         "wires": [
             [
@@ -599,6 +653,7 @@
         "id": "8f3387aa9461f0b0",
         "type": "function",
         "z": "6654f6e517e71542",
+        "g": "ba76f4d28d46e2dc",
         "name": "map",
         "func": "msg.payload = 0;\nmsg.topic = 'gpio/*';\nreturn msg;\n",
         "outputs": 1,
@@ -606,7 +661,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1230,
+        "x": 1490,
         "y": 600,
         "wires": [
             [
@@ -618,11 +673,22 @@
         "id": "bcb3d789004b5e9d",
         "type": "http response",
         "z": "6654f6e517e71542",
+        "g": "ba76f4d28d46e2dc",
         "name": "",
         "statusCode": "200",
         "headers": {},
-        "x": 1220,
+        "x": 1480,
         "y": 560,
+        "wires": []
+    },
+    {
+        "id": "f9cff9ae712a9da6",
+        "type": "comment",
+        "z": "6654f6e517e71542",
+        "name": "Force reset all state after calendar update",
+        "info": "",
+        "x": 1420,
+        "y": 740,
         "wires": []
     },
     {
