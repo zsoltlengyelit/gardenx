@@ -89,6 +89,13 @@ export function useGetGpioNodes(flowId: string | null) {
   }, [data]);
 
   useEffect(() => {
+    if (isConnected) {
+      // this will make Node-red send a state update via WebSocket
+      swrFetcher('/send-io-state');
+    }
+  }, [isConnected]);
+
+  useEffect(() => {
 
     ws.addEventListener('open', () => {
       setIsConnected(true);

@@ -424,8 +424,9 @@
         "id": "1714093af39e1ecf",
         "type": "ical-sensor",
         "z": "6654f6e517e71542",
+        "d": true,
         "confignode": "4e04a4d03b8d4fb4",
-        "timeout": "3",
+        "timeout": "10",
         "timeoutUnits": "seconds",
         "cron": "",
         "name": "Calendar sensor",
@@ -515,8 +516,8 @@
         "complete": "false",
         "statusVal": "",
         "statusType": "auto",
-        "x": 1400,
-        "y": 500,
+        "x": 1220,
+        "y": 460,
         "wires": []
     },
     {
@@ -565,7 +566,7 @@
         "type": "debug",
         "z": "6654f6e517e71542",
         "name": "debug 3",
-        "active": false,
+        "active": true,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
@@ -575,6 +576,54 @@
         "statusType": "auto",
         "x": 1840,
         "y": 420,
+        "wires": []
+    },
+    {
+        "id": "0655c63f03be8248",
+        "type": "http in",
+        "z": "6654f6e517e71542",
+        "name": "",
+        "url": "/io-state",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 1070,
+        "y": 600,
+        "wires": [
+            [
+                "8f3387aa9461f0b0",
+                "bcb3d789004b5e9d"
+            ]
+        ]
+    },
+    {
+        "id": "8f3387aa9461f0b0",
+        "type": "function",
+        "z": "6654f6e517e71542",
+        "name": "map",
+        "func": "msg.payload = 0;\nmsg.topic = 'gpio/*';\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1230,
+        "y": 600,
+        "wires": [
+            [
+                "644c959c85ef1928"
+            ]
+        ]
+    },
+    {
+        "id": "bcb3d789004b5e9d",
+        "type": "http response",
+        "z": "6654f6e517e71542",
+        "name": "",
+        "statusCode": "200",
+        "headers": {},
+        "x": 1220,
+        "y": 560,
         "wires": []
     },
     {
