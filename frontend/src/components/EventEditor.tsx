@@ -11,13 +11,7 @@ import {
 import { SlotInfo } from 'react-big-calendar';
 import { Controller, SubmitErrorHandler, useForm } from 'react-hook-form';
 
-import 'bootstrap/dist/css/bootstrap.css'; // this lib uses boostrap (v. 4.0.0-beta.2)
-import 'react-rrule-generator/build/styles.css'; // react-rrule-generator's custom CSS
-// @ts-ignore
-import RRuleGenerator from 'react-rrule-generator';
-
 import 'react-calendar/dist/Calendar.css';
-import 'react-clock/dist/Clock.css';
 import { CalendarEvent } from '../api/events';
 import { RRule, rrulestr } from 'rrule';
 import { useGetGpioNodes, useTabGpioNodeMap } from '../api/nodered';
@@ -29,6 +23,7 @@ import * as joi from 'joi';
 import { toFormMessage } from '../common/form';
 import ConfirmedButton from './ConfirmedButton';
 import { useEffect } from 'react';
+import RRuleEditor from './rrule/RRuleEditor';
 
 export type EventEditorFormFields = {
     flowId: string;
@@ -219,18 +214,11 @@ export default function EventEditor({ draft, onClose, onSave, onDelete, onUpdate
                                     name="rrule"
                                     control={control}
                                     render={({ field: { onChange, value }, fieldState: { error } }) => (
-                                        <><RRuleGenerator
-                                            value={value}
-                                            onChange={(rrule: string) => onChange(rrule)}
-                                            config={{
-                                              repeat: ['Weekly', 'Monthly', 'Daily'],
-                                              yearly: 'on the',
-                                              monthly: 'on',
-                                              end: ['Never', 'On date'],
-                                              weekStartsOnSunday: false,
-                                              hideError: true,
-                                            }}
-                                          />
+                                        <>
+                                            <RRuleEditor
+                                                value={value}
+                                                onChange={(rrule: string) => onChange(rrule)}
+                                            />
                                             <FormFieldMessages messages={toFormMessage(error)}/>
                                         </>
                                     )}
