@@ -28,7 +28,9 @@ import { joiResolver } from '@hookform/resolvers/joi';
 import * as joi from 'joi';
 import { toFormMessage } from '../common/form';
 import ConfirmedButton from './ConfirmedButton';
-import { useEffect } from 'react';
+import { ComponentProps, useEffect } from 'react';
+import moment from 'moment';
+import { FieldPath } from 'react-hook-form/dist/types/path';
 
 export type EventEditorFormFields = {
     flowId: string;
@@ -67,7 +69,7 @@ export default function EventEditor({ draft, onClose, onSave, onDelete, onUpdate
     rrule: joi.string().allow('')
   });
 
-  const { control, handleSubmit, watch, setValue } = useForm<EventEditorFormFields>({
+  const { control, handleSubmit, watch, setValue, getValues, setError } = useForm<EventEditorFormFields>({
     resolver: joiResolver(formSchema),
     defaultValues: {
       flowId: isSaved ? flowId : (selectedTab?.id ?? undefined),
@@ -107,6 +109,30 @@ export default function EventEditor({ draft, onClose, onSave, onDelete, onUpdate
       setValue('nodeId', gpioNodes[0].info);
     }
   }, [gpioNodes]);
+
+  function handleDateChange(
+    onChange: ComponentProps<typeof GDateTimeInput>['onChange'],
+    ownPath: FieldPath<EventEditorFormFields>,
+    correctedPath: FieldPath<EventEditorFormFields>
+  ) {
+
+    return (date: Date | null) => {
+
+      const endTime = getValues(correctedPath);
+      const dayOfYear = moment(date).get('dayOfYear');
+      const correctedDate = moment(endTime).set('dayOfYear', dayOfYear).toDate();
+
+      if (
+        (correctedPath === 'end' && moment(correctedDate).isSameOrBefore(date)) ||
+                (correctedPath === 'start' && moment(correctedDate).isSameOrAfter(date))) {
+        setError(ownPath, { message: 'Start cannot be after end' });
+        return;
+      }
+
+      setValue(correctedPath, correctedDate);
+      onChange(date);
+    };
+  }
 
   return (
         <>
@@ -188,10 +214,10 @@ export default function EventEditor({ draft, onClose, onSave, onDelete, onUpdate
                             <Controller
                                 name="start"
                                 control={control}
-                                render={({ field: { onChange, value }, fieldState: { error } }) => (
+                                render={({ field: { onChange, value, name }, fieldState: { error } }) => (
                                     <GDateTimeInput
                                         value={value}
-                                        onChange={onChange}
+                                        onChange={handleDateChange(onChange, name, 'end')}
                                         label="Start"
                                         messages={toFormMessage(error)}
                                     />
@@ -201,10 +227,10 @@ export default function EventEditor({ draft, onClose, onSave, onDelete, onUpdate
                             <Controller
                                 name="end"
                                 control={control}
-                                render={({ field: { onChange, value }, fieldState: { error } }) => (
+                                render={({ field: { onChange, value, name }, fieldState: { error } }) => (
                                     <GDateTimeInput
                                         value={value}
-                                        onChange={onChange}
+                                        onChange={handleDateChange(onChange, name, 'start')}
                                         label="End"
                                         messages={toFormMessage(error)}
                                     />
