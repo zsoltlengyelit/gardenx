@@ -1,6 +1,6 @@
 import GpioNodeList from './GpioNodeList';
 import { useGetTabs } from '../api/nodered';
-import { Flex, Heading, IconCalendarClockLine, View } from '@instructure/ui';
+import { Flex, Heading, View } from '@instructure/ui';
 import Schedule from './Schedule';
 
 export default function Board() {
@@ -22,12 +22,12 @@ export default function Board() {
                             margin="medium"
                         >
                             <Heading level="h1">
-                                <IconCalendarClockLine
-                                    size="medium"
-                                    color="success"
+                                <img
+                                    src={'./happyplant.webp'}
+                                    height={80}
                                 />
                                 {' '}
-                                GardenX
+                                HapPi Plant
                             </Heading>
                         </View>
 

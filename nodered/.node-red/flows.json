@@ -50,6 +50,104 @@
         "h": 269.5
     },
     {
+        "id": "a91e2c4450d81c14",
+        "type": "group",
+        "z": "6654f6e517e71542",
+        "name": "Central controller",
+        "style": {
+            "label": true,
+            "stroke": "#ff0000"
+        },
+        "nodes": [
+            "644c959c85ef1928",
+            "1ec92144d1e66faf"
+        ],
+        "x": 1654,
+        "y": 359,
+        "w": 272,
+        "h": 122
+    },
+    {
+        "id": "e27dd930f7ebb7e8",
+        "type": "group",
+        "z": "6654f6e517e71542",
+        "name": "Manual control",
+        "style": {
+            "label": true
+        },
+        "nodes": [
+            "8bc79f15c0a688db",
+            "79a0d0eb13560a84",
+            "2ea1e99be30211b2",
+            "67e4df38392a472a",
+            "c5fcf09098ee0458",
+            "3288b51e87c0cf0e",
+            "2be20fd9fe210b05"
+        ],
+        "x": 14,
+        "y": 279,
+        "w": 932,
+        "h": 182
+    },
+    {
+        "id": "31b6deb47a9e7be4",
+        "type": "group",
+        "z": "6654f6e517e71542",
+        "name": "Force state update",
+        "style": {
+            "label": true
+        },
+        "nodes": [
+            "0655c63f03be8248",
+            "8f3387aa9461f0b0",
+            "bcb3d789004b5e9d"
+        ],
+        "x": 1214,
+        "y": 539,
+        "w": 412,
+        "h": 122
+    },
+    {
+        "id": "46e82b11dd71185d",
+        "type": "group",
+        "z": "6654f6e517e71542",
+        "name": "WebSocket status updates",
+        "style": {
+            "label": true
+        },
+        "nodes": [
+            "63308ea7f10df86b",
+            "2ed07befb9e49e7c"
+        ],
+        "x": 1934,
+        "y": 539,
+        "w": 192,
+        "h": 142
+    },
+    {
+        "id": "3069d0b288ab8525",
+        "type": "group",
+        "z": "6654f6e517e71542",
+        "style": {
+            "stroke": "#999999",
+            "stroke-opacity": "1",
+            "fill": "none",
+            "fill-opacity": "1",
+            "label": true,
+            "label-position": "nw",
+            "color": "#a4a4a4"
+        },
+        "nodes": [
+            "1714093af39e1ecf",
+            "5eef3ad2022205c8",
+            "7043f089e62cf40c"
+        ],
+        "x": 454,
+        "y": 499,
+        "w": 392,
+        "h": 122
+    },
+    {
         "id": "c4bff4d6e8023886",
         "type": "websocket-listener",
         "path": "/ws/io",
@@ -74,13 +172,14 @@
         "id": "8bc79f15c0a688db",
         "type": "http in",
         "z": "6654f6e517e71542",
+        "g": "e27dd930f7ebb7e8",
         "name": "PUT /io",
         "url": "/io",
         "method": "put",
         "upload": false,
         "swaggerDoc": "",
-        "x": 770,
-        "y": 400,
+        "x": 90,
+        "y": 420,
         "wires": [
             [
                 "79a0d0eb13560a84",
@@ -92,6 +191,7 @@
         "id": "79a0d0eb13560a84",
         "type": "function",
         "z": "6654f6e517e71542",
+        "g": "e27dd930f7ebb7e8",
         "name": "Body Mapper",
         "func": "\nmsg.payload = msg.payload.map(state => JSON.stringify(state)).join('\\n');\n\nreturn msg;",
         "outputs": 1,
@@ -99,8 +199,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 980,
-        "y": 400,
+        "x": 300,
+        "y": 420,
         "wires": [
             [
                 "67e4df38392a472a"
@@ -111,17 +211,19 @@
         "id": "2ea1e99be30211b2",
         "type": "http response",
         "z": "6654f6e517e71542",
+        "g": "e27dd930f7ebb7e8",
         "name": "",
         "statusCode": "200",
         "headers": {},
-        "x": 980,
-        "y": 300,
+        "x": 300,
+        "y": 320,
         "wires": []
     },
     {
         "id": "67e4df38392a472a",
         "type": "split",
         "z": "6654f6e517e71542",
+        "g": "e27dd930f7ebb7e8",
         "name": "",
         "splt": "\\n",
         "spltType": "str",
@@ -129,8 +231,8 @@
         "arraySpltType": "len",
         "stream": false,
         "addname": "",
-        "x": 1150,
-        "y": 400,
+        "x": 470,
+        "y": 420,
         "wires": [
             [
                 "c5fcf09098ee0458"
@@ -141,6 +243,7 @@
         "id": "c5fcf09098ee0458",
         "type": "function",
         "z": "6654f6e517e71542",
+        "g": "e27dd930f7ebb7e8",
         "name": "parse JSON",
         "func": "msg.payload = JSON.parse(msg.payload);\nreturn msg;",
         "outputs": 1,
@@ -148,8 +251,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1310,
-        "y": 400,
+        "x": 630,
+        "y": 420,
         "wires": [
             [
                 "3288b51e87c0cf0e",
@@ -161,6 +264,7 @@
         "id": "3288b51e87c0cf0e",
         "type": "function",
         "z": "6654f6e517e71542",
+        "g": "e27dd930f7ebb7e8",
         "name": "Normalize message",
         "func": "msg.topic = msg.payload.io;\nmsg.mode = msg.payload.mode;\n\n// set last\nmsg.payload = msg.payload.state;\n\n\nreturn msg;",
         "outputs": 1,
@@ -168,8 +272,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1510,
-        "y": 400,
+        "x": 830,
+        "y": 420,
         "wires": [
             [
                 "644c959c85ef1928"
@@ -180,11 +284,12 @@
         "id": "63308ea7f10df86b",
         "type": "websocket out",
         "z": "6654f6e517e71542",
+        "g": "46e82b11dd71185d",
         "name": "Publish state",
         "server": "c4bff4d6e8023886",
         "client": "",
-        "x": 2110,
-        "y": 560,
+        "x": 2030,
+        "y": 640,
         "wires": []
     },
     {
@@ -426,6 +531,7 @@
         "id": "1714093af39e1ecf",
         "type": "ical-sensor",
         "z": "6654f6e517e71542",
+        "g": "3069d0b288ab8525",
         "confignode": "4e04a4d03b8d4fb4",
         "timeout": "2",
         "timeoutUnits": "seconds",
@@ -441,8 +547,8 @@
         "calendartype": "str",
         "triggertype": "trigger",
         "trigger": "always",
-        "timezone": "",
-        "timezonetype": "str",
+        "timezone": "UTC",
+        "timezonetype": "timezone",
         "dateformat": "{ \"timeStyle\": \"short\", \"dateStyle\": \"short\" }",
         "dateformattype": "json",
         "language": "en",
@@ -456,8 +562,8 @@
         "filter2": "",
         "filter": "",
         "combineResponse": false,
-        "x": 1300,
-        "y": 500,
+        "x": 560,
+        "y": 580,
         "wires": [
             [
                 "5eef3ad2022205c8"
@@ -469,6 +575,7 @@
         "id": "2ed07befb9e49e7c",
         "type": "function",
         "z": "6654f6e517e71542",
+        "g": "46e82b11dd71185d",
         "name": "Prepare ws",
         "func": "msg.payload = {\n    state: msg.payload,\n    io: msg.topic,\n    mode: msg.mode\n};\nreturn msg;",
         "outputs": 1,
@@ -476,8 +583,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 2110,
-        "y": 500,
+        "x": 2030,
+        "y": 580,
         "wires": [
             [
                 "63308ea7f10df86b"
@@ -488,6 +595,7 @@
         "id": "5eef3ad2022205c8",
         "type": "function",
         "z": "6654f6e517e71542",
+        "g": "3069d0b288ab8525",
         "name": "control",
         "func": "\nif (msg.payload.on === false) {\n    msg.payload = 0;\n    msg.topic = 'gpio/*';\n} else {\n    msg.topic = msg.payload.categories[1];\n    msg.payload = 1;\n}\nreturn msg;\n",
         "outputs": 1,
@@ -495,8 +603,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1490,
-        "y": 500,
+        "x": 750,
+        "y": 580,
         "wires": [
             [
                 "7043f089e62cf40c",
@@ -508,6 +616,7 @@
         "id": "7043f089e62cf40c",
         "type": "debug",
         "z": "6654f6e517e71542",
+        "g": "3069d0b288ab8525",
         "name": "debug 1",
         "active": false,
         "tosidebar": true,
@@ -516,14 +625,15 @@
         "complete": "false",
         "statusVal": "",
         "statusType": "auto",
-        "x": 1480,
-        "y": 460,
+        "x": 740,
+        "y": 540,
         "wires": []
     },
     {
         "id": "644c959c85ef1928",
         "type": "function",
         "z": "6654f6e517e71542",
+        "g": "a91e2c4450d81c14",
         "name": "Auto/manual switch",
         "func": "const statePrefix = 'manualstate_';\n\nconst modes = {\n    auto: 'auto',\n    manual: 'manual'\n};\n\n// handle gpio/*\nif (msg.topic === 'gpio/*') {\n\n    const manuals = flow.keys().filter(key => key.startsWith(statePrefix));\n\n    const manualModes = manuals.reduce((acc, key) => {\n        acc[key.substring(statePrefix.length)] = flow.get(key);\n        return acc;\n    }, {});\n\n    axios.get('http://localhost:1880/flows')\n        .then(function (response) {\n            const gpioNodes = response.data.filter(n => n.type === 'rpi-gpio out');\n\n            gpioNodes.map(node => {\n                return {\n                    topic: node.info,\n                    payload: manualModes[node.info] === undefined ? msg.payload : manualModes[node.info],\n                    mode: manualModes[node.info] === undefined ? modes.auto : modes.manual\n                }\n            }).forEach(message => node.send(message));\n\n            node.done();\n        });\n\n    return;\n}\n\n\nconst stateKey = (statePrefix + msg.topic).replaceAll(' ', '_');\n\nif (msg.mode === modes.manual) {\n    flow.set(stateKey, msg.payload);\n}\nif (msg.mode === modes.auto) {\n    flow.set(stateKey, undefined);\n}\n\nconst manualState = flow.get(stateKey);\n\nif (manualState !== undefined) {\n    msg.payload = manualState;\n    msg.mode = modes.manual;\n}\n\nreturn msg;",
         "outputs": 1,
@@ -550,6 +660,7 @@
         "id": "2be20fd9fe210b05",
         "type": "debug",
         "z": "6654f6e517e71542",
+        "g": "e27dd930f7ebb7e8",
         "name": "debug 2",
         "active": false,
         "tosidebar": true,
@@ -558,14 +669,15 @@
         "complete": "false",
         "statusVal": "",
         "statusType": "auto",
-        "x": 1500,
-        "y": 300,
+        "x": 820,
+        "y": 320,
         "wires": []
     },
     {
         "id": "1ec92144d1e66faf",
         "type": "debug",
         "z": "6654f6e517e71542",
+        "g": "a91e2c4450d81c14",
         "name": "debug 3",
         "active": false,
         "tosidebar": true,
@@ -575,21 +687,22 @@
         "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
-        "x": 1900,
-        "y": 520,
+        "x": 1820,
+        "y": 440,
         "wires": []
     },
     {
         "id": "0655c63f03be8248",
         "type": "http in",
         "z": "6654f6e517e71542",
+        "g": "31b6deb47a9e7be4",
         "name": "",
         "url": "/send-io-state",
         "method": "get",
         "upload": false,
         "swaggerDoc": "",
-        "x": 1270,
-        "y": 600,
+        "x": 1330,
+        "y": 620,
         "wires": [
             [
                 "8f3387aa9461f0b0",
@@ -601,6 +714,7 @@
         "id": "8f3387aa9461f0b0",
         "type": "function",
         "z": "6654f6e517e71542",
+        "g": "31b6deb47a9e7be4",
         "name": "map",
         "func": "msg.payload = 0;\nmsg.topic = 'gpio/*';\nreturn msg;\n",
         "outputs": 1,
@@ -608,8 +722,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1490,
-        "y": 600,
+        "x": 1550,
+        "y": 620,
         "wires": [
             [
                 "644c959c85ef1928"
@@ -620,11 +734,12 @@
         "id": "bcb3d789004b5e9d",
         "type": "http response",
         "z": "6654f6e517e71542",
+        "g": "31b6deb47a9e7be4",
         "name": "",
         "statusCode": "200",
         "headers": {},
-        "x": 1480,
-        "y": 560,
+        "x": 1540,
+        "y": 580,
         "wires": []
     },
     {
@@ -702,11 +817,26 @@
                 "t": "eq",
                 "v": "gpio/2",
                 "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "gpio/3",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "gpio/5",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "gpio/6",
+                "vt": "str"
             }
         ],
         "checkall": "true",
         "repair": false,
-        "outputs": 2,
+        "outputs": 5,
         "x": 450,
         "y": 480,
         "wires": [
@@ -715,21 +845,78 @@
             ],
             [
                 "05e046d8a67ed56c"
+            ],
+            [
+                "f163a93b1b43035b"
+            ],
+            [
+                "528f8913dfc444d2"
+            ],
+            [
+                "c973bbeb43612f31"
             ]
         ]
+    },
+    {
+        "id": "f163a93b1b43035b",
+        "type": "rpi-gpio out",
+        "z": "56e1b27d8d230e3f",
+        "name": "Zone 3",
+        "pin": "20",
+        "set": true,
+        "level": "0",
+        "freq": "",
+        "out": "out",
+        "bcm": true,
+        "x": 680,
+        "y": 580,
+        "wires": [],
+        "info": "gpio/3"
+    },
+    {
+        "id": "528f8913dfc444d2",
+        "type": "rpi-gpio out",
+        "z": "56e1b27d8d230e3f",
+        "name": "Zone 5",
+        "pin": "5",
+        "set": true,
+        "level": "0",
+        "freq": "",
+        "out": "out",
+        "bcm": true,
+        "x": 680,
+        "y": 640,
+        "wires": [],
+        "info": "gpio/5"
+    },
+    {
+        "id": "c973bbeb43612f31",
+        "type": "rpi-gpio out",
+        "z": "56e1b27d8d230e3f",
+        "name": "Zone 6",
+        "pin": "13",
+        "set": true,
+        "level": "0",
+        "freq": "",
+        "out": "out",
+        "bcm": true,
+        "x": 680,
+        "y": 700,
+        "wires": [],
+        "info": "gpio/6"
     },
     {
         "id": "zxl7jen16tkmodwa",
         "type": "rpi-gpio out",
         "z": "5b1f4133f210d4ec",
-        "name": "Watering Demo",
+        "name": "Zone 4",
         "pin": "4",
         "set": true,
         "level": "0",
         "freq": "",
         "out": "out",
         "bcm": true,
-        "x": 600,
+        "x": 580,
         "y": 180,
         "wires": [],
         "info": "gpio/4"
