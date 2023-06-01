@@ -15,8 +15,7 @@ import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import * as ics from 'ics';
 import EventEditor, { EventEditorFormFields } from './EventEditor';
 import { randomString } from '../api/random';
-import { axiosInstance } from '../api/axios';
-import useSWR from 'swr';
+import { useAxiosFetcher } from '../api/axios';
 import {
   CalendarEvent,
   currentRangeAtom,
@@ -25,7 +24,7 @@ import {
   icalAtom,
   weekStartsOn
 } from '../api/events';
-import { useTabGpioNodeMap } from '../api/nodered';
+// import { useTabGpioNodeMap } from '../api/nodered';
 import { RRule, rrulestr } from 'rrule';
 import { setHours, setMinutes } from 'date-fns';
 
@@ -55,20 +54,17 @@ export default function Schedule() {
 
   const [slotInfoDraft, setSlotInfoDraft] = useState<SlotInfo | null | CalendarEvent>(null);
 
-  const { data: icalData, isLoading, error } = useSWR('/schedule-ical');
+  const { fetch, post } = useAxiosFetcher();
 
-  const tabMap = useTabGpioNodeMap();
+  // useEffect(() => {
+  //   fetch('/flows/schedule-ical');
+  // }, [fetch]);
 
-  useEffect(() => {
+  const tabMap = [];
 
-    if (!error && !isLoading) {
-      setIcal(icalData);
-    }
-  }, [icalData]);
-
-  function saveIcal(content: string) {
+  async function saveIcal(content: string) {
     setIcal(content);
-    axiosInstance.post('/schedule-ical', {
+    await post('/schedule-ical', {
       ical: content
     });
   }

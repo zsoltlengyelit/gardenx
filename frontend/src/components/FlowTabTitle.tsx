@@ -1,16 +1,17 @@
-import { NodeControlMode, Tab, useGpioNodeStates } from '../api/nodered';
-import { Heading, IconWarningSolid } from '@instructure/ui';
+import {Heading, IconWarningSolid} from '@instructure/ui';
+import {IoPoint, Site} from "../api/useIo";
 
 type Props = {
-    tab: Tab
+    site: Site;
+    ioConfigs: IoPoint[];
 };
 
-export default function FlowTabTitle({ tab }: Props) {
-  const { gpioNodes } = useGpioNodeStates(tab.id ?? null);
-  const hasManual = gpioNodes.some(node => node.mode === NodeControlMode.MANUAL);
-  return (
+export default function FlowTabTitle({site}: Props) {
+    // const hasManual = gpioNodes.some(node => node.mode === NodeControlMode.MANUAL);
+    const hasManual = true;
+    return (
         <Heading level="h4">
-            {tab.label}
+            {site}
             {' '}
             {hasManual && (
                 <IconWarningSolid
@@ -19,6 +20,6 @@ export default function FlowTabTitle({ tab }: Props) {
                 />
             )}
         </Heading>
-  );
+    );
 
 }

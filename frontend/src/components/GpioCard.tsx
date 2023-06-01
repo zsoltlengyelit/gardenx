@@ -1,40 +1,43 @@
-import { Button, Flex, Heading, IconEmptyLine, IconEmptySolid, Text, View } from '@instructure/ui';
-import { GpioNode, NodeControlMode, useGpioNodeStates } from '../api/nodered';
+import { Button, Flex, Heading, IconEmptyLine, IconEmptySolid, Pill, Text, View } from '@instructure/ui';
+import React from 'react';
+import { IoPoint } from '../api/useIo';
 
+enum NodeControlMode {
+    MANUAL
+}
 type Props = {
-    node: GpioNode;
-    flowId: string | null
+    ioPoint: IoPoint;
+    site: string | null
 };
 
-export default function GpioCard({ node, flowId }: Props) {
+export default function GpioCard({ ioPoint, site }: Props) {
 
-  const { updateGpioNode } = useGpioNodeStates(flowId);
+  // const { updateGpioNode } = useGpioNodeStates(flowId);
+  const updateGpioNode = (a: any) => {};
 
-  function handleUpdateState(node: GpioNode) {
+  function handleUpdateState(node: IoPoint) {
     updateGpioNode(node);
   }
 
   return (
         <View
-            key={node.id}
             as="div"
             shadow="resting"
             margin="small"
             padding="small"
-            background={node.state ? 'success' : undefined}
+            background={ioPoint.state ? 'success' : undefined}
         >
             <Flex direction="row">
                 <Flex.Item shouldGrow>
-                    <Heading level="h3">{node.name}</Heading>
+                    <Heading level="h3">{ioPoint.name}</Heading>
                 </Flex.Item>
                 <Flex.Item>
-                    <Button
-                        color={node.mode === NodeControlMode.MANUAL ? 'danger' : 'primary-inverse'}
-                        disabled
-                        title={node.mode === NodeControlMode.MANUAL ? 'Manual mode' : 'Auto mode'}
+                    <Pill
+                        color={ioPoint.mode === NodeControlMode.MANUAL ? 'warning' : 'success'}
+                        title={ioPoint.mode === NodeControlMode.MANUAL ? 'Manual mode' : 'Auto mode'}
                     >
-                        {node.mode === NodeControlMode.MANUAL ? 'M' : 'A'}
-                    </Button>
+                        {ioPoint.mode === NodeControlMode.MANUAL ? 'manual' : 'auto'}
+                    </Pill>
                 </Flex.Item>
             </Flex>
 
@@ -45,10 +48,10 @@ export default function GpioCard({ node, flowId }: Props) {
             >
                 <Flex.Item shouldGrow>
 
-                    <Text weight="bold">{node.info}</Text>
+                    <Text weight="bold">{ioPoint.info}</Text>
 
                     <View as="div">
-                        <Text>PIN: {node.pin}</Text>
+                        <Text>PIN: {ioPoint.pin}</Text>
                     </View>
 
                 </Flex.Item>
@@ -60,9 +63,9 @@ export default function GpioCard({ node, flowId }: Props) {
                 >
                     <Button
                         color="primary-inverse"
-                        onClick={() => handleUpdateState(node)}
+                        onClick={() => handleUpdateState(ioPoint)}
                     >
-                        {node.state ? <IconEmptySolid color="success"/> : <IconEmptyLine/>}
+                        {ioPoint.state ? <IconEmptySolid color="success"/> : <IconEmptyLine/>}
                     </Button>
 
                 </Flex.Item>

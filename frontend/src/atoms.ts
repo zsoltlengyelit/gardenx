@@ -1,4 +1,4 @@
-import { atomWithStorage } from 'jotai/utils';
-import { Tab } from './api/nodered';
+import {atomWithStorage} from 'jotai/utils';
+import {Site} from "./api/useIo";
 
-export const selectedTabAtom = atomWithStorage<Tab | null>('selectedTab', null);
+export const selectedSiteAtom = atomWithStorage<Site | null>('selectedSite', null);

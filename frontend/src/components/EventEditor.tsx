@@ -20,9 +20,9 @@ import 'react-calendar/dist/Calendar.css';
 import 'react-clock/dist/Clock.css';
 import { CalendarEvent } from '../api/events';
 import { RRule, rrulestr } from 'rrule';
-import { useGetGpioNodes, useTabGpioNodeMap } from '../api/nodered';
+// import { useGetGpioNodes, useTabGpioNodeMap } from '../api/nodered';
 import { useAtomValue } from 'jotai';
-import { selectedTabAtom } from '../atoms';
+import { selectedSiteAtom } from '../atoms';
 import GDateTimeInput from './GDateTimeInput';
 import { joiResolver } from '@hookform/resolvers/joi';
 import * as joi from 'joi';
@@ -55,7 +55,7 @@ export default function EventEditor({ draft, onClose, onSave, onDelete, onUpdate
   }
 
   const tabMaps = useTabGpioNodeMap();
-  const selectedTab = useAtomValue(selectedTabAtom);
+  const selectedTab = useAtomValue(selectedSiteAtom);
 
   const isSaved = isCalendarEvent(draft);
 

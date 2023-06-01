@@ -1,53 +1,53 @@
-import { Tab, useGpioNodeStates } from '../api/nodered';
-import { Tabs, View } from '@instructure/ui';
-import { useEffect } from 'react';
-import { useUpdateAtom } from 'jotai/utils';
-import { useAtomValue } from 'jotai';
+// import { Tab, useGpioNodeStates } from '../api/nodered';
+import {Tabs, View} from '@instructure/ui';
+import {useEffect} from 'react';
+import {useUpdateAtom} from 'jotai/utils';
+import {useAtomValue} from 'jotai';
 import GpioCard from './GpioCard';
 import FlowTabTitle from './FlowTabTitle';
-import { selectedTabAtom } from '../atoms';
+import {selectedSiteAtom} from '../atoms';
+import {IoState, Site} from "../api/useIo";
 
 type Props = {
-    tabs: Tab[];
+    ioState: IoState;
 };
 
-export default function GpioNodeList({ tabs }: Props) {
+export default function GpioNodeList({ioState}: Props) {
 
-  const selectedTab = useAtomValue<Tab | null>(selectedTabAtom);
-  const setSelectedTab = useUpdateAtom(selectedTabAtom);
-  const { gpioNodes } = useGpioNodeStates(selectedTab?.id ?? null);
+    const selectedSite = useAtomValue<Site | null>(selectedSiteAtom);
+    const setSelectedTab = useUpdateAtom(selectedSiteAtom);
 
-  useEffect(() => {
-    if (selectedTab === null && tabs.length > 0) {
-      setSelectedTab(tabs[0]);
+    const sites = ioState ? Object.keys(ioState) : [];
+    useEffect(() => {
+        if (selectedSite === null && ioState !== null && sites.length > 0) {
+            setSelectedTab(sites[0]);
+        }
+    }, [ioState]);
+
+    function handleTabChange(event: any, {index}: { index: number }) {
+        setSelectedTab(sites[index]);
     }
-  }, [tabs]);
 
-  function handleTabChange(event: any, { index }: { index: number }) {
-    setSelectedTab(tabs[index]);
-  }
-
-  return (
+    return (
         <View
             as="div"
         >
 
             <Tabs
                 onRequestTabChange={handleTabChange}
-
             >
-                {tabs.map(tab => (
+                {ioState && Object.entries(ioState).map(([site, ioPoints], index) => (
                     <Tabs.Panel
-                        key={tab.id}
-                        id={tab.id}
-                        renderTitle={() => <FlowTabTitle tab={tab}/>}
-                        isSelected={tab.id === selectedTab?.id}
+                        key={site}
+                        id={site}
+                        renderTitle={() => <FlowTabTitle site={site} ioConfigs={ioPoints}/>}
+                        isSelected={site === selectedSite}
                     >
-                        {gpioNodes.map(node => (
+                        {ioPoints.map(ioPoint => (
                             <GpioCard
-                                node={node}
-                                key={node.id}
-                                flowId={selectedTab?.id ?? null}
+                                ioPoint={ioPoint}
+                                key={ioPoint.name}
+                                site={selectedSite ?? null}
                             />
                         ))}
                     </Tabs.Panel>
@@ -56,5 +56,5 @@ export default function GpioNodeList({ tabs }: Props) {
             </Tabs>
 
         </View>
-  );
+    );
 }
