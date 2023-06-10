@@ -43,6 +43,11 @@ const localizer = dateFnsLocalizer({
   getDay,
   locales,
 });
+
+function timestamptToArray(startTime: Date) {
+  return convertTimestampToArray(startTime.valueOf(), 'local');
+}
+
 // @ts-ignore
 const DnDCalendar = withDragAndDrop(Calendar);
 
@@ -78,9 +83,11 @@ export default function Schedule() {
   };
 
   function calendarEventToEventAttributes(event: CalendarEvent) {
+    const startTimestamp = event.start!;
+    const endTimestamp = event.end!;
     return {
-      start: convertTimestampToArray(event.start!.valueOf(), 'local'),
-      end: convertTimestampToArray(event.end!.valueOf(), 'local'),
+      start: timestamptToArray(startTimestamp),
+      end: timestamptToArray(endTimestamp),
       recurrenceRule: event.rrule?.toString(),
       uid: event.uid,
       title: event.summary,
@@ -121,8 +128,8 @@ export default function Schedule() {
       ...existingEvents,
       {
         uid: randomString(32),
-        start: convertTimestampToArray(draft.start.valueOf(), 'local'),
-        end: convertTimestampToArray(draft.end.valueOf(), 'local'),
+        start: timestamptToArray(draft.start),
+        end: timestamptToArray(draft.end),
         categories: [draft.flowId, draft.nodeId],
         recurrenceRule: draft.rrule
           ? normalizeRrule(rrulestr(draft.rrule, {
@@ -183,11 +190,13 @@ export default function Schedule() {
 
     const mappedEvents = existingEvents.map(ee => {
       if (ee.uid === event.uid) {
-        const recurrenceRule = event.rrule ? normalizeRrule(event.rrule as any, event.start!) : undefined;
+        const startTime = event.start!;
+        const endTime = event.end!;
+        const recurrenceRule = event.rrule ? normalizeRrule(event.rrule as any, startTime!) : undefined;
         return {
           uid: event.uid,
-          start: convertTimestampToArray(event.start!.valueOf(), 'local'),
-          end: convertTimestampToArray(event.end!.valueOf(), 'local'),
+          start: timestamptToArray(startTime),
+          end: timestamptToArray(endTime),
           categories: event.categories,
           recurrenceRule
         };
