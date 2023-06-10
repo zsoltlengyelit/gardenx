@@ -15,13 +15,9 @@ export default function GpioCard({ node, flowId }: Props) {
   }
 
   return (
-        <View
+        <div
             key={node.id}
-            as="div"
-            shadow="resting"
-            margin="small"
-            padding="small"
-            background={node.state ? 'success' : undefined}
+            className={`drop-shadow-md border-2 m-2 rounded-md p-2 px-3 ${node.state ? 'bg-green-700 text-white' : ''}`}
         >
             <Flex direction="row">
                 <Flex.Item shouldGrow>
@@ -67,6 +63,6 @@ export default function GpioCard({ node, flowId }: Props) {
 
                 </Flex.Item>
             </Flex>
-
-        </View>);
+        </div>
+  );
 }

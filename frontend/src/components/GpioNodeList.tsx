@@ -28,13 +28,10 @@ export default function GpioNodeList({ tabs }: Props) {
   }
 
   return (
-        <View
-            as="div"
-        >
+        <div>
 
             <Tabs
                 onRequestTabChange={handleTabChange}
-
             >
                 {tabs.map(tab => (
                     <Tabs.Panel
@@ -55,6 +52,6 @@ export default function GpioNodeList({ tabs }: Props) {
 
             </Tabs>
 
-        </View>
+        </div>
   );
 }

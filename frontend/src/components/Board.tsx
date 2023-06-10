@@ -9,39 +9,28 @@ export default function Board() {
 
   return (
         <>
-            <Flex>
-                <Flex.Item
-                    align="start"
+            <div className="flex flex-col md:flex-row">
+                <div
+                    className="align-top"
                 >
-                    <View
-                        as="div"
-                        width={400}
-                    >
-                        <View
-                            as="header"
-                            margin="medium"
-                        >
-                            <Heading level="h1">
-                                <img
-                                    src={'./happyplant.webp'}
-                                    height={80}
-                                />
-                                {' '}
-                                HapPi Plant
-                            </Heading>
-                        </View>
+                    <header className="m-3">
+                        <h1 className="text-2xl font-weight-bold">
+                            <img
+                                src={'./happyplant.webp'}
+                                className="h-12 inline"
+                            />
+                            {' '}
+                            HapPi Plant
+                        </h1>
+                    </header>
 
-                        <GpioNodeList tabs={tabs}/>
-                    </View>
-                </Flex.Item>
+                    <GpioNodeList tabs={tabs}/>
+                </div>
 
-                <Flex.Item
-                    shouldGrow
-                    padding="0 small 0 0"
-                >
+                <div className="flex-grow pt-3">
                     <Schedule/>
-                </Flex.Item>
-            </Flex>
+                </div>
+            </div>
         </>
   );
 }
