@@ -6,7 +6,10 @@
   "scripts": {
     "start": "run-p start:nodered start:frontend",
     "start:nodered": "cd nodered && npm run start",
-    "start:frontend": "cd frontend && npm run dev"
+    "start:frontend": "cd frontend && npm run dev",
+    "build": "zx ./tools/build.mjs",
+    "deploy": "zx ./tools/deploy.mjs",
+    "bd": "npm run build && npm run deploy"
   },
   "repository": {
     "type": "git",
@@ -20,6 +23,10 @@
   },
   "homepage": "https://github.com/zsoltlengyelit/gardenx#readme",
   "dependencies": {
-    "npm-run-all": "^4.1.5"
+    "npm-run-all": "^4.1.5",
+    "pm2": "^5.3.0"
+  },
+  "devDependencies": {
+    "zx": "^7.2.2"
   }
 }

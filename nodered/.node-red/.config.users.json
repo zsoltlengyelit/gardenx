@@ -17,7 +17,7 @@
             }
         },
         "debug": {
-            "filter": "filterCurrent"
+            "filter": "filterAll"
         },
         "menu-deploymenu-item-flow": false,
         "menu-deploymenu-item-full": true

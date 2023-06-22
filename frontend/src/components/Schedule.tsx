@@ -117,7 +117,12 @@ export default function Schedule() {
       byminute: [start.getUTCMinutes()]
     };
 
-    const rruleString = rruleClone.toString();
+    let rruleString = rruleClone.toString();
+    const parts = rruleString.split('\n');
+    rruleString = parts[parts.length - 1];
+
+    rruleString = rruleString.split(';').filter(part => !part.startsWith('DTSTART')).join(';');
+
     const prefix = 'RRULE:';
     return rruleString.startsWith(prefix) ? rruleString.substring(prefix.length) : rruleString;
   }
@@ -248,7 +253,7 @@ export default function Schedule() {
                     selectable={true}
                     onSelectSlot={handleSelectSlot}
                     resizable
-                    style={{ height: '100%' }}
+                    style={{ height: '50vh' }}
                     onNavigate={handleNavigate}
                     onView={handleView}
                     onSelectEvent={handleSelectEvent}

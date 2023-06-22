@@ -64,7 +64,7 @@
         ],
         "x": 1654,
         "y": 359,
-        "w": 272,
+        "w": 292,
         "h": 122
     },
     {
@@ -678,7 +678,7 @@
         "type": "debug",
         "z": "6654f6e517e71542",
         "g": "a91e2c4450d81c14",
-        "name": "debug 3",
+        "name": "Before router",
         "active": false,
         "tosidebar": true,
         "console": false,
@@ -687,7 +687,7 @@
         "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
-        "x": 1820,
+        "x": 1830,
         "y": 440,
         "wires": []
     },
@@ -846,9 +846,15 @@
             [
                 "05e046d8a67ed56c"
             ],
-            [],
-            [],
-            []
+            [
+                "f163a93b1b43035b"
+            ],
+            [
+                "528f8913dfc444d2"
+            ],
+            [
+                "c973bbeb43612f31"
+            ]
         ]
     },
     {

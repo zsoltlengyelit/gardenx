@@ -75,8 +75,10 @@ export function useGetTabs() {
   return filtered;
 }
 
-const ws = new ReconnectingWebSocket('ws://localhost:1880/ws/io');
+const ws = new ReconnectingWebSocket(import.meta.env.VITE_NODE_RED_WS);
 const wildCardGpioName = 'gpio/*';
+
+let needSendIoStateRefresh = true;
 
 export function useGetGpioNodes(flowId: string | null) {
   const { data, error, isLoading } = useGetFlow(flowId);
@@ -89,9 +91,15 @@ export function useGetGpioNodes(flowId: string | null) {
   }, [data]);
 
   useEffect(() => {
-    if (isConnected) {
+    if (isConnected && needSendIoStateRefresh) {
       // this will make Node-red send a state update via WebSocket
-      swrFetcher('/send-io-state');
+      needSendIoStateRefresh = false;
+      swrFetcher('/send-io-state').catch((e) => {
+        needSendIoStateRefresh = true;
+        throw e;
+      });
+    } else {
+      needSendIoStateRefresh = true;
     }
   }, [isConnected]);
 
@@ -135,22 +143,7 @@ export function useGetGpioNodes(flowId: string | null) {
   return { flow: data, gpioNodes: filtered, isConnected };
 }
 
-export async function updateGpioNode(node: GpioNode) {
-
-  let state = NodeState.OFF;
-  let mode = NodeControlMode.AUTO;
-
-  if (node.mode === NodeControlMode.AUTO || node.mode === undefined) {
-    mode = NodeControlMode.MANUAL;
-    state = NodeState.ON;
-  } else if (node.mode === NodeControlMode.MANUAL && node.state) {
-    mode = NodeControlMode.MANUAL;
-    state = NodeState.OFF;
-  } else if (node.mode === NodeControlMode.MANUAL && !node.state) {
-    mode = NodeControlMode.AUTO;
-    state = NodeState.OFF;
-  }
-
+export async function updateGpioNode(node: GpioNode, state: NodeState, mode: NodeControlMode) {
   await axiosInstance.put('/io', [{
     io: node.info,
     mode,
