@@ -533,7 +533,7 @@
         "z": "6654f6e517e71542",
         "g": "3069d0b288ab8525",
         "confignode": "4e04a4d03b8d4fb4",
-        "timeout": "2",
+        "timeout": "10",
         "timeoutUnits": "seconds",
         "cron": "",
         "name": "Calendar sensor",

@@ -50,6 +50,7 @@ export default function GpioCard({ node, flowId }: Props) {
                             name={`context-${node.id}`}
                             defaultValue="auto"
                             description=""
+                            size="large"
                             variant="toggle"
                             layout="stacked"
                             onChange={(event, value) => handleUpdateStateSwitch(node, value as any)}

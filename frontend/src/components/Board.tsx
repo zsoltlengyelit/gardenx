@@ -13,13 +13,7 @@ export default function Board() {
                 <div
                     className="align-top shadow-xl rounded-lg rounded"
                 >
-                    <header className="bg-green-600 text-white py-4 px-2 pr-4">
-                        <span className='inline rounded-circle p-4 w-12 bg-white mr-6'>
-                        <img
-                            src={'./happyplant.png'}
-                            className="h-12 w-12 inline"
-                        />
-                        </span>
+                    <header className="bg-green-600 text-white py-3 px-3 pr-4">
                         <h1 className="text-2xl font-weight-bold inline">
                             HapPi Plant
                         </h1>
