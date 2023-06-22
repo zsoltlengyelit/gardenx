@@ -28,7 +28,7 @@ export default function GpioNodeList({ tabs }: Props) {
   }
 
   return (
-        <div className="bg-green-100">
+        <div className="">
 
             <Tabs
                 onRequestTabChange={handleTabChange}
@@ -40,7 +40,7 @@ export default function GpioNodeList({ tabs }: Props) {
                         renderTitle={() => <FlowTabTitle tab={tab}/>}
                         isSelected={tab.id === selectedTab?.id}
                     >
-                        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-2">
+                        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-2 px-4">
                         {gpioNodes.map(node => (
                             <GpioCard
                                 node={node}

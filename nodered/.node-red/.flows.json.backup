@@ -142,9 +142,9 @@
             "5eef3ad2022205c8",
             "7043f089e62cf40c"
         ],
-        "x": 454,
+        "x": 434,
         "y": 499,
-        "w": 392,
+        "w": 412,
         "h": 122
     },
     {
@@ -635,7 +635,7 @@
         "z": "6654f6e517e71542",
         "g": "a91e2c4450d81c14",
         "name": "Auto/manual switch",
-        "func": "const statePrefix = 'manualstate_';\n\nconst modes = {\n    auto: 'auto',\n    manual: 'manual'\n};\n\n// handle gpio/*\nif (msg.topic === 'gpio/*') {\n\n    const manuals = flow.keys().filter(key => key.startsWith(statePrefix));\n\n    const manualModes = manuals.reduce((acc, key) => {\n        acc[key.substring(statePrefix.length)] = flow.get(key);\n        return acc;\n    }, {});\n\n    axios.get('http://localhost:1880/flows')\n        .then(function (response) {\n            const gpioNodes = response.data.filter(n => n.type === 'rpi-gpio out');\n\n            gpioNodes.map(node => {\n                return {\n                    topic: node.info,\n                    payload: manualModes[node.info] === undefined ? msg.payload : manualModes[node.info],\n                    mode: manualModes[node.info] === undefined ? modes.auto : modes.manual\n                }\n            }).forEach(message => node.send(message));\n\n            node.done();\n        });\n\n    return;\n}\n\n\nconst stateKey = (statePrefix + msg.topic).replaceAll(' ', '_');\n\nif (msg.mode === modes.manual) {\n    flow.set(stateKey, msg.payload);\n}\nif (msg.mode === modes.auto) {\n    flow.set(stateKey, undefined);\n}\n\nconst manualState = flow.get(stateKey);\n\nif (manualState !== undefined) {\n    msg.payload = manualState;\n    msg.mode = modes.manual;\n}\n\nreturn msg;",
+        "func": "const statePrefix = 'manualstate_';\n\nconst modes = {\n    auto: 'auto',\n    manual: 'manual'\n};\n\n// handle gpio/*\nif (msg.topic === 'gpio/*') {\n\n    const manuals = flow.keys().filter(key => key.startsWith(statePrefix));\n\n    const manualModes = manuals.reduce((acc, key) => {\n        acc[key.substring(statePrefix.length)] = flow.get(key);\n        return acc;\n    }, {});\n\n    axios.get('http://localhost:1880/flows')\n        .then(function (response) {\n            const gpioNodes = response.data.filter(n => n.type === 'rpi-gpio out');\n\n            gpioNodes.map(node => {\n                return {\n                    topic: node.info,\n                    payload: manualModes[node.info] === undefined ? msg.payload : manualModes[node.info],\n                    mode: manualModes[node.info] === undefined ? modes.auto : modes.manual\n                }\n            }).forEach(message => node.send(message));\n\n            node.done();\n        });\n\n    return;\n}\n\nfunction escapeRegExp(string) {\n    return string.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&'); // $& means the whole matched string\n}\n\nfunction replaceAll(str, find, replace) {\n    return str.replace(new RegExp(escapeRegExp(find), 'g'), replace);\n}\n\n\nconst stateKey = replaceAll(statePrefix + msg.topic, ' ', '_');\n\nif (msg.mode === modes.manual) {\n    flow.set(stateKey, msg.payload);\n}\nif (msg.mode === modes.auto) {\n    flow.set(stateKey, undefined);\n}\n\nconst manualState = flow.get(stateKey);\n\nif (manualState !== undefined) {\n    msg.payload = manualState;\n    msg.mode = modes.manual;\n}\n\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -763,10 +763,10 @@
         "freq": "",
         "out": "out",
         "bcm": true,
+        "info": "gpio/1",
         "x": 680,
         "y": 440,
-        "wires": [],
-        "info": "gpio/1"
+        "wires": []
     },
     {
         "id": "05e046d8a67ed56c",
@@ -779,10 +779,10 @@
         "freq": "",
         "out": "out",
         "bcm": true,
+        "info": "gpio/2",
         "x": 680,
         "y": 520,
-        "wires": [],
-        "info": "gpio/2"
+        "wires": []
     },
     {
         "id": "6ed0c7fefce6a48c",
@@ -868,10 +868,10 @@
         "freq": "",
         "out": "out",
         "bcm": true,
+        "info": "gpio/3",
         "x": 680,
         "y": 580,
-        "wires": [],
-        "info": "gpio/3"
+        "wires": []
     },
     {
         "id": "528f8913dfc444d2",
@@ -884,10 +884,10 @@
         "freq": "",
         "out": "out",
         "bcm": true,
+        "info": "gpio/5",
         "x": 680,
         "y": 640,
-        "wires": [],
-        "info": "gpio/5"
+        "wires": []
     },
     {
         "id": "c973bbeb43612f31",
@@ -900,10 +900,10 @@
         "freq": "",
         "out": "out",
         "bcm": true,
+        "info": "gpio/6",
         "x": 680,
         "y": 700,
-        "wires": [],
-        "info": "gpio/6"
+        "wires": []
     },
     {
         "id": "zxl7jen16tkmodwa",
@@ -916,10 +916,10 @@
         "freq": "",
         "out": "out",
         "bcm": true,
+        "info": "gpio/4",
         "x": 580,
         "y": 180,
-        "wires": [],
-        "info": "gpio/4"
+        "wires": []
     },
     {
         "id": "7420abdf45b8e8f9",

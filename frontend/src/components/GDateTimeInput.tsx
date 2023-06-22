@@ -26,7 +26,7 @@ export default function GDateTimeInput({
                 dateFormat="yyyy MMMM D, dddd"
                 timeFormat="HH:mm"
                 isRequired={true}
-                timeStep={10}
+                timeStep={5}
                 onChange={(event, value) => {
                   onChange(value ? new Date(value) : null);
                 }

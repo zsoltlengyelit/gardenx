@@ -253,7 +253,7 @@ export default function Schedule() {
                     selectable={true}
                     onSelectSlot={handleSelectSlot}
                     resizable
-                    style={{ height: '50vh' }}
+                    style={{ height: '100%' }}
                     onNavigate={handleNavigate}
                     onView={handleView}
                     onSelectEvent={handleSelectEvent}
