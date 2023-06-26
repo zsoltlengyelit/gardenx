@@ -4,7 +4,6 @@ import {constants} from "http2";
 
 export default fp(async (fastify) => {
 
-
     const IdParams = Type.Object({id: Type.String()});
     type IdParamsType = Static<typeof IdParams>;
 

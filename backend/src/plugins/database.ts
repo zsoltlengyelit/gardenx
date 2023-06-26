@@ -5,18 +5,18 @@ import {
     InferAttributes,
     InferCreationAttributes,
     CreationOptional,
-    NonAttribute, Association, HasOneSetAssociationMixin
+    NonAttribute, Association
 } from 'sequelize';
 import fp from "fastify-plugin";
 
-class Controller extends Model<InferAttributes<Controller>, InferCreationAttributes<Controller>> {
+export class Controller extends Model<InferAttributes<Controller>, InferCreationAttributes<Controller>> {
     declare id: CreationOptional<string>;
     declare name: string;
     declare state: 'on' | 'off' | 'auto';
     declare gpio: number;
 }
 
-class Schedule extends Model<InferAttributes<Schedule>, InferCreationAttributes<Schedule>> {
+export class Schedule extends Model<InferAttributes<Schedule>, InferCreationAttributes<Schedule>> {
     declare id: CreationOptional<string>;
     declare start: Date;
     declare end: Date;
@@ -24,8 +24,6 @@ class Schedule extends Model<InferAttributes<Schedule>, InferCreationAttributes<
     declare active: boolean;
 
     declare controller: NonAttribute<Controller>;
-
-    declare setController: HasOneSetAssociationMixin<Schedule, Controller>;
 
     declare static associations: {
         controller: Association<Schedule, Controller>;
@@ -59,6 +57,7 @@ export default fp(async (fastify) => {
         name: {
             type: DataTypes.STRING,
             allowNull: false,
+            unique: true
         },
         state: {
             type: DataTypes.ENUM('on', 'off', 'auto'),
@@ -67,7 +66,8 @@ export default fp(async (fastify) => {
         },
         gpio: {
             type: DataTypes.INTEGER,
-            allowNull: false
+            allowNull: false,
+            unique: true
         }
     }, {
         sequelize,

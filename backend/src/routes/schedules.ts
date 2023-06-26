@@ -1,12 +1,10 @@
-import * as ics from "ics";
-import {convertTimestampToArray, EventAttributes} from "ics";
 import fp from "fastify-plugin";
 import {Static, Type} from "@sinclair/typebox";
 import {parseJSON} from 'date-fns';
 
 export default fp(async (fastify) => {
 
-    fastify.get('/schedules/ical', {
+    fastify.get('/schedules', {
         schema: {}
     }, async () => {
 
@@ -16,23 +14,7 @@ export default fp(async (fastify) => {
             include: {model: Controller, as: 'controller'},
         });
 
-        const events = schedules.map(schedule => {
-            return {
-                start: convertTimestampToArray(schedule.start.valueOf(), 'utc'),
-                end: convertTimestampToArray(schedule.end.valueOf(), 'utc'),
-                recurrenceRule: schedule.rrule,
-                uid: schedule.id,
-                categories: [schedule.controller.id, schedule.controller.name],
-                classification: schedule.active ? "ACTIVE" : 'INACTIVE',
-                title: schedule.controller.name,
-                startInputType: "utc",
-                endInputType: "utc",
-            } as EventAttributes;
-        });
-
-        const calendarContent = ics.createEvents(events);
-
-        return calendarContent.value
+        return schedules;
     });
 
     const CreateScheduleBody = Type.Object({
@@ -77,4 +59,26 @@ export default fp(async (fastify) => {
 
         reply.code(201);
     });
+
+
+    const IdParams = Type.Object({id: Type.String()});
+    type IdParamsType = Static<typeof IdParams>;
+
+    fastify.delete<{Params: IdParamsType}>('/schedules/:id', {
+        schema: {
+            params: IdParams
+        }
+    }, async (req, reply) => {
+        const {id} = req.params;
+
+        const count = await fastify.db.Schedule.destroy({
+            where: {id}
+        });
+
+        if (count !== 1) {
+            return reply.code(404).send();
+        }
+
+        reply.code(204);
+    })
 });

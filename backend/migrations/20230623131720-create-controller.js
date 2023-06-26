@@ -22,7 +22,8 @@ module.exports = {
                     },
                     gpio: {
                         type: DataTypes.INTEGER,
-                        allowNull: true
+                        allowNull: true,
+                        unique: true
                     }
                 }, {transaction}),
 
