@@ -2,6 +2,7 @@ import {join} from 'path';
 import AutoLoad, {AutoloadPluginOptions} from '@fastify/autoload';
 import {FastifyPluginAsync} from 'fastify';
 import * as fastifyEnv from "@fastify/env";
+import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox';
 
 export type AppOptions = {
     // Place your custom options for app below here.
@@ -26,6 +27,8 @@ const app: FastifyPluginAsync<AppOptions> = async (
     opts
 ): Promise<void> => {
     // Place here your custom code!
+
+    fastify.withTypeProvider<TypeBoxTypeProvider>();
 
     await fastify.register(fastifyEnv, {
             confKey: 'config',
@@ -67,7 +70,7 @@ const app: FastifyPluginAsync<AppOptions> = async (
     void fastify.register(AutoLoad, {
         dir: join(__dirname, 'routes'),
         options: opts
-    })
+    });
 
 };
 

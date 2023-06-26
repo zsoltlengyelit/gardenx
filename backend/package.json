@@ -8,8 +8,9 @@
     "test": "npm run build:ts && tsc -p test/tsconfig.json && tap --ts \"test/**/*.test.ts\"",
     "build:ts": "tsc",
     "watch:ts": "tsc -w",
+    "predev": "rm -rf dist",
     "dev": "npm run build:ts && concurrently -k -p \"[{name}]\" -n \"TypeScript,App\" -c \"yellow.bold,cyan.bold\" \"npm:watch:ts\" \"npm:dev:start\"",
-    "dev:start": "fastify start --ignore-watch=.ts$ -w -l info -P dist/app.js",
+    "dev:start": "export $(grep -v '^#' .env | xargs); fastify start --debug --debug-port -P --ignore-watch=.ts$ -w -l info -P dist/app.js",
     "migrate": "export $(grep -v '^#' .env | xargs); npx sequelize-cli db:migrate"
   },
   "keywords": [],
@@ -18,8 +19,12 @@
   "dependencies": {
     "@fastify/autoload": "^5.0.0",
     "@fastify/env": "^4.2.0",
+    "@fastify/routes": "^5.1.0",
     "@fastify/sensible": "^5.0.0",
+    "@fastify/type-provider-typebox": "^3.2.0",
     "@fastify/websocket": "^8.1.0",
+    "@sinclair/typebox": "^0.28.18",
+    "date-fns": "^2.30.0",
     "fastify": "^4.0.0",
     "fastify-cli": "^5.7.1",
     "fastify-plugin": "^4.0.0",
