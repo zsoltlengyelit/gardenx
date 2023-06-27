@@ -7,11 +7,6 @@ export default fp(async (fastify) => {
     const IdParams = Type.Object({id: Type.String()});
     type IdParamsType = Static<typeof IdParams>;
 
-    const BodyWithNameParams = Type.Object({
-        name: Type.String(),
-    });
-    type BodyWithNameParamsType = Static<typeof BodyWithNameParams>;
-
     const CreateControllerBodyType = Type.Object({
         name: Type.String(),
         gpio: Type.Integer()
@@ -42,20 +37,34 @@ export default fp(async (fastify) => {
         return reply.code(constants.HTTP_STATUS_CREATED).send(controller);
     });
 
-    fastify.put<{ Body: BodyWithNameParamsType, Params: IdParamsType }>('/controllers/:id', {
+    const UpdateControllerBody = Type.Object({
+        name: Type.String(),
+        gpio: Type.Integer(),
+        state: Type.String()
+    })
+    type UpdateControllerBodyType = Static<typeof UpdateControllerBody>;
+    fastify.put<{ Body: UpdateControllerBodyType, Params: IdParamsType }>('/controllers/:id', {
         schema: {
             params: IdParams,
-            body: BodyWithNameParams
+            body: UpdateControllerBody
         }
     }, async req => {
         const {id} = req.params;
 
         const body = req.body;
+
+        req.log.info("Req");
+        req.log.info(body);
+
         await fastify.db.Controller.update({
-            name: body.name
+            name: body.name,
+            state: body.state as 'on' | 'off' | 'auto',
+            gpio: body.gpio
         }, {
             where: {id}
         });
+
+        req.log.info('update success')
 
         return await fastify.db.Controller.findByPk(id);
     });

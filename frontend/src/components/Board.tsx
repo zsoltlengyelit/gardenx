@@ -1,11 +1,11 @@
-import GpioNodeList from './GpioNodeList';
-import { useGetTabs } from '../api/nodered';
+import ControllerCardList from './ControllerCardList';
 import { Button } from '@instructure/ui';
 import Schedule from './Schedule';
+import { useLiveState } from '../api/live-state';
 
 export default function Board() {
 
-  const tabs = useGetTabs();
+  const { changes } = useLiveState();
 
   return (
         <>
@@ -27,9 +27,7 @@ export default function Board() {
                         </div>
                     </header>
 
-                    <div className="bg-green-100">
-                        <GpioNodeList tabs={tabs}/>
-                    </div>
+                    <ControllerCardList changes={changes}/>
                 </div>
 
                 <div className="flex-grow pt-3 mx-4">

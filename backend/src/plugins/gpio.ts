@@ -73,6 +73,8 @@ export default fp(async (fastify) => {
 
     async function refreshState() {
 
+        log.info('Refresh state');
+
         Object.values(decoration.gpios).forEach(gpio => {
             gpio.close();
         })
@@ -152,10 +154,13 @@ export default fp(async (fastify) => {
         model.afterSave(async () => refreshState());
         // @ts-ignore
         model.afterDestroy(async () => refreshState());
+
         // @ts-ignore
         model.afterBulkDestroy(async () => refreshState());
         // @ts-ignore
-        model.afterUpdate(async () => refreshState());
+        model.afterBulkDestroy(async () => refreshState());
+        // @ts-ignore
+        model.afterBulkUpdate(async () => refreshState());
     });
 
 

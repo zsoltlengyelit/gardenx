@@ -1,36 +1,34 @@
 import { Flex, Heading, RadioInput, RadioInputGroup, Text, View } from '@instructure/ui';
-import { GpioNode, NodeControlMode, NodeState, useGpioNodeStates } from '../api/nodered';
 import React from 'react';
+import { useControllers } from '../api/controllers';
+import { Controller, OnOffAuto } from '../api/types';
 
 type Props = {
-    node: GpioNode;
-    flowId: string | null
+    controller: Controller;
+    set: boolean
 };
 
-export default function GpioCard({ node, flowId }: Props) {
+export default function ControllerCard({ controller, set }: Props) {
 
-  const { updateGpioNode } = useGpioNodeStates(flowId);
+  const { updateController } = useControllers();
 
-  function handleUpdateStateSwitch(node: GpioNode, value: 'auto' | 'off' | 'on') {
-    const state: NodeState = value === 'on' ? NodeState.ON : NodeState.OFF;
-    const mode: NodeControlMode = value === 'auto' ? NodeControlMode.AUTO : NodeControlMode.MANUAL;
-    updateGpioNode(node, state, mode);
+  function handleUpdateStateSwitch(controller: Controller, value: OnOffAuto) {
+    updateController(controller, {
+      state: value
+    });
   }
 
   return (
         <div
-            key={node.id}
-            className={`shadow-sm border-2 rounded-md p-2 px-3 ${node.state ? 'bg-green-700 text-white' : ''}`}
+            className={`shadow-sm border-2 rounded-md p-2 px-3 ${set ? 'bg-green-600 text-white' : ''}`}
         >
             <Flex direction="row">
                 <Flex.Item shouldGrow>
-                    <Heading level="h3">{node.name}</Heading>
+                    <Heading level="h3">{controller.name}</Heading>
                 </Flex.Item>
                 <Flex.Item>
-                    <Text weight="bold">{node.info}</Text>
-
                     <View as="div">
-                        <Text>PIN: {node.pin}</Text>
+                        <Text>PIN: {controller.gpio}</Text>
                     </View>
                 </Flex.Item>
             </Flex>
@@ -47,13 +45,13 @@ export default function GpioCard({ node, flowId }: Props) {
                         align="center"
                     >
                         <RadioInputGroup
-                            name={`context-${node.id}`}
-                            defaultValue="auto"
+                            name={`context-${controller.id}`}
+                            value={controller.state}
                             description=""
                             size="large"
                             variant="toggle"
                             layout="stacked"
-                            onChange={(event, value) => handleUpdateStateSwitch(node, value as any)}
+                            onChange={(event, value) => handleUpdateStateSwitch(controller, value as any)}
                         >
                             <RadioInput
                                 label="Off"

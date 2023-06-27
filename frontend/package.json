@@ -37,8 +37,7 @@
     "react-rrule-generator": "^1.2.0",
     "reconnecting-websocket": "^4.4.0",
     "rrule": "^2.7.1",
-    "sort-by": "^1.2.0",
-    "swr": "^2.0.0"
+    "sort-by": "^1.2.0"
   },
   "devDependencies": {
     "@types/react": "^18.0.26",

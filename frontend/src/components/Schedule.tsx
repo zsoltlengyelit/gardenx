@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Calendar, dateFnsLocalizer, SlotInfo, Views } from 'react-big-calendar';
 import withDragAndDrop, { withDragAndDropProps } from 'react-big-calendar/lib/addons/dragAndDrop';
 import format from 'date-fns/format';
@@ -11,21 +11,10 @@ import 'react-big-calendar/lib/addons/dragAndDrop/styles.css';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 
 import { View } from '@instructure/ui';
-import { useAtom, useAtomValue, useSetAtom } from 'jotai';
+import { useAtom, useAtomValue } from 'jotai';
 import * as ics from 'ics';
 import EventEditor, { EventEditorFormFields } from './EventEditor';
-import { randomString } from '../api/random';
-import { axiosInstance } from '../api/axios';
-import useSWR from 'swr';
-import {
-  CalendarEvent,
-  currentRangeAtom,
-  eventsAtom,
-  eventsInCurrentRangeAtom,
-  icalAtom,
-  weekStartsOn
-} from '../api/events';
-import { useTabGpioNodeMap } from '../api/nodered';
+import { CalendarEvent, currentRangeAtom, eventsAtom, eventsInCurrentRangeAtom, weekStartsOn } from '../api/events';
 import { RRule, rrulestr } from 'rrule';
 import { setHours, setMinutes } from 'date-fns';
 
@@ -53,30 +42,12 @@ const DnDCalendar = withDragAndDrop(Calendar);
 
 export default function Schedule() {
 
-  const setIcal = useSetAtom(icalAtom);
+  // const setIcal = useSetAtom(icalAtom);
   const events = useAtomValue(eventsAtom);
   const eventsInCurrentRange = useAtomValue(eventsInCurrentRangeAtom);
   const [currentRange, setCurrentRange] = useAtom(currentRangeAtom);
 
   const [slotInfoDraft, setSlotInfoDraft] = useState<SlotInfo | null | CalendarEvent>(null);
-
-  const { data: icalData, isLoading, error } = useSWR('/schedule-ical');
-
-  const tabMap = useTabGpioNodeMap();
-
-  useEffect(() => {
-
-    if (!error && !isLoading) {
-      setIcal(icalData);
-    }
-  }, [icalData]);
-
-  function saveIcal(content: string) {
-    setIcal(content);
-    axiosInstance.post('/schedule-ical', {
-      ical: content
-    });
-  }
 
   const handleSelectSlot = (slotInfo: SlotInfo) => {
     setSlotInfoDraft(slotInfo);
@@ -132,7 +103,7 @@ export default function Schedule() {
     const parsedIcal = ics.createEvents([
       ...existingEvents,
       {
-        uid: randomString(32),
+        // uid: randomString(32),
         start: timestamptToArray(draft.start),
         end: timestamptToArray(draft.end),
         categories: [draft.flowId, draft.nodeId],
@@ -149,7 +120,7 @@ export default function Schedule() {
       throw new Error((parsedIcal.error as any).errors.join('\n'));
     }
 
-    saveIcal(parsedIcal.value as string);
+    // saveIcal(parsedIcal.value as string);
 
     setSlotInfoDraft(null);
   }
@@ -185,7 +156,7 @@ export default function Schedule() {
       throw new Error((parsedIcal.error as any).errors.join('\n'));
     }
 
-    saveIcal(parsedIcal.value as string ?? '');
+    // saveIcal(parsedIcal.value as string ?? '');
 
     setSlotInfoDraft(null);
   }
@@ -215,7 +186,7 @@ export default function Schedule() {
       throw new Error((parsedIcal.error as any).errors.join('\n'));
     }
 
-    saveIcal(parsedIcal.value as string ?? '');
+    // saveIcal(parsedIcal.value as string ?? '');
 
     setSlotInfoDraft(null);
   }
@@ -258,23 +229,24 @@ export default function Schedule() {
                     onView={handleView}
                     onSelectEvent={handleSelectEvent}
                     titleAccessor={event => {
-                      if (tabMap.length === 0) {
-                        return '';
-                      }
-                      const [flowId, nodeId] = (event as CalendarEvent).categories as string[] ?? [null, null];
-
-                      const tab = tabMap.find(tab => tab.tab.id === flowId);
-
-                      if (!tab) {
-                        return `Tab is removed: ${flowId}`;
-                      }
-                      const node = tab.nodes.find(node => node.info === nodeId);
-
-                      if (!node) {
-                        return `${tab.tab.label} - Node is removed: ${nodeId}`;
-                      }
-
-                      return `${tab.tab.label} - ${node.name}`;
+                      // if (tabMap.length === 0) {
+                      //   return '';
+                      // }
+                      // const [flowId, nodeId] = (event as CalendarEvent).categories as string[] ?? [null, null];
+                      //
+                      // const tab = tabMap.find(tab => tab.tab.id === flowId);
+                      //
+                      // if (!tab) {
+                      //   return `Tab is removed: ${flowId}`;
+                      // }
+                      // const node = tab.nodes.find(node => node.info === nodeId);
+                      //
+                      // if (!node) {
+                      //   return `${tab.tab.label} - Node is removed: ${nodeId}`;
+                      // }
+                      //
+                      // return `${tab.tab.label} - ${node.name}`;
+                      return 'tab';
 
                     }}
                 />

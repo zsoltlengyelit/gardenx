@@ -3,7 +3,6 @@ import ical from 'ical';
 import { addDays, addMinutes, differenceInMinutes, startOfDay, startOfWeek } from 'date-fns';
 import { rrulestr } from 'rrule';
 import { Views } from 'react-big-calendar';
-import { randomString } from './random';
 
 export const weekStartsOn = 1;
 
@@ -46,7 +45,7 @@ export const eventsInCurrentRangeAtom = atom((get) => {
       const newEvents = dates.map(date => {
         return {
           ...event,
-          uid: `${event.uid}.${randomString(16)}`,
+          uid: `${event.uid}`, // TODO
           start: date,
           dtstamp: date,
           end: addMinutes(date, durationInMins),

@@ -4,9 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "run-p start:nodered start:frontend",
-    "start:nodered": "cd nodered && npm run start",
-    "start:frontend": "cd frontend && npm run dev",
+    "dev": "run-p dev:backend dev:frontend",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
     "build": "zx ./tools/build.mjs",
     "deploy": "zx ./tools/deploy.mjs",
     "bd": "npm run build && npm run deploy"

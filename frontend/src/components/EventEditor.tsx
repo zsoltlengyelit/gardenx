@@ -20,7 +20,6 @@ import 'react-calendar/dist/Calendar.css';
 import 'react-clock/dist/Clock.css';
 import { CalendarEvent } from '../api/events';
 import { RRule, rrulestr } from 'rrule';
-import { useGetGpioNodes, useTabGpioNodeMap } from '../api/nodered';
 import { useAtomValue } from 'jotai';
 import { selectedTabAtom } from '../atoms';
 import GDateTimeInput from './GDateTimeInput';
@@ -54,7 +53,6 @@ export default function EventEditor({ draft, onClose, onSave, onDelete, onUpdate
     return !!(draft as CalendarEvent).uid;
   }
 
-  const tabMaps = useTabGpioNodeMap();
   const selectedTab = useAtomValue(selectedTabAtom);
 
   const isSaved = isCalendarEvent(draft);
@@ -80,8 +78,6 @@ export default function EventEditor({ draft, onClose, onSave, onDelete, onUpdate
     } as EventEditorFormFields
   });
 
-  const { gpioNodes } = useGetGpioNodes(watch('flowId'));
-
   function handleFormSubmit(data: EventEditorFormFields) {
     if (isSaved) {
       // @ts-ignore
@@ -101,14 +97,6 @@ export default function EventEditor({ draft, onClose, onSave, onDelete, onUpdate
   };
 
   const submit = handleSubmit(handleFormSubmit, handleFormError);
-
-  const selectedNodeId = watch('nodeId');
-
-  useEffect(() => {
-    if (gpioNodes.length > 0 && !selectedNodeId) {
-      setValue('nodeId', gpioNodes[0].info);
-    }
-  }, [gpioNodes]);
 
   function handleDateChange(
     onChange: ComponentProps<typeof GDateTimeInput>['onChange'],
@@ -146,13 +134,13 @@ export default function EventEditor({ draft, onClose, onSave, onDelete, onUpdate
                     <Heading level="h3">Schedule</Heading>
                 </Modal.Header>
 
-                {tabMaps.length === 0 && (
+                {false && (
                     <Modal.Body>
                         No areas are defined. Please use Node-red admin
                     </Modal.Body>
                 )}
 
-                {tabMaps.length > 0 && (
+                {true && (
                     <Modal.Body>
                         <FormFieldGroup
                             description={''}
@@ -170,14 +158,14 @@ export default function EventEditor({ draft, onClose, onSave, onDelete, onUpdate
                                         }}
                                         messages={toFormMessage(error)}
                                     >
-                                        {tabMaps.map(tabMap =>
-                                            <SimpleSelect.Option
-                                                key={tabMap.tab.id}
-                                                id={tabMap.tab.id}
-                                                value={tabMap.tab.id}
-                                            >
-                                                {tabMap.tab.label}
-                                            </SimpleSelect.Option>)}
+                                        {/* {tabMaps.map(tabMap => */}
+                                        {/*    <SimpleSelect.Option */}
+                                        {/*        key={tabMap.tab.id} */}
+                                        {/*        id={tabMap.tab.id} */}
+                                        {/*        value={tabMap.tab.id} */}
+                                        {/*    > */}
+                                        {/*        {tabMap.tab.label} */}
+                                        {/*    </SimpleSelect.Option>)} */}
                                     </SimpleSelect>
                                 )}
                             />
@@ -186,9 +174,9 @@ export default function EventEditor({ draft, onClose, onSave, onDelete, onUpdate
                                 name="nodeId"
                                 control={control}
                                 render={({ field: { onChange, value }, fieldState: { error } }) => {
-                                  if (gpioNodes.length === 0) {
-                                    return <>No nodes</>;
-                                  }
+                                  // if (gpioNodes.length === 0) {
+                                  //   return <>No nodes</>;
+                                  // }
 
                                   return (
                                         <SimpleSelect
@@ -197,15 +185,15 @@ export default function EventEditor({ draft, onClose, onSave, onDelete, onUpdate
                                             onChange={(e, data) => onChange(data.value)}
                                             messages={toFormMessage(error)}
                                         >
-                                            {gpioNodes.map(node => (
-                                                <SimpleSelect.Option
-                                                    key={node.id as string}
-                                                    id={node.id as string}
-                                                    value={node.info as string}
-                                                >
-                                                    {node.name}
-                                                </SimpleSelect.Option>
-                                            ))}
+                                            {/* {gpioNodes.map(node => ( */}
+                                            {/*    <SimpleSelect.Option */}
+                                            {/*        key={node.id as string} */}
+                                            {/*        id={node.id as string} */}
+                                            {/*        value={node.info as string} */}
+                                            {/*    > */}
+                                            {/*        {node.name} */}
+                                            {/*    </SimpleSelect.Option> */}
+                                            {/* ))} */}
                                         </SimpleSelect>
                                   );
                                 }}
