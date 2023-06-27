@@ -54,6 +54,7 @@ module.exports = {
                     controller_id: {
                         type: DataTypes.STRING,
                         references: {model: {tableName: 'controller'}, key: 'id'},
+                        onDelete: 'CASCADE',
                         allowNull: false
                     }
                 }, {transaction})

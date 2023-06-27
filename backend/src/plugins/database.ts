@@ -30,12 +30,15 @@ export class Schedule extends Model<InferAttributes<Schedule>, InferCreationAttr
     }
 }
 
+type DbType = {
+    Controller: typeof Controller,
+    Schedule: typeof Schedule
+};
+
 declare module 'fastify' {
+
     export interface FastifyInstance {
-        db: {
-            Controller: typeof Controller,
-            Schedule: typeof Schedule
-        };
+        db: DbType;
     }
 }
 export default fp(async (fastify) => {
@@ -104,7 +107,11 @@ export default fp(async (fastify) => {
         tableName: 'schedule',
         timestamps: false
     });
-    Schedule.belongsTo(Controller, {as: 'controller', foreignKey: 'controller_id'})
+    Schedule.belongsTo(Controller, {
+        as: 'controller',
+        foreignKey: 'controller_id',
+        onDelete: 'cascade'
+    });
 
     try {
         await sequelize.authenticate();
@@ -113,7 +120,7 @@ export default fp(async (fastify) => {
         console.error('Unable to connect to the database:', error);
     }
 
-    fastify.decorate('db', {
+    fastify.decorate<DbType>('db', {
         Controller,
         Schedule
     });
