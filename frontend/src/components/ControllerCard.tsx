@@ -1,16 +1,27 @@
-import { Flex, Heading, RadioInput, RadioInputGroup, Text, View } from '@instructure/ui';
+import {
+  Flex,
+  Heading,
+  IconButton,
+  IconInfoLine,
+  RadioInput,
+  RadioInputGroup,
+  Text,
+  Tooltip,
+  View
+} from '@instructure/ui';
 import React from 'react';
 import { useControllers } from '../api/controllers';
 import { Controller, OnOffAuto } from '../api/types';
+import ConfirmedButton from './ConfirmedButton';
 
 type Props = {
     controller: Controller;
-    set: boolean
+    set: boolean;
 };
 
 export default function ControllerCard({ controller, set }: Props) {
 
-  const { updateController } = useControllers();
+  const { updateController, deleteController } = useControllers();
 
   function handleUpdateStateSwitch(controller: Controller, value: OnOffAuto) {
     updateController(controller, {
@@ -27,9 +38,26 @@ export default function ControllerCard({ controller, set }: Props) {
                     <Heading level="h3">{controller.name}</Heading>
                 </Flex.Item>
                 <Flex.Item>
-                    <View as="div">
-                        <Text>PIN: {controller.gpio}</Text>
-                    </View>
+
+                    <Tooltip
+                        renderTip={(
+                            <div>
+                                <Text>PIN: {controller.gpio}</Text>
+                                <div className="p-3">
+                                    <ConfirmedButton onClick={() => deleteController(controller)}>Delete</ConfirmedButton>
+                                </div>
+                            </div>
+                        )}
+                        placement="bottom"
+                        on={['click', 'hover', 'focus']}
+                    >
+                        <IconButton
+                            renderIcon={IconInfoLine}
+                            withBackground={false}
+                            withBorder={false}
+                            screenReaderLabel="Toggle Tooltip"
+                        />
+                    </Tooltip>
                 </Flex.Item>
             </Flex>
 

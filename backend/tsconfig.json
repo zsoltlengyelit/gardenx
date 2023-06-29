@@ -2,8 +2,9 @@
   "extends": "fastify-tsconfig",
   "compilerOptions": {
     "outDir": "dist",
-    "sourceMap": true,
-    "allowSyntheticDefaultImports": true
+    "sourceMap": false,
+    "allowSyntheticDefaultImports": true,
+    "declaration": false
   },
   "include": ["src/**/*.ts"]
 }

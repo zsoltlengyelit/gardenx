@@ -6,6 +6,7 @@
   "scripts": {
     "start": "npm run build:ts && fastify start -l info dist/app.js",
     "test": "npm run build:ts && tsc -p test/tsconfig.json && tap --ts \"test/**/*.test.ts\"",
+    "prebuild:ts": "npm run predev",
     "build:ts": "tsc",
     "watch:ts": "tsc -w",
     "predev": "rm -rf dist",

@@ -1,5 +1,6 @@
 import ControllerCard from './ControllerCard';
 import { ControllerChange } from '../api/types';
+import NewControllerCard from './NewControllerCard';
 
 type Props = {
     controllers: ControllerChange[];
@@ -17,6 +18,8 @@ export default function ControllerCardList({ controllers }: Props) {
                     set={controller.set}
                 />
             ))}
+
+            <NewControllerCard />
         </div>
   );
 }
