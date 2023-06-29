@@ -9,8 +9,8 @@ module.exports = {
             PM2_SERVE_HOMEPAGE: '/index.html'
         }
     }, {
-        name: 'node-red',
-        script: 'npx node-red -u ./.node-red',
-        cwd: 'nodered'
+        name: 'backend',
+        script: 'npx fastify',
+        cwd: 'backend'
     }]
 }

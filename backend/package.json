@@ -12,7 +12,8 @@
     "predev": "rm -rf dist",
     "dev": "npm run build:ts && concurrently -k -p \"[{name}]\" -n \"TypeScript,App\" -c \"yellow.bold,cyan.bold\" \"npm:watch:ts\" \"npm:dev:start\"",
     "dev:start": "export $(grep -v '^#' .env | xargs); fastify start --debug --debug-port -P --ignore-watch=.ts$ -w -l info -P dist/app.js",
-    "migrate": "export $(grep -v '^#' .env | xargs); npx sequelize-cli db:migrate"
+    "migrate": "export $(grep -v '^#' .env | xargs); npx sequelize-cli db:migrate",
+    "lint": "eslint ."
   },
   "keywords": [],
   "author": "",
@@ -29,8 +30,12 @@
     "@fastify/type-provider-typebox": "^3.2.0",
     "@fastify/websocket": "^8.1.0",
     "@sinclair/typebox": "^0.28.18",
+    "@typescript-eslint/eslint-plugin": "^5.60.1",
+    "@typescript-eslint/parser": "^5.60.1",
     "croner": "^6.0.5",
     "date-fns": "^2.30.0",
+    "eslint": "^8.43.0",
+    "eslint-config-standard": "^17.1.0",
     "fastify": "^4.0.0",
     "fastify-cli": "^5.7.1",
     "fastify-plugin": "^4.0.0",

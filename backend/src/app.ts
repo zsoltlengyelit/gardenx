@@ -1,12 +1,19 @@
-import {join} from 'path';
-import AutoLoad, {AutoloadPluginOptions} from '@fastify/autoload';
 import {FastifyPluginAsync} from 'fastify';
 import * as fastifyEnv from "@fastify/env";
-import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox';
+import {TypeBoxTypeProvider} from '@fastify/type-provider-typebox';
+
+import corsPlugin from './plugins/cors';
+import sensiblePlugin from './plugins/sensible';
+import databasePlugin from './plugins/database';
+import gpioPlugin from './plugins/gpio';
+
+import controllerRoutes from './routes/controller';
+import scheduleRoutes from './routes/schedules';
+import liveStateRoutes from './routes/live-state';
 
 export type AppOptions = {
     // Place your custom options for app below here.
-} & Partial<AutoloadPluginOptions>;
+};
 
 
 // Pass --options via CLI arguments in command to enable these options.
@@ -17,7 +24,6 @@ declare module 'fastify' {
         config: {
             DB_PATH: string;
             DB_NAME: string;
-            ICAL_PATH: string;
         };
     }
 }
@@ -34,19 +40,11 @@ const app: FastifyPluginAsync<AppOptions> = async (
             confKey: 'config',
             schema: {
                 type: 'object',
-                required: ['PORT'],
                 properties: {
-                    PORT: {
-                        type: 'string',
-                        default: 3000
-                    },
                     DB_PATH: {
                         type: 'string'
                     },
                     DB_NAME: {
-                        type: 'string'
-                    },
-                    ICAL_PATH: {
                         type: 'string'
                     }
                 }
@@ -60,17 +58,16 @@ const app: FastifyPluginAsync<AppOptions> = async (
     // This loads all plugins defined in plugins
     // those should be support plugins that are reused
     // through your application
-    void fastify.register(AutoLoad, {
-        dir: join(__dirname, 'plugins'),
-        options: opts
-    })
+    void fastify.register(corsPlugin, {});
+    void fastify.register(sensiblePlugin, {});
+    void fastify.register(databasePlugin, {});
+    void fastify.register(gpioPlugin, {});
 
     // This loads all plugins defined in routes
     // define your routes in one of these
-    void fastify.register(AutoLoad, {
-        dir: join(__dirname, 'routes'),
-        options: opts
-    });
+    void fastify.register(controllerRoutes);
+    void fastify.register(scheduleRoutes);
+    void fastify.register(liveStateRoutes);
 
 };
 
