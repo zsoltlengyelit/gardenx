@@ -1,11 +1,13 @@
 import ControllerCardList from './ControllerCardList';
-import { Button } from '@instructure/ui';
 import Schedule from './Schedule';
 import { useLiveState } from '../api/live-state';
+import { useMemo } from 'react';
 
 export default function Board() {
 
-  const { changes } = useLiveState();
+  const { controllers, schedules: scheduleChanges } = useLiveState();
+
+  const schedules = useMemo(() => scheduleChanges.map(s => s.schedule), [scheduleChanges]);
 
   return (
         <>
@@ -17,21 +19,13 @@ export default function Board() {
                         <h1 className="text-2xl font-weight-bold inline">
                             HapPi Plant
                         </h1>
-
-                        <div className="float-right">
-                            <Button
-                                target="_blank"
-                                href={import.meta.env.VITE_NODE_RED_URL}
-                            >Admin
-                            </Button>
-                        </div>
                     </header>
 
-                    <ControllerCardList changes={changes}/>
+                    <ControllerCardList controllers={controllers}/>
                 </div>
 
                 <div className="flex-grow pt-3 mx-4">
-                    <Schedule/>
+                    <Schedule schedules={schedules}/>
                 </div>
             </div>
         </>

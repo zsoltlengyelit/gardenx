@@ -18,62 +18,64 @@ import RRuleGenerator from 'react-rrule-generator';
 
 import 'react-calendar/dist/Calendar.css';
 import 'react-clock/dist/Clock.css';
-import { CalendarEvent } from '../api/events';
-import { RRule, rrulestr } from 'rrule';
-import { useAtomValue } from 'jotai';
-import { selectedTabAtom } from '../atoms';
+import { rrulestr } from 'rrule';
 import GDateTimeInput from './GDateTimeInput';
 import { joiResolver } from '@hookform/resolvers/joi';
 import * as joi from 'joi';
 import { toFormMessage } from '../common/form';
 import ConfirmedButton from './ConfirmedButton';
-import { ComponentProps, useEffect } from 'react';
-import moment from 'moment';
+import { ComponentProps, useMemo } from 'react';
 import { FieldPath } from 'react-hook-form/dist/types/path';
+import { useLiveState } from '../api/live-state';
+import { Schedule } from '../api/types';
+import parseISO from 'date-fns/parseISO';
+import { getDayOfYear, setDayOfYear } from 'date-fns';
+import { makeDate } from '../common/date';
 
 export type EventEditorFormFields = {
-    flowId: string;
-    nodeId: string;
+    id?: string;
+    controllerId: string;
     start: Date;
     end: Date;
     rrule?: string;
 }
 
 type Props = {
-    draft: SlotInfo | CalendarEvent;
+    draft: SlotInfo | Schedule;
     onClose: () => void;
     onSave: (draft: EventEditorFormFields) => void;
-    onDelete: (event: CalendarEvent) => void;
-    onUpdate: (event: CalendarEvent) => void;
+    onDelete: (event: Schedule) => void;
+    onUpdate: (event: Schedule) => void;
 };
 
 export default function EventEditor({ draft, onClose, onSave, onDelete, onUpdate }: Props) {
 
-  function isCalendarEvent(draft: SlotInfo | CalendarEvent): draft is CalendarEvent {
-    return !!(draft as CalendarEvent).uid;
+  const { controllers: controllerChanges } = useLiveState();
+
+  const controllers = useMemo(() => controllerChanges.map(c => c.controller), [controllerChanges]);
+
+  function isScheduleEvent(draft: SlotInfo | Schedule): draft is Schedule {
+    return !!(draft as Schedule).id;
   }
 
-  const selectedTab = useAtomValue(selectedTabAtom);
-
-  const isSaved = isCalendarEvent(draft);
-
-  const [flowId, nodeId] = isSaved ? draft.categories as string[] : [null, null];
+  const isSaved = isScheduleEvent(draft);
 
   const formSchema = joi.object<EventEditorFormFields>({
-    flowId: joi.string().required(),
-    nodeId: joi.string().required(),
+    id: joi.string().optional(),
+    controllerId: joi.string().required(),
     start: joi.date().required(),
     end: joi.date().required(),
     rrule: joi.string().allow('')
   });
 
-  const { control, handleSubmit, watch, setValue, getValues, setError } = useForm<EventEditorFormFields>({
+  const { control, handleSubmit, setValue, getValues } = useForm<EventEditorFormFields>({
     resolver: joiResolver(formSchema),
     defaultValues: {
-      flowId: isSaved ? flowId : (selectedTab?.id ?? undefined),
-      nodeId: isSaved ? nodeId : undefined,
-      start: draft.start,
-      end: draft.end,
+      // FIXME
+      id: isSaved ? draft.id : undefined,
+      controllerId: isSaved ? (draft as Schedule).controller.id : (controllers.length > 0 ? controllers[0].id : null),
+      start: makeDate(draft.start),
+      end: makeDate(draft.end),
       rrule: isSaved ? draft.rrule?.toString() : ''
     } as EventEditorFormFields
   });
@@ -82,11 +84,13 @@ export default function EventEditor({ draft, onClose, onSave, onDelete, onUpdate
     if (isSaved) {
       // @ts-ignore
       onUpdate({
-        ...(draft as CalendarEvent),
-        ...data,
-        categories: [data.flowId, data.nodeId],
-        rrule: data.rrule ? rrulestr(data.rrule) as RRule : null
-      } as CalendarEvent);
+        id: data.id!,
+        start: data.start.toISOString(),
+        end: data.end.toISOString(),
+        active: true,
+        controller: controllers.find(c => c.id === data.controllerId)!,
+        rrule: data.rrule ? rrulestr(data.rrule).toString() : undefined
+      });
     } else {
       onSave(data);
     }
@@ -106,16 +110,16 @@ export default function EventEditor({ draft, onClose, onSave, onDelete, onUpdate
 
     return (date: Date | null) => {
 
-      const endTime = getValues(correctedPath);
-      const dayOfYear = moment(date).get('dayOfYear');
-      const correctedDate = moment(endTime).set('dayOfYear', dayOfYear).toDate();
+      const endTime = getValues(correctedPath as 'end');
+      const dayOfYear = getDayOfYear(date!);
+      const correctedDate = setDayOfYear(endTime, dayOfYear);
 
-      if (
-        (correctedPath === 'end' && moment(correctedDate).isSameOrBefore(date)) ||
-                (correctedPath === 'start' && moment(correctedDate).isSameOrAfter(date))) {
-        setError(ownPath, { message: 'Start cannot be after end' });
-        return;
-      }
+      // if (
+      //   (correctedPath === 'end' && makeDate(correctedDate).isSameOrBefore(date)) ||
+      //           (correctedPath === 'start' && makeDate(correctedDate).isSameOrAfter(date))) {
+      //   setError(ownPath, { message: 'Start cannot be after end' });
+      //   return;
+      // }
 
       setValue(correctedPath, correctedDate);
       onChange(date);
@@ -134,125 +138,93 @@ export default function EventEditor({ draft, onClose, onSave, onDelete, onUpdate
                     <Heading level="h3">Schedule</Heading>
                 </Modal.Header>
 
-                {false && (
-                    <Modal.Body>
-                        No areas are defined. Please use Node-red admin
-                    </Modal.Body>
-                )}
+                <Modal.Body>
+                    <FormFieldGroup
+                        description={''}
+                        rowSpacing="small"
+                    >
+                        <Controller
+                            name="controllerId"
+                            control={control}
+                            render={({ field: { onChange, value }, fieldState: { error } }) => {
+                              if (controllers.length === 0) {
+                                return <>No controllers</>;
+                              }
 
-                {true && (
-                    <Modal.Body>
-                        <FormFieldGroup
-                            description={''}
-                            rowSpacing="small"
-                        >
-                            <Controller
-                                name="flowId"
-                                control={control}
-                                render={({ field: { onChange, value }, fieldState: { error } }) => (
+                              return (
                                     <SimpleSelect
-                                        renderLabel={'Flow'}
+                                        renderLabel={'Controller'}
                                         value={value}
-                                        onChange={(e, { value: eventValue }) => {
-                                          onChange(eventValue);
-                                        }}
+                                        onChange={(e, data) => onChange(data.value)}
                                         messages={toFormMessage(error)}
                                     >
-                                        {/* {tabMaps.map(tabMap => */}
-                                        {/*    <SimpleSelect.Option */}
-                                        {/*        key={tabMap.tab.id} */}
-                                        {/*        id={tabMap.tab.id} */}
-                                        {/*        value={tabMap.tab.id} */}
-                                        {/*    > */}
-                                        {/*        {tabMap.tab.label} */}
-                                        {/*    </SimpleSelect.Option>)} */}
+                                        {controllers.map(controller => (
+                                            <SimpleSelect.Option
+                                                key={controller.id}
+                                                id={controller.id as string}
+                                                value={controller.id}
+                                            >
+                                                {controller.name}
+                                            </SimpleSelect.Option>
+                                        ))}
                                     </SimpleSelect>
-                                )}
-                            />
+                              );
+                            }}
+                        />
 
-                            <Controller
-                                name="nodeId"
-                                control={control}
-                                render={({ field: { onChange, value }, fieldState: { error } }) => {
-                                  // if (gpioNodes.length === 0) {
-                                  //   return <>No nodes</>;
-                                  // }
-
-                                  return (
-                                        <SimpleSelect
-                                            renderLabel={'Node'}
-                                            value={value}
-                                            onChange={(e, data) => onChange(data.value)}
-                                            messages={toFormMessage(error)}
-                                        >
-                                            {/* {gpioNodes.map(node => ( */}
-                                            {/*    <SimpleSelect.Option */}
-                                            {/*        key={node.id as string} */}
-                                            {/*        id={node.id as string} */}
-                                            {/*        value={node.info as string} */}
-                                            {/*    > */}
-                                            {/*        {node.name} */}
-                                            {/*    </SimpleSelect.Option> */}
-                                            {/* ))} */}
-                                        </SimpleSelect>
-                                  );
-                                }}
-                            />
-
-                            <Controller
-                                name="start"
-                                control={control}
-                                render={({ field: { onChange, value, name }, fieldState: { error } }) => (
-                                    <GDateTimeInput
-                                        value={value}
-                                        onChange={handleDateChange(onChange, name, 'end')}
-                                        label="Start"
-                                        messages={toFormMessage(error)}
-                                    />
-                                )}
-                            />
-
-                            <Controller
-                                name="end"
-                                control={control}
-                                render={({ field: { onChange, value, name }, fieldState: { error } }) => (
-                                    <GDateTimeInput
-                                        value={value}
-                                        onChange={handleDateChange(onChange, name, 'start')}
-                                        label="End"
-                                        messages={toFormMessage(error)}
-                                    />
-                                )}
-                            />
-
-                            <FormField
-                                label={''}
-                                id={'rrule'}
-                            >
-                                <Controller
-                                    name="rrule"
-                                    control={control}
-                                    render={({ field: { onChange, value }, fieldState: { error } }) => (
-                                        <><RRuleGenerator
-                                            value={value}
-                                            onChange={(rrule: string) => onChange(rrule)}
-                                            config={{
-                                              repeat: ['Weekly', 'Monthly', 'Daily'],
-                                              yearly: 'on the',
-                                              monthly: 'on',
-                                              end: ['Never', 'On date'],
-                                              weekStartsOnSunday: false,
-                                              hideError: true,
-                                            }}
-                                          />
-                                            <FormFieldMessages messages={toFormMessage(error)}/>
-                                        </>
-                                    )}
+                        <Controller
+                            name="start"
+                            control={control}
+                            render={({ field: { onChange, value, name }, fieldState: { error } }) => (
+                                <GDateTimeInput
+                                    value={typeof value === 'string' ? parseISO(value) : value}
+                                    onChange={handleDateChange(onChange, name, 'end')}
+                                    label="Start"
+                                    messages={toFormMessage(error)}
                                 />
-                            </FormField>
-                        </FormFieldGroup>
-                    </Modal.Body>
-                )}
+                            )}
+                        />
+
+                        <Controller
+                            name="end"
+                            control={control}
+                            render={({ field: { onChange, value, name }, fieldState: { error } }) => (
+                                <GDateTimeInput
+                                    value={typeof value === 'string' ? parseISO(value) : value}
+                                    onChange={handleDateChange(onChange, name, 'start')}
+                                    label="End"
+                                    messages={toFormMessage(error)}
+                                />
+                            )}
+                        />
+
+                        <FormField
+                            label={''}
+                            id={'rrule'}
+                        >
+                            <Controller
+                                name="rrule"
+                                control={control}
+                                render={({ field: { onChange, value }, fieldState: { error } }) => (
+                                    <><RRuleGenerator
+                                        value={value}
+                                        onChange={(rrule: string) => onChange(rrule)}
+                                        config={{
+                                          repeat: ['Weekly', 'Monthly', 'Daily'],
+                                          yearly: 'on the',
+                                          monthly: 'on',
+                                          end: ['Never', 'On date'],
+                                          weekStartsOnSunday: false,
+                                          hideError: true,
+                                        }}
+                                      />
+                                        <FormFieldMessages messages={toFormMessage(error)}/>
+                                    </>
+                                )}
+                            />
+                        </FormField>
+                    </FormFieldGroup>
+                </Modal.Body>
 
                 <Modal.Footer>
                     <Flex width="100%">
@@ -290,6 +262,5 @@ export default function EventEditor({ draft, onClose, onSave, onDelete, onUpdate
             </Modal>
 
         </>
-  )
-  ;
+  );
 }

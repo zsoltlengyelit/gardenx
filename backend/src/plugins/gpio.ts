@@ -2,8 +2,11 @@ import fp from "fastify-plugin";
 import {BinaryValue, Gpio, ValueCallback} from "onoff";
 import {isWithinInterval} from "date-fns";
 import {Observable, ReplaySubject} from "rxjs";
-import {Controller} from "./database";
+import {Controller, Schedule} from "./database";
 import {FastifyBaseLogger} from "fastify";
+import {calculateSchedules} from "./gpio/schedules-rrule";
+import fastifySchedule from '@fastify/schedule'
+import {AsyncTask, CRON_EVERY_MINUTE, CronJob} from "toad-scheduler";
 
 function createMockGpio(controller: Controller, log: FastifyBaseLogger) {
     return {
@@ -46,16 +49,24 @@ class MemoizedGpio {
     }
 }
 
-type GpioChange = {
+type ControllerChange = {
+    type: 'controller'
     controller: Controller;
     set: boolean;
 }
+
+type ScheduleChange = {
+    schedule: Schedule;
+    type: 'schedule'
+}
+
+type Change = ScheduleChange | ControllerChange;
 
 declare module 'fastify' {
     export interface FastifyInstance {
         gpio: {
             gpios: Record<string, MemoizedGpio>;
-            changes: Observable<GpioChange[]>
+            changes: Observable<Change[]>
         };
     }
 }
@@ -66,7 +77,7 @@ export default fp(async (fastify) => {
     const log = fastify.log;
     const decoration = {
         gpios: {} as Record<string, MemoizedGpio>,
-        changes: new ReplaySubject<GpioChange[]>(1)
+        changes: new ReplaySubject<Change[]>(1)
     };
 
     fastify.decorate('gpio', decoration);
@@ -93,14 +104,12 @@ export default fp(async (fastify) => {
         }, {} as Record<string, MemoizedGpio>);
 
 
-        const schedules = await Schedule.findAll({
+        const scheduleEntities = await Schedule.findAll({
             include: {
                 model: Controller, as: 'controller'
-            },
-            where: {
-                active: true,
             }
         });
+        const schedules = calculateSchedules(scheduleEntities);
 
         // set states
         for (const controller of controllers) {
@@ -114,17 +123,14 @@ export default fp(async (fastify) => {
 
             } else if (controller.state === 'auto') {
 
-                const ownSchedules = schedules.filter(sch => sch.controller.id === controller.id);
+                const ownSchedules = schedules.filter(sch => sch.schedule.controller.id === controller.id && sch.schedule.active);
 
-                const isOnBySchedule = ownSchedules.some(sch => {
-                    // find one that activates
-                    if (sch.rrule) {
-                        // TODO handle
-                    } else if (isWithinInterval(new Date(), {
-                        start: sch.start,
-                        end: sch.end
+                const isOnBySchedule = ownSchedules.some(event => {
+                    if (isWithinInterval(new Date(), {
+                        start: event.start,
+                        end: event.end
                     })) {
-                        log.info(`Activate GPIO by Schedule ${sch.id}`);
+                        log.info(`Activate GPIO by Schedule ${JSON.stringify(event.schedule, null, 4)}`);
                         return true;
                     }
                 });
@@ -136,11 +142,17 @@ export default fp(async (fastify) => {
         // publish controllers state
         const changes = Object.values(decoration.gpios).reduce((acc, gpio) => {
             acc.push({
+                type: 'controller',
                 controller: gpio.controller,
                 set: !!gpio.value
             })
             return acc;
-        }, [] as GpioChange[]);
+        }, [] as Change[]);
+
+        changes.push(...scheduleEntities.map(schedule => ({
+            type: 'schedule',
+            schedule
+        } as ScheduleChange)));
 
         decoration.changes.next(changes);
 
@@ -164,12 +176,24 @@ export default fp(async (fastify) => {
     });
 
 
-    // FIXME
-    // await fastify.register(trapsPluginAsync, {
-    //     onClose() {
-    //         gpios.forEach(gpio => gpio.unexport());
-    //         return {};
-    //     }
-    // })
+    await fastify.register(fastifySchedule, {});
 
+    const task = new AsyncTask(
+        'refresh GPIO state task',
+        async () => {
+            fastify.log.info("Execute CRON job to sync GPIO state");
+            await refreshState();
+        },
+        (err) => {
+            fastify.log.error(err)
+        }
+    )
+    const job = new CronJob({cronExpression: CRON_EVERY_MINUTE}, task)
+
+
+// `fastify.scheduler` becomes available after initialization.
+// Therefore, you need to call `ready` method.
+    fastify.ready().then(() => {
+        fastify.scheduler.addCronJob(job)
+    })
 });

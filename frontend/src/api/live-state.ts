@@ -1,13 +1,34 @@
 import ReconnectingWebSocket from 'reconnecting-websocket';
 import { useEffect, useState } from 'react';
-import { GpioChange } from './types';
+import { Change, ControllerChange, Schedule, ScheduleChange } from './types';
+import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 
 const ws = new ReconnectingWebSocket(import.meta.env.VITE_BACKEND_WS);
+
+function isScheduleChange(change: Change): change is ScheduleChange {
+  return change.type === 'schedule';
+}
+
+function isControllerChange(change: Change): change is ControllerChange {
+  return change.type === 'controller';
+}
+
+const globalChangesAtom = atom<Change[]>([]);
+
+const scheduleChangesAtom = atom(get => {
+  return get(globalChangesAtom).filter(isScheduleChange);
+});
+
+const controllerChangesAtom = atom(get => {
+  return get(globalChangesAtom).filter(isControllerChange);
+});
 
 export function useLiveState() {
 
   const [isConnected, setIsConnected] = useState(false);
-  const [changes, setChanges] = useState<GpioChange[]>([]);
+  const setGlobal = useSetAtom(globalChangesAtom);
+  const schedules = useAtomValue(scheduleChangesAtom);
+  const controllers = useAtomValue(controllerChangesAtom);
 
   useEffect(() => {
 
@@ -16,14 +37,15 @@ export function useLiveState() {
     });
 
     ws.addEventListener('message', (event) => {
-      const changesFromWs = JSON.parse(event.data) as GpioChange[];
-      setChanges(changesFromWs);
+      const changesFromWs = JSON.parse(event.data) as Change[];
+
+      setGlobal(changesFromWs);
     });
 
   }, []);
 
   return {
-    changes, isConnected
+    controllers, isConnected, schedules
   };
 
 }

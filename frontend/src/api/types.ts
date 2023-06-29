@@ -1,3 +1,5 @@
+import type { Event } from 'react-big-calendar';
+
 export type OnOffAuto = 'on' | 'off' | 'auto';
 
 export type Controller = {
@@ -7,7 +9,28 @@ export type Controller = {
     state: OnOffAuto;
 };
 
-export type GpioChange = {
+export type ChangeBase = {
+    type: 'schedule' | 'controller';
+}
+
+export type ControllerChange = ChangeBase & {
     controller: Controller;
     set: boolean;
 }
+
+export type Schedule = {
+    id: string;
+    start: string;
+    end: string;
+    rrule?: string;
+    active: boolean;
+    controller: Controller;
+}
+
+export type ScheduleChange = ChangeBase & {
+    schedule: Schedule;
+}
+
+export type Change = ControllerChange | ScheduleChange;
+
+export type ScheduledEvent = Event & { resource: Schedule };
