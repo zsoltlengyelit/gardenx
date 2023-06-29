@@ -10,7 +10,7 @@ module.exports = {
         }
     }, {
         name: 'backend',
-        script: 'npx fastify',
+        script: 'export $(grep -v \'^#\' .env.production | xargs); NODE_ENV=production npx fastify start --address 0.0.0.0 --port 1880 -l debug  -P ./app.js',
         cwd: 'backend'
     }]
 }
