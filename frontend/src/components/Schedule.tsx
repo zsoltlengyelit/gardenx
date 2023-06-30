@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react';
-import { Calendar, dateFnsLocalizer, SlotInfo, Views } from 'react-big-calendar';
+import React, { useMemo, useState } from 'react';
+import { Calendar, dateFnsLocalizer, Views } from 'react-big-calendar';
 import withDragAndDrop, { withDragAndDropProps } from 'react-big-calendar/lib/addons/dragAndDrop';
 import format from 'date-fns/format';
 import parse from 'date-fns/parse';
@@ -20,6 +20,7 @@ import { addDays, addMinutes, differenceInMinutes, setHours, setMinutes, startOf
 import { Schedule as ScheduleType, ScheduledEvent } from '../api/types';
 import { useSchedules } from '../api/schedules';
 import { makeDate } from '../common/date';
+import ScheduleTemplates from './ScheduleTemplates';
 
 const locales = {
   hu,
@@ -93,9 +94,9 @@ export default function Schedule({ schedules }: Props) {
 
   }, [schedules, currentRange]);
 
-  const [slotInfoDraft, setSlotInfoDraft] = useState<SlotInfo | null | ScheduleType>(null);
+  const [slotInfoDraft, setSlotInfoDraft] = useState<null | ScheduleType>(null);
 
-  const handleSelectSlot = (slotInfo: SlotInfo) => {
+  const handleSelectSlot = (slotInfo: any) => {
     setSlotInfoDraft(slotInfo);
   };
 
@@ -176,6 +177,10 @@ export default function Schedule({ schedules }: Props) {
                 as="div"
                 margin="small 0"
             >
+                <div className="py-2 mb-3">
+                  <ScheduleTemplates />
+                </div>
+
                 <DnDCalendar
                     date={currentRange.date}
                     defaultView={Views.WEEK}

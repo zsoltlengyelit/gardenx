@@ -8,7 +8,6 @@ import {
   Modal,
   SimpleSelect
 } from '@instructure/ui';
-import { SlotInfo } from 'react-big-calendar';
 import { Controller, SubmitErrorHandler, useForm } from 'react-hook-form';
 
 import 'bootstrap/dist/css/bootstrap.css'; // this lib uses boostrap (v. 4.0.0-beta.2)
@@ -41,7 +40,7 @@ export type EventEditorFormFields = {
 }
 
 type Props = {
-    draft: SlotInfo | Schedule;
+    draft: Schedule;
     onClose: () => void;
     onSave: (draft: EventEditorFormFields) => void;
     onDelete: (event: Schedule) => void;
@@ -54,11 +53,11 @@ export default function EventEditor({ draft, onClose, onSave, onDelete, onUpdate
 
   const controllers = useMemo(() => controllerChanges.map(c => c.controller), [controllerChanges]);
 
-  function isScheduleEvent(draft: SlotInfo | Schedule): draft is Schedule {
+  function isScheduleEvent() {
     return !!(draft as Schedule).id;
   }
 
-  const isSaved = isScheduleEvent(draft);
+  const isSaved = isScheduleEvent();
 
   const formSchema = joi.object<EventEditorFormFields>({
     id: joi.string().optional(),
