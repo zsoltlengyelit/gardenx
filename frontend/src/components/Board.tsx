@@ -2,13 +2,13 @@ import ControllerCardList from './ControllerCardList';
 import Schedule from './Schedule';
 import { useLiveState } from '../api/live-state';
 import { useMemo } from 'react';
-import { IconAdminSolid, IconButton, IconEditLine, IconEssayLine, IconExitFullScreenLine } from '@instructure/ui';
+import { Flex, Heading, IconAdminSolid, IconButton, IconTroubleSolid, Modal } from '@instructure/ui';
 import { useAtom } from 'jotai';
 import { editorModeAtom } from '../atoms';
 
 export default function Board() {
 
-  const { controllers, schedules: scheduleChanges } = useLiveState();
+  const { controllers, schedules: scheduleChanges, isConnected } = useLiveState();
   const [editorMode, setEditorMode] = useAtom(editorModeAtom);
 
   const schedules = useMemo(() => scheduleChanges.map(s => s.schedule), [scheduleChanges]);
@@ -49,6 +49,35 @@ export default function Board() {
                     <Schedule schedules={schedules}/>
                 </div>
             </div>
+
+            {!isConnected &&
+                <Modal
+                    label={'Connection lost...'}
+                    open={true}
+                    shouldCloseOnDocumentClick={false}
+                    shouldReturnFocus={true}
+                    size="small"
+                >
+                    <Modal.Header>
+                        <Heading level="h3">Connection lost...</Heading>
+                    </Modal.Header>
+
+                    <Modal.Body>
+                        <div className="flex flex-row align-middle justify-content-center">
+                            <div className="justify-content-center mr-5">
+                                <IconTroubleSolid
+                                    size="medium"
+                                    color="error"
+                                />
+
+                            </div>
+                            <div className="grow align-middle justify-content-center">
+                                <Heading>Oooops</Heading>
+                            </div>
+                        </div>
+                    </Modal.Body>
+                </Modal>
+            }
         </>
   );
 }

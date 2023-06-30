@@ -1,7 +1,7 @@
 import ReconnectingWebSocket from 'reconnecting-websocket';
 import { useEffect, useState } from 'react';
-import { Change, ControllerChange, Schedule, ScheduleChange } from './types';
-import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
+import { Change, ControllerChange, ScheduleChange } from './types';
+import { atom, useAtomValue, useSetAtom } from 'jotai';
 
 const ws = new ReconnectingWebSocket(import.meta.env.VITE_BACKEND_WS);
 
@@ -34,6 +34,11 @@ export function useLiveState() {
 
     ws.addEventListener('open', () => {
       setIsConnected(true);
+    });
+
+    ws.addEventListener('close', () => {
+      console.log('dis');
+      setIsConnected(false);
     });
 
     ws.addEventListener('message', (event) => {
