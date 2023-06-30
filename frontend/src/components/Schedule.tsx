@@ -12,7 +12,7 @@ import 'react-big-calendar/lib/addons/dragAndDrop/styles.css';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 
 import { View } from '@instructure/ui';
-import { useAtom } from 'jotai';
+import { useAtom, useAtomValue } from 'jotai';
 import EventEditor, { EventEditorFormFields } from './EventEditor';
 import { currentRangeAtom, weekStartsOn } from '../api/events';
 import { rrulestr } from 'rrule';
@@ -21,6 +21,7 @@ import { Schedule as ScheduleType, ScheduledEvent } from '../api/types';
 import { useSchedules } from '../api/schedules';
 import { makeDate } from '../common/date';
 import ScheduleTemplates from './ScheduleTemplates';
+import { editorModeAtom } from '../atoms';
 
 const locales = {
   hu,
@@ -46,6 +47,7 @@ export type Props = {
 export default function Schedule({ schedules }: Props) {
 
   const [currentRange, setCurrentRange] = useAtom(currentRangeAtom);
+  const editorMode = useAtomValue(editorModeAtom);
 
   const { deleteSchedule, createSchedule, updateSchedule, deleteScheduleGroup } = useSchedules();
 
@@ -182,13 +184,15 @@ export default function Schedule({ schedules }: Props) {
                 as="div"
                 margin="small 0"
             >
-                <div className="py-2 mb-3">
-                  <ScheduleTemplates
-                      onDelete={handleDelete}
-                      onUpdate={handleUpdate}
-                      onSave={handleSave}
-                  />
-                </div>
+                {editorMode &&
+                    <div className="py-2 mb-3">
+                        <ScheduleTemplates
+                            onDelete={handleDelete}
+                            onUpdate={handleUpdate}
+                            onSave={handleSave}
+                        />
+                    </div>
+                }
 
                 <DnDCalendar
                     date={currentRange.date}
