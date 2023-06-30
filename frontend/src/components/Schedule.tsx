@@ -178,7 +178,11 @@ export default function Schedule({ schedules }: Props) {
                 margin="small 0"
             >
                 <div className="py-2 mb-3">
-                  <ScheduleTemplates />
+                  <ScheduleTemplates
+                      onDelete={handleDelete}
+                      onUpdate={handleUpdate}
+                      onSave={handleSave}
+                  />
                 </div>
 
                 <DnDCalendar
