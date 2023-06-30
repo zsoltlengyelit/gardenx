@@ -17,6 +17,10 @@ export default function Board() {
                 >
                     <header className="bg-green-600 text-white py-3 px-3 pr-4">
                         <h1 className="text-2xl font-weight-bold inline">
+                            <img
+                                src="/plant.png"
+                                className="inline w-10 mr-2 bg-white p-1 rounded"
+                            />
                             HapPi Plant
                         </h1>
                     </header>
