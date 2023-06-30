@@ -1,6 +1,6 @@
-import {addDays, addMinutes, differenceInMinutes, startOfDay} from "date-fns";
-import {Schedule} from "../database";
-import {rrulestr} from 'rrule';
+import { addDays, addMinutes, differenceInMinutes, startOfDay } from 'date-fns';
+import { Schedule } from '../database';
+import { rrulestr } from 'rrule';
 
 export type ScheduledEvent = {
     start: Date;
@@ -9,39 +9,41 @@ export type ScheduledEvent = {
 }
 
 export function calculateSchedules(schedules: Schedule[]) {
-    return schedules.reduce((collection, schedule) => {
-        const startDate = schedule.start;
-        const endDate = schedule.end;
+  return schedules.filter(sch => {
+    return sch.end > new Date() || !!sch.rrule;
+  }).reduce((collection, schedule) => {
+    const startDate = schedule.start;
+    const endDate = schedule.end;
 
-        if (schedule.rrule) {
+    if (schedule.rrule) {
 
-            const rangeStart = startOfDay(new Date());
-            const rangeEnd = addDays(rangeStart, 1);
+      const rangeStart = startOfDay(new Date());
+      const rangeEnd = addDays(rangeStart, 1);
 
-            const dates = rrulestr(schedule.rrule, {
-                dtstart: startDate
-            }).between(rangeStart, rangeEnd, true);
+      const dates = rrulestr(schedule.rrule, {
+        dtstart: startDate
+      }).between(rangeStart, rangeEnd, true);
 
-            const durationInMins = differenceInMinutes(endDate, startDate);
+      const durationInMins = differenceInMinutes(endDate, startDate);
 
-            const newEvents = dates.map(date => {
-                return {
-                    start: date,
-                    end: addMinutes(date, durationInMins),
-                    schedule
-                } as ScheduledEvent;
-            });
-            collection.push(...newEvents);
+      const newEvents = dates.map(date => {
+        return {
+          start: date,
+          end: addMinutes(date, durationInMins),
+          schedule
+        } as ScheduledEvent;
+      });
+      collection.push(...newEvents);
 
-        } else {
-            collection.push({
-                start: startDate,
-                end: endDate,
-                schedule
-            });
-        }
+    } else {
+      collection.push({
+        start: startDate,
+        end: endDate,
+        schedule
+      });
+    }
 
-        return collection;
-    }, [] as ScheduledEvent[]);
+    return collection;
+  }, [] as ScheduledEvent[]);
 
 }
