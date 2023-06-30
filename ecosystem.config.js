@@ -5,7 +5,16 @@ module.exports = {
         cwd: 'frontend'
     }, {
         name: 'backend',
-        script: 'export $(grep -v \'^#\' .env.production | xargs); NODE_ENV=production npx fastify start --address 0.0.0.0 --port 1880 -l debug  -P ./app.js',
-        cwd: 'backend'
+        script: 'npx fastify start ./app.js',
+        cwd: 'backend',
+        env: {
+            FASTIFY_PORT: '1880',
+            FASTIFY_ADDRESS: '0.0.0.0',
+            FASTIFY_PRETTY_LOGS: 'true',
+            NODE_ENV: 'production',
+            DB_PATH: '/home/pi/gardenx/data/db.sqlite',
+            DB_NAME: 'gardenx',
+            FASTIFY_LOG_LEVEL: 'debug'
+        }
     }]
 }

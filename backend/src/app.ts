@@ -23,7 +23,6 @@ declare module 'fastify' {
         config: {
             DB_PATH: string;
             DB_NAME: string;
-            HOSTNAME: string;
         };
     }
 }
