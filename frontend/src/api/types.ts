@@ -25,6 +25,7 @@ export type Schedule = {
     rrule?: string;
     active: boolean;
     controller: Controller;
+    group_id?: string;
 }
 
 export type ScheduleChange = ChangeBase & {

@@ -45,9 +45,10 @@ type Props = {
     onSave: (draft: EventEditorFormFields) => void;
     onDelete: (event: Schedule) => void;
     onUpdate: (event: Schedule) => void;
+    onDeleteGroup: (groupId: string) => void;
 };
 
-export default function EventEditor({ draft, onClose, onSave, onDelete, onUpdate }: Props) {
+export default function EventEditor({ draft, onClose, onSave, onDelete, onUpdate, onDeleteGroup }: Props) {
 
   const { controllers: controllerChanges } = useLiveState();
 
@@ -234,6 +235,15 @@ export default function EventEditor({ draft, onClose, onSave, onDelete, onUpdate
                                     onClick={() => onDelete(draft)}
                                 >
                                     Delete
+                                </ConfirmedButton>
+                            }
+
+                            {isSaved && draft.group_id &&
+                                <ConfirmedButton
+                                    color="danger"
+                                    onClick={() => onDeleteGroup(draft.group_id!)}
+                                >
+                                    Delete Group
                                 </ConfirmedButton>
                             }
                         </Flex.Item>

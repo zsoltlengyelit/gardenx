@@ -47,7 +47,7 @@ export default function Schedule({ schedules }: Props) {
 
   const [currentRange, setCurrentRange] = useAtom(currentRangeAtom);
 
-  const { deleteSchedule, createSchedule, updateSchedule } = useSchedules();
+  const { deleteSchedule, createSchedule, updateSchedule, deleteScheduleGroup } = useSchedules();
 
   const eventsInCurrentRange = useMemo(() => {
 
@@ -138,6 +138,11 @@ export default function Schedule({ schedules }: Props) {
     setSlotInfoDraft(null);
   }
 
+  async function handleDeleteGroup(groupId: string) {
+    await deleteScheduleGroup(groupId);
+    setSlotInfoDraft(null);
+  }
+
   async function handleUpdate(event: ScheduleType) {
     // FIXME: wrong tipe
     await updateSchedule({
@@ -214,6 +219,7 @@ export default function Schedule({ schedules }: Props) {
                     onSave={handleSave}
                     onDelete={handleDelete}
                     onUpdate={handleUpdate}
+                    onDeleteGroup={handleDeleteGroup}
                 />
             }
 

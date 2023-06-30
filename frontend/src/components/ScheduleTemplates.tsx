@@ -3,6 +3,8 @@ import EventEditor, { EventEditorFormFields } from './EventEditor';
 import React, { useState } from 'react';
 import { Schedule } from '../api/types';
 import { addMinutes, startOfHour } from 'date-fns';
+import { NewSchedule, useSchedules } from '../api/schedules';
+import DistributorEditor from './DistributorEditor';
 
 type Props = {
     onSave(event: EventEditorFormFields): void;
@@ -13,10 +15,9 @@ type Props = {
 export default function ScheduleTemplates({ onSave, onDelete, onUpdate }: Props) {
 
   const [draft, setDraft] = useState<null | Partial<Schedule>>(null);
+  const [distributorOpen, setDistributorOpen] = useState(false);
 
-  // function handleCreateDistributor() {
-  //
-  // }
+  const { createSchedule } = useSchedules();
 
   function handleCreateNew() {
     const start = startOfHour(new Date());
@@ -27,13 +28,18 @@ export default function ScheduleTemplates({ onSave, onDelete, onUpdate }: Props)
     });
   }
 
+  async function handleSaveDistributor(...schedules: NewSchedule[]) {
+    await createSchedule(...schedules);
+    setDistributorOpen(false);
+  }
+
   return (
         <div className="flex flex-col md:flex-row">
             <div className="grow">
                 <Button onClick={handleCreateNew}>New Schedule</Button>
             </div>
             <div>
-                {/* <Button onClick={handleCreateDistributor}>Distributor</Button> */}
+                <Button onClick={() => setDistributorOpen(true)}>Distributor</Button>
             </div>
 
             {draft &&
@@ -43,6 +49,14 @@ export default function ScheduleTemplates({ onSave, onDelete, onUpdate }: Props)
                     onSave={onSave}
                     onDelete={onDelete}
                     onUpdate={onUpdate}
+                    onDeleteGroup={() => {}}
+                />
+            }
+
+            {distributorOpen &&
+                <DistributorEditor
+                    onSave={handleSaveDistributor}
+                    onClose={() => setDistributorOpen(false)}
                 />
             }
         </div>
