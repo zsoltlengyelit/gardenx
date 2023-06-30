@@ -1,12 +1,15 @@
 import ControllerCard from './ControllerCard';
 import { ControllerChange } from '../api/types';
 import NewControllerCard from './NewControllerCard';
+import { useAtomValue } from 'jotai';
+import { editorModeAtom } from '../atoms';
 
 type Props = {
     controllers: ControllerChange[];
 };
 
 export default function ControllerCardList({ controllers }: Props) {
+  const editorMode = useAtomValue(editorModeAtom);
 
   return (
 
@@ -19,7 +22,7 @@ export default function ControllerCardList({ controllers }: Props) {
                 />
             ))}
 
-            <NewControllerCard />
+            {editorMode && <NewControllerCard/> }
         </div>
   );
 }

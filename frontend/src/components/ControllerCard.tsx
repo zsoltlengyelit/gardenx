@@ -13,6 +13,8 @@ import React from 'react';
 import { useControllers } from '../api/controllers';
 import { Controller, OnOffAuto } from '../api/types';
 import ConfirmedButton from './ConfirmedButton';
+import { useAtomValue } from 'jotai';
+import { editorModeAtom } from '../atoms';
 
 type Props = {
     controller: Controller;
@@ -22,6 +24,7 @@ type Props = {
 export default function ControllerCard({ controller, set }: Props) {
 
   const { updateController, deleteController } = useControllers();
+  const editorMode = useAtomValue(editorModeAtom);
 
   function handleUpdateStateSwitch(controller: Controller, value: OnOffAuto) {
     updateController(controller, {
@@ -43,9 +46,14 @@ export default function ControllerCard({ controller, set }: Props) {
                         renderTip={(
                             <div>
                                 <Text>PIN: {controller.gpio}</Text>
-                                <div className="p-3">
-                                    <ConfirmedButton onClick={() => deleteController(controller)}>Delete</ConfirmedButton>
-                                </div>
+                                {editorMode &&
+                                    <div className="p-3">
+                                        <ConfirmedButton
+                                            onClick={() => deleteController(controller)}
+                                        >Delete
+                                        </ConfirmedButton>
+                                    </div>
+                                }
                             </div>
                         )}
                         placement="bottom"
@@ -68,7 +76,6 @@ export default function ControllerCard({ controller, set }: Props) {
                     justifyItems="center"
                 >
                     <Flex.Item
-                        shouldGrow
                         textAlign="center"
                         align="center"
                     >
