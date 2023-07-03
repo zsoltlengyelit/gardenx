@@ -1,28 +1,20 @@
-import {
-  Button,
-  Flex,
-  FormFieldGroup,
-  Heading,
-  IconButton,
-  IconPlusLine, NumberInput,
-  RadioInput,
-  RadioInputGroup,
-  TextInput
-} from '@instructure/ui';
 import React, { useState } from 'react';
 import { useControllers } from '../api/controllers';
 import * as joi from 'joi';
 import { Controller, SubmitErrorHandler, useForm } from 'react-hook-form';
 import { joiResolver } from '@hookform/resolvers/joi/dist/joi';
-
-type Props = {};
+import TextInput from './TextInput';
+import NumberInput from './NumberInput';
+import Button from './Button';
+import { PlusIcon } from '@heroicons/react/20/solid';
+import Field from './Field';
 
 type NewControllerFields = {
     name: string;
     gpio: number;
 }
 
-export default function NewControllerCard({}: Props) {
+export default function NewControllerCard() {
 
   const { createController } = useControllers();
 
@@ -59,79 +51,67 @@ export default function NewControllerCard({}: Props) {
             {activated
               ? (
                     <>
-                        <FormFieldGroup
-                            description={''}
-                            rowSpacing="small"
-                        >
-                            <Controller
-                                name="name"
-                                control={control}
-                                render={({ field: { onChange, value }, fieldState: { error } }) => {
-                                  return <TextInput
-                                      renderLabel="Name"
-                                      value={value}
-                                      onChange={onChange}
-                                         />;
-                                }}
-                            />
-
-                            <Controller
-                                name="gpio"
-                                control={control}
-                                render={({ field: { onChange, value }, fieldState: { error } }) => {
-                                  return <NumberInput
-                                      renderLabel='GPIO'
-                                      value={value}
-                                      onChange={onChange}
-                                         />;
-                                }}
-                            />
-
-                            <div className="mt-3">
-                                <Flex
-                                    margin="xx-small 0 0 0"
-                                    alignItems="center"
-                                    justifyItems="center"
+                        <Controller
+                            name="name"
+                            control={control}
+                            render={({ field: { onChange, value }, fieldState: { error } }) =>
+                                <Field
+                                    label="Name"
+                                    error={error}
                                 >
-                                    <Flex.Item
-                                        shouldGrow
-                                        textAlign="center"
-                                        align="center"
-                                    >
-                                        <Button
-                                            color="primary"
-                                            type="submit"
-                                            autoFocus
-                                            onClick={() => submit()}
-                                        >
-                                            Save
-                                        </Button>
+                                    <TextInput
+                                        value={value}
+                                        onChange={onChange}
+                                    />
+                                </Field>}
+                        />
 
-                                    </Flex.Item>
-                                </Flex>
+                        <Controller
+                            name="gpio"
+                            control={control}
+                            render={({ field: { onChange, value }, fieldState: { error } }) =>
+                                <Field
+                                    label="GPIO"
+                                    error={error}
+                                >
+                                    <NumberInput
+                                        value={value}
+                                        onChange={onChange}
+                                    />
+                                </Field>
+                            }
+                        />
+
+                        <div className="mt-3 clex align-middle justify-items-center">
+                            <div className="grow text-center align-middle">
+                                <Button
+                                    color="primary"
+                                    className="w-full"
+                                    type="submit"
+                                    onClick={() => submit()}
+                                >
+                                    Save
+                                </Button>
+
                             </div>
-                        </FormFieldGroup>
+                        </div>
                     </>
                 )
               : (
-                    <Flex
-                        width="100%"
-                        height="100%"
-                        alignItems="center"
-                        justifyItems="center"
+                    <div
+                        className="w-full h-full align-middle items-center justify-items-center flex text-center"
                     >
-                        <Flex.Item>
-                            <IconButton
-                                screenReaderLabel="Create"
-                                renderIcon={<IconPlusLine/>}
-                                withBorder={false}
-                                size={'large'}
-                                withBackground={false}
+                        <div className="grow align-middle justify-center">
+                            <Button
                                 onClick={() => setActivated(true)}
-                            />
-                        </Flex.Item>
-                    </Flex>
+                                color="transparent"
+                            >
+                                <PlusIcon className="w-10 h-10"/>
+                            </Button>
+                        </div>
+                    </div>
                 )}
         </div>
-  );
+  )
+  ;
 }

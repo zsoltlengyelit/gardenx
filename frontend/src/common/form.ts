@@ -1,7 +1,6 @@
 import { FieldError } from 'react-hook-form';
-import type { FormMessage } from '@instructure/ui-form-field';
 
-export function toFormMessage(fieldError?: FieldError): FormMessage[] | undefined {
+export function toFormMessage(fieldError?: FieldError): { type: 'error', text?: string; }[] | undefined {
 
   if (!fieldError) {
     return undefined;

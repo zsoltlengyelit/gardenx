@@ -1,10 +1,10 @@
-import { Button } from '@instructure/ui';
 import EventEditor, { EventEditorFormFields } from './EventEditor';
 import React, { useState } from 'react';
 import { Schedule } from '../api/types';
 import { addMinutes, startOfHour } from 'date-fns';
 import { NewSchedule, useSchedules } from '../api/schedules';
 import DistributorEditor from './DistributorEditor';
+import Button from './Button';
 
 type Props = {
     onSave(event: EventEditorFormFields): void;
@@ -37,16 +37,17 @@ export default function ScheduleTemplates({ onSave, onDelete, onUpdate }: Props)
         <div className="flex flex-col md:flex-row gap-4">
             <div className="grow">
                 <Button
-                    display="block"
+                    className="block w-full"
                     onClick={handleCreateNew}
                 >New Schedule
                 </Button>
             </div>
             <div className="grow">
                 <Button
-                    display="block"
+                    className="block w-full"
                     onClick={() => setDistributorOpen(true)}
-                >Distributor
+                >
+                    Distributor
                 </Button>
             </div>
 

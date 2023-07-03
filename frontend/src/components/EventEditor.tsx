@@ -1,20 +1,9 @@
-import {
-  Button,
-  Flex,
-  FormField,
-  FormFieldGroup, FormFieldLabel,
-  FormFieldMessages,
-  Heading,
-  Modal,
-  SimpleSelect
-} from '@instructure/ui';
 import { Controller, SubmitErrorHandler, useForm } from 'react-hook-form';
 
 import { rrulestr } from 'rrule';
 import GDateTimeInput from './GDateTimeInput';
 import { joiResolver } from '@hookform/resolvers/joi';
 import * as joi from 'joi';
-import { toFormMessage } from '../common/form';
 import ConfirmedButton from './ConfirmedButton';
 import { ComponentProps, useMemo } from 'react';
 import { FieldPath } from 'react-hook-form/dist/types/path';
@@ -24,6 +13,10 @@ import parseISO from 'date-fns/parseISO';
 import { getDayOfYear, setDayOfYear } from 'date-fns';
 import { makeDate } from '../common/date';
 import RruleEditor from './RruleEditor';
+import Button from './Button';
+import Modal from './Modal';
+import SimpleSelect from './SimpleSelect';
+import Field from './Field';
 
 export type EventEditorFormFields = {
     id?: string;
@@ -117,94 +110,10 @@ export default function EventEditor({ draft, onClose, onSave, onDelete, onUpdate
         <>
 
             <Modal
-                label={'Schedule'}
-                open={true}
-                size="medium"
-            >
-                <Modal.Header>
-                    <Heading level="h3">Schedule</Heading>
-                </Modal.Header>
-
-                <Modal.Body>
-                    <FormFieldGroup
-                        description={''}
-                        rowSpacing="small"
-                    >
-                        <Controller
-                            name="controllerId"
-                            control={control}
-                            render={({ field: { onChange, value }, fieldState: { error } }) => {
-                              if (controllers.length === 0) {
-                                return <>No controllers</>;
-                              }
-
-                              return (
-                                    <SimpleSelect
-                                        renderLabel={'Controller'}
-                                        value={value}
-                                        onChange={(e, data) => onChange(data.value)}
-                                        messages={toFormMessage(error)}
-                                    >
-                                        {controllers.map(controller => (
-                                            <SimpleSelect.Option
-                                                key={controller.id}
-                                                id={controller.id as string}
-                                                value={controller.id}
-                                            >
-                                                {controller.name}
-                                            </SimpleSelect.Option>
-                                        ))}
-                                    </SimpleSelect>
-                              );
-                            }}
-                        />
-
-                        <Controller
-                            name="start"
-                            control={control}
-                            render={({ field: { onChange, value, name }, fieldState: { error } }) => (
-                                <GDateTimeInput
-                                    value={typeof value === 'string' ? parseISO(value) : value}
-                                    onChange={handleDateChange(onChange, name, 'end')}
-                                    label="Start"
-                                    messages={toFormMessage(error)}
-                                />
-                            )}
-                        />
-
-                        <Controller
-                            name="end"
-                            control={control}
-                            render={({ field: { onChange, value, name }, fieldState: { error } }) => (
-                                <GDateTimeInput
-                                    value={typeof value === 'string' ? parseISO(value) : value}
-                                    onChange={handleDateChange(onChange, name, 'start')}
-                                    label="End"
-                                    messages={toFormMessage(error)}
-                                />
-                            )}
-                        />
-
-                        <Controller
-                            name="rrule"
-                            control={control}
-                            render={({ field: { onChange, value }, fieldState: { error } }) => (
-                                <>
-                                    <RruleEditor
-                                        rrule={value}
-                                        onChange={onChange}
-                                    />
-                                    <FormFieldMessages messages={toFormMessage(error)}/>
-                                </>
-                            )}
-                        />
-
-                    </FormFieldGroup>
-                </Modal.Body>
-
-                <Modal.Footer>
-                    <Flex width="100%">
-                        <Flex.Item shouldGrow>
+                header={<h3>Schedule</h3>}
+                footer={
+                    <div className='flex items-center'>
+                        <div className="grow justify-start items-start">
                             {isSaved &&
                                 <ConfirmedButton
                                     color="danger"
@@ -215,20 +124,22 @@ export default function EventEditor({ draft, onClose, onSave, onDelete, onUpdate
                             }
 
                             {isSaved && draft.group_id &&
-                                <ConfirmedButton
-                                    color="danger"
-                                    onClick={() => onDeleteGroup(draft.group_id!)}
-                                >
-                                    Delete Group
-                                </ConfirmedButton>
+                                <div>
+                                    <ConfirmedButton
+                                        color="danger"
+                                        onClick={() => onDeleteGroup(draft.group_id!)}
+                                    >
+                                        Delete Group
+                                    </ConfirmedButton>
+                                </div>
                             }
-                        </Flex.Item>
+                        </div>
 
-                        <Flex.Item>
+                        <div>
                             <Button
                                 color="primary-inverse"
                                 onClick={() => onClose()}
-                                margin="0 small 0 0"
+                                className="mr-2"
                             >
                                 Cancel
                             </Button>
@@ -236,14 +147,87 @@ export default function EventEditor({ draft, onClose, onSave, onDelete, onUpdate
                             <Button
                                 color="primary"
                                 type="submit"
-                                autoFocus
                                 onClick={() => submit()}
                             >
                                 Save
                             </Button>
-                        </Flex.Item>
-                    </Flex>
-                </Modal.Footer>
+                        </div>
+                    </div>
+                }
+            >
+                <Controller
+                    name="controllerId"
+                    control={control}
+                    render={({ field: { onChange, value }, fieldState: { error } }) => {
+                      if (controllers.length === 0) {
+                        return <>No controllers</>;
+                      }
+
+                      return (
+                            <Field
+                                label='Controller'
+                                error={error}
+                            >
+                                <SimpleSelect
+                                    value={value}
+                                    onChange={(value) => onChange(value)}
+                                    options={controllers.map(c => ({
+                                      value: c.id,
+                                      label: c.name
+                                    }))}
+                                />
+                            </Field>
+                      );
+                    }}
+                />
+
+                <Controller
+                    name="start"
+                    control={control}
+                    render={({ field: { onChange, value, name }, fieldState: { error } }) => (
+                        <Field
+                            label="Start"
+                            error={error}
+                        >
+                            <GDateTimeInput
+                                value={typeof value === 'string' ? parseISO(value) : value}
+                                onChange={handleDateChange(onChange, name, 'end')}
+                            />
+                        </Field>
+                    )}
+                />
+
+                <Controller
+                    name="end"
+                    control={control}
+                    render={({ field: { onChange, value, name }, fieldState: { error } }) => (
+                        <Field
+                            label="End"
+                            error={error}
+                        >
+                            <GDateTimeInput
+                                value={typeof value === 'string' ? parseISO(value) : value}
+                                onChange={handleDateChange(onChange, name, 'start')}
+                            />
+                        </Field>
+                    )}
+                />
+
+                <Controller
+                    name="rrule"
+                    control={control}
+                    render={({ field: { onChange, value }, fieldState: { error } }) => (
+                        <Field
+                            label="Repeat"
+                            error={error}
+                        >
+                            <RruleEditor
+                                rrule={value}
+                                onChange={onChange}
+                            />
+                        </Field>
+                    )}
+                />
             </Modal>
 
         </>

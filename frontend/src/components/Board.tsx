@@ -2,9 +2,11 @@ import ControllerCardList from './ControllerCardList';
 import Schedule from './Schedule';
 import { useLiveState } from '../api/live-state';
 import { useMemo } from 'react';
-import { Flex, Heading, IconAdminSolid, IconButton, IconTroubleSolid, Modal } from '@instructure/ui';
 import { useAtom } from 'jotai';
 import { editorModeAtom } from '../atoms';
+import { WifiIcon, WrenchScrewdriverIcon } from '@heroicons/react/24/solid';
+import Button from './Button';
+import Modal from './Modal';
 
 export default function Board() {
 
@@ -30,14 +32,12 @@ export default function Board() {
                             </h1>
 
                             <div>
-                                <IconButton
-                                    screenReaderLabel={'Editor mode'}
-                                    withBackground={editorMode}
-                                    withBorder={editorMode}
-                                    color={editorMode ? 'secondary' : 'primary-inverse'}
-                                    renderIcon={<IconAdminSolid/>}
+                                <Button
+                                    color={editorMode ? 'secondary' : 'transparent'}
                                     onClick={() => setEditorMode(!editorMode)}
-                                />
+                                >
+                                    <WrenchScrewdriverIcon className="h-4 w-4"/>
+                                </Button>
                             </div>
                         </div>
                     </header>
@@ -51,31 +51,16 @@ export default function Board() {
             </div>
 
             {!isConnected &&
-                <Modal
-                    label={'Connection lost...'}
-                    open={true}
-                    shouldCloseOnDocumentClick={false}
-                    shouldReturnFocus={true}
-                    size="small"
-                >
-                    <Modal.Header>
-                        <Heading level="h3">Connection lost...</Heading>
-                    </Modal.Header>
+                <Modal header={<h3>Connection lost...</h3>}>
+                    <div className="flex flex-row align-middle justify-content-center">
+                        <div className="justify-content-center mr-5">
+                            <WifiIcon className="h-10 w-10 text-red-800" />
 
-                    <Modal.Body>
-                        <div className="flex flex-row align-middle justify-content-center">
-                            <div className="justify-content-center mr-5">
-                                <IconTroubleSolid
-                                    size="medium"
-                                    color="error"
-                                />
-
-                            </div>
-                            <div className="grow align-middle justify-content-center">
-                                <Heading>Oooops</Heading>
-                            </div>
                         </div>
-                    </Modal.Body>
+                        <div className="grow align-middle justify-content-center">
+                            <h1>Oooops</h1>
+                        </div>
+                    </div>
                 </Modal>
             }
         </>

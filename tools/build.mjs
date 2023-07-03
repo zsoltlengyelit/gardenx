@@ -21,5 +21,6 @@ await within(async () => {
     await $`cp -a ./frontend/dist/. ./build/frontend/`;
     await $`cp ecosystem.config.js ./build/`;
     await $`cp -a ./backend/dist/ ./build/backend`;
+    await $`cp ./backend/server-setup.js ./build/backend/server-setup.js`;
     await $`cp ./frontend/production/frontend-server.mjs ./build/frontend-server.mjs`;
 });
