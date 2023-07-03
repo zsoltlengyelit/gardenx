@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { FormField } from '@instructure/ui';
+import Button from './Button';
 
 type RButtonProps = {
     active?: boolean;
@@ -10,12 +10,13 @@ type RButtonProps = {
 
 function RButton({ active, onClick, children, className }: RButtonProps) {
   return (
-        <button
+        <Button
             onClick={onClick}
-            className={`${className ?? ''} ${(active ?? false) ? 'bg-green-600 hover:bg-green-700 text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-700'} font-sans font-normal m-0.5 p-2 border-1`}
+            color={active ? 'success' : 'secondary'}
+            className={`${className ?? ''}`}
         >
             {children}
-        </button>
+        </Button>
   );
 }
 
@@ -27,8 +28,6 @@ type Props = {
 const DAYS = ['MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU'];
 
 export default function RruleEditor({ rrule: defaultRrule, onChange }: Props) {
-
-  const [rrule, setRrule] = useState(defaultRrule ?? '');
 
   const defaultSelection = () => {
     if (defaultRrule) {
@@ -59,7 +58,6 @@ export default function RruleEditor({ rrule: defaultRrule, onChange }: Props) {
     if (selectedDays.length > 0) {
       newRrule = `RRULE:FREQ=WEEKLY;INTERVAL=1;BYDAY=${selectedDays.join(',')}`;
     }
-    setRrule(newRrule);
     onChange(newRrule);
   }, [selectedDays]);
 
@@ -80,10 +78,7 @@ export default function RruleEditor({ rrule: defaultRrule, onChange }: Props) {
   }
 
   return (
-        <FormField
-            label="Repeat"
-            id="rrule"
-        >
+        <>
             <div className="grid grid-cols-7 w-full">
                 {DAYS.map((day, index) => {
 
@@ -92,7 +87,7 @@ export default function RruleEditor({ rrule: defaultRrule, onChange }: Props) {
                             key={day}
                             onClick={() => handleDayClick(day, index)}
                             active={selectedDays.includes(day)}
-                            className={`${index === 0 && 'rounded-l-md'} ${index === (DAYS.length - 1) && 'rounded-r-md'}`}
+                            className={`${index === 0 && 'rounded-l-lg'} ${index === (DAYS.length - 1) && 'rounded-r-lg'}`}
                         >
                             {day}
                         </RButton>
@@ -124,6 +119,6 @@ export default function RruleEditor({ rrule: defaultRrule, onChange }: Props) {
                     Weekend
                 </RButton>
             </div>
-        </FormField>
+        </>
   );
 }

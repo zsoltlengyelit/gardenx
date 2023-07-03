@@ -11,7 +11,6 @@ import hu from 'date-fns/locale/hu';
 import 'react-big-calendar/lib/addons/dragAndDrop/styles.css';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 
-import { View } from '@instructure/ui';
 import { useAtom, useAtomValue } from 'jotai';
 import EventEditor, { EventEditorFormFields } from './EventEditor';
 import { currentRangeAtom, weekStartsOn } from '../api/events';
@@ -178,21 +177,22 @@ export default function Schedule({ schedules }: Props) {
 
   const onEventDrop: withDragAndDropProps['onEventDrop'] = data => onEventResize(data);
 
+  if (!editorMode) {
+    return <></>;
+  }
+
   return (
         <>
-            <View
-                as="div"
-                margin="small 0"
+            <div
+                className="my-3"
             >
-                {editorMode &&
-                    <div className="py-2 mb-3">
-                        <ScheduleTemplates
-                            onDelete={handleDelete}
-                            onUpdate={handleUpdate}
-                            onSave={handleSave}
-                        />
-                    </div>
-                }
+                <div className="py-2 mb-3">
+                    <ScheduleTemplates
+                        onDelete={handleDelete}
+                        onUpdate={handleUpdate}
+                        onSave={handleSave}
+                    />
+                </div>
 
                 <DnDCalendar
                     date={currentRange.date}
@@ -214,7 +214,7 @@ export default function Schedule({ schedules }: Props) {
                       return `${resource.controller.name}`;
                     }}
                 />
-            </View>
+            </div>
 
             {slotInfoDraft &&
                 <EventEditor

@@ -1,38 +1,34 @@
-import { DateTimeInput } from '@instructure/ui';
-import type { FormMessage } from '@instructure/ui-form-field';
+import { Theme } from '../theme';
+import { memo } from 'react';
+import format from 'date-fns/format';
 
 type Props = {
     value: Date;
     onChange: (value: Date | null) => void;
-    label: string;
-    messages?: FormMessage[];
 };
 
-export default function GDateTimeInput({
-  value, onChange, label, messages
+function formatDateTime(date: Date | undefined) {
+  return date ? format(date, "yyyy-MM-dd'T'HH:mm") : '';
+}
+
+function GDateTimeInput({
+  value, onChange,
 }: Props) {
 
+  const fo = formatDateTime(value);
   return (
-        <>
-            <DateTimeInput
-                value={value.toISOString()}
-                description={label}
-                layout="columns"
-                invalidDateTimeMessage="invalid"
-                prevMonthLabel="Prev month"
-                nextMonthLabel="Next month"
-                timeRenderLabel=""
-                dateRenderLabel=""
-                dateFormat="yyyy MMMM D, dddd"
-                timeFormat="HH:mm"
-                isRequired={true}
-                timeStep={5}
-                onChange={(event, value) => {
-                  onChange(value ? new Date(value) : null);
-                }
-                }
-                messages={messages}
-            />
-        </>
+        <input
+            type="datetime-local"
+            value={fo}
+            required
+            className={Theme.components.input}
+            onChange={(event) => {
+              onChange(event.target?.valueAsDate ?? null);
+            }
+            }
+        />
   );
 }
+
+const GDateTimeInputM = memo(GDateTimeInput);
+export default GDateTimeInputM;
