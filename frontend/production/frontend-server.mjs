@@ -63,9 +63,12 @@ async function frontendServer() {
 
         const filePath = path.join(baseDir, fileName);
 
-        fs.readFile(`${filePath}.br`, function (brotliError, brotliContent) {
+        console.log(`Serving: ${filePath}`);
+
+        fs.readFile(`${filePath}.gz`, function (brotliError, brotliContent) {
             if (brotliError) {
                 if (brotliError.code == 'ENOENT') {
+                    console.log(`Gzip file not found, fallback to ${filePath}`);
                     serverRawFile(response, contentType, fileName, filePath)
                 } else {
                     response.writeHead(500);
@@ -73,9 +76,10 @@ async function frontendServer() {
                     response.end();
                 }
             } else {
+                console.log(`Gzip file found: ${filePath}.gz`);
                 response.writeHead(200, {
                     'Content-Type': contentType,
-                    'Content-Encoding': 'br',
+                    'Content-Encoding': 'gzip',
                     'Last-Modified': 'Thu, 04 Feb 2021 18:22:39 GMT',
                     'ETag': fileName,
                     'Accept-Ranges': 'bytes',
