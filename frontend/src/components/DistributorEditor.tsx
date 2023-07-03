@@ -4,11 +4,21 @@ import * as joi from 'joi';
 import { Controller, SubmitErrorHandler, useForm } from 'react-hook-form';
 import { joiResolver } from '@hookform/resolvers/joi/dist/joi';
 import { addMinutes, startOfMinute } from 'date-fns';
-import { Button, Flex, FormFieldGroup, Heading, Modal, NumberInput, SimpleSelect } from '@instructure/ui';
+import {
+  Button,
+  Flex, FormField,
+  FormFieldGroup,
+  FormFieldMessages,
+  Heading,
+  Modal,
+  NumberInput,
+  SimpleSelect
+} from '@instructure/ui';
 import { toFormMessage } from '../common/form';
 import GDateTimeInput from './GDateTimeInput';
 import parseISO from 'date-fns/parseISO';
 import { NewSchedule } from '../api/schedules';
+import RruleEditor from './RruleEditor';
 
 type DistributorEditorFormFields = {
     controllerId: string | undefined;
@@ -16,6 +26,7 @@ type DistributorEditorFormFields = {
     start: Date;
     duration: number;
     gap: number;
+    rrule: string;
 }
 
 function generateUUID() { // Public Domain/MIT
@@ -49,7 +60,8 @@ export default function DistributorEditor({ onSave, onClose }: Props) {
     lineCount: joi.number().required(),
     start: joi.date().required(),
     duration: joi.number().required(),
-    gap: joi.number().required()
+    gap: joi.number().required(),
+    rrule: joi.string().optional()
   });
 
   const { control, handleSubmit } = useForm<DistributorEditorFormFields>({
@@ -60,6 +72,7 @@ export default function DistributorEditor({ onSave, onClose }: Props) {
       gap: 1,
       duration: 20,
       lineCount: 6,
+      rrule: ''
     }
   });
 
@@ -75,7 +88,7 @@ export default function DistributorEditor({ onSave, onClose }: Props) {
         start: startDate.toISOString(),
         end: endDate.toISOString(),
         active: true,
-        rrule: '',
+        rrule: data.rrule ? data.rrule : undefined,
         controllerId: data.controllerId!,
         // eslint-disable-next-line camelcase
         group_id
@@ -187,6 +200,20 @@ export default function DistributorEditor({ onSave, onClose }: Props) {
                                 renderLabel="Gap"
                                 messages={toFormMessage(error)}
                             />
+                        )}
+                    />
+
+                    <Controller
+                        name="rrule"
+                        control={control}
+                        render={({ field: { onChange, value }, fieldState: { error } }) => (
+                            <>
+                                <RruleEditor
+                                    rrule={value}
+                                    onChange={onChange}
+                                />
+                                <FormFieldMessages messages={toFormMessage(error)}/>
+                            </>
                         )}
                     />
                 </FormFieldGroup>

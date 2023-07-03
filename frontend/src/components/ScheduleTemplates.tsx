@@ -34,12 +34,20 @@ export default function ScheduleTemplates({ onSave, onDelete, onUpdate }: Props)
   }
 
   return (
-        <div className="flex flex-col md:flex-row">
+        <div className="flex flex-col md:flex-row gap-4">
             <div className="grow">
-                <Button onClick={handleCreateNew}>New Schedule</Button>
+                <Button
+                    display="block"
+                    onClick={handleCreateNew}
+                >New Schedule
+                </Button>
             </div>
-            <div>
-                <Button onClick={() => setDistributorOpen(true)}>Distributor</Button>
+            <div className="grow">
+                <Button
+                    display="block"
+                    onClick={() => setDistributorOpen(true)}
+                >Distributor
+                </Button>
             </div>
 
             {draft &&
@@ -49,7 +57,8 @@ export default function ScheduleTemplates({ onSave, onDelete, onUpdate }: Props)
                     onSave={onSave}
                     onDelete={onDelete}
                     onUpdate={onUpdate}
-                    onDeleteGroup={() => {}}
+                    onDeleteGroup={() => {
+                    }}
                 />
             }
 

@@ -1,9 +1,13 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import viteCompression from 'vite-plugin-compression';
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), viteCompression({
+    algorithm: 'brotliCompress',
+    deleteOriginFile: true
+  })],
   define: {
     // specify some special constants that are used by dependencies, mostly InstUI
     'global.PREVENT_CODEMIRROR_RENDER': undefined,
@@ -11,7 +15,16 @@ export default defineConfig({
     'process.env': {},
   },
   build: {
+    commonjsOptions: {
+      exclude: [
+        'moment-timezone/data/packed/latest.json?commonjs-proxy'
+      ]
+    },
     minify: true,
-    rollupOptions: {}
+    rollupOptions: {
+      external: [
+        'moment-timezone/data/packed/latest.json?commonjs-proxy'
+      ]
+    },
   }
 });

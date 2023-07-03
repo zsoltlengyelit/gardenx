@@ -2,7 +2,7 @@ import {
   Button,
   Flex,
   FormField,
-  FormFieldGroup,
+  FormFieldGroup, FormFieldLabel,
   FormFieldMessages,
   Heading,
   Modal,
@@ -10,13 +10,6 @@ import {
 } from '@instructure/ui';
 import { Controller, SubmitErrorHandler, useForm } from 'react-hook-form';
 
-import 'bootstrap/dist/css/bootstrap.css'; // this lib uses boostrap (v. 4.0.0-beta.2)
-import 'react-rrule-generator/build/styles.css'; // react-rrule-generator's custom CSS
-// @ts-ignore
-import RRuleGenerator from 'react-rrule-generator';
-
-import 'react-calendar/dist/Calendar.css';
-import 'react-clock/dist/Clock.css';
 import { rrulestr } from 'rrule';
 import GDateTimeInput from './GDateTimeInput';
 import { joiResolver } from '@hookform/resolvers/joi';
@@ -30,6 +23,7 @@ import { Schedule } from '../api/types';
 import parseISO from 'date-fns/parseISO';
 import { getDayOfYear, setDayOfYear } from 'date-fns';
 import { makeDate } from '../common/date';
+import RruleEditor from './RruleEditor';
 
 export type EventEditorFormFields = {
     id?: string;
@@ -114,13 +108,6 @@ export default function EventEditor({ draft, onClose, onSave, onDelete, onUpdate
       const dayOfYear = getDayOfYear(date!);
       const correctedDate = setDayOfYear(endTime, dayOfYear);
 
-      // if (
-      //   (correctedPath === 'end' && makeDate(correctedDate).isSameOrBefore(date)) ||
-      //           (correctedPath === 'start' && makeDate(correctedDate).isSameOrAfter(date))) {
-      //   setError(ownPath, { message: 'Start cannot be after end' });
-      //   return;
-      // }
-
       setValue(correctedPath, correctedDate);
       onChange(date);
     };
@@ -198,31 +185,20 @@ export default function EventEditor({ draft, onClose, onSave, onDelete, onUpdate
                             )}
                         />
 
-                        <FormField
-                            label={''}
-                            id={'rrule'}
-                        >
-                            <Controller
-                                name="rrule"
-                                control={control}
-                                render={({ field: { onChange, value }, fieldState: { error } }) => (
-                                    <><RRuleGenerator
-                                        value={value}
-                                        onChange={(rrule: string) => onChange(rrule)}
-                                        config={{
-                                          repeat: ['Weekly', 'Monthly', 'Daily'],
-                                          yearly: 'on the',
-                                          monthly: 'on',
-                                          end: ['Never', 'On date'],
-                                          weekStartsOnSunday: false,
-                                          hideError: true,
-                                        }}
-                                      />
-                                        <FormFieldMessages messages={toFormMessage(error)}/>
-                                    </>
-                                )}
-                            />
-                        </FormField>
+                        <Controller
+                            name="rrule"
+                            control={control}
+                            render={({ field: { onChange, value }, fieldState: { error } }) => (
+                                <>
+                                    <RruleEditor
+                                        rrule={value}
+                                        onChange={onChange}
+                                    />
+                                    <FormFieldMessages messages={toFormMessage(error)}/>
+                                </>
+                            )}
+                        />
+
                     </FormFieldGroup>
                 </Modal.Body>
 
