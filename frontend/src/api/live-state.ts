@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { Change, ControllerChange, ScheduleChange } from './types';
 import { atom, useAtomValue, useSetAtom } from 'jotai';
 
-const ws = new ReconnectingWebSocket(import.meta.env.VITE_BACKEND_WS);
+const ws = new ReconnectingWebSocket(import.meta.env.VITE_BACKEND_WS.replace('HOSTNAME', location.hostname));
 
 function isScheduleChange(change: Change): change is ScheduleChange {
   return change.type === 'schedule';
