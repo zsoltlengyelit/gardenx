@@ -1,5 +1,5 @@
 import { Theme } from '../theme';
-import { memo } from 'react';
+import { memo, useMemo, useState } from 'react';
 import format from 'date-fns/format';
 
 type Props = {
@@ -7,7 +7,7 @@ type Props = {
     onChange: (value: Date | null) => void;
 };
 
-function formatDateTime(date: Date | undefined) {
+function formatDateTime(date: Date | null) {
   return date ? format(date, "yyyy-MM-dd'T'HH:mm") : '';
 }
 
@@ -15,7 +15,10 @@ function GDateTimeInput({
   value, onChange,
 }: Props) {
 
-  const fo = formatDateTime(value);
+  const [myValue, setMyValue] = useState<Date | null>(value);
+
+  const fo = useMemo(() => formatDateTime(myValue), [myValue]);
+
   return (
         <input
             type="datetime-local"
@@ -23,7 +26,10 @@ function GDateTimeInput({
             required
             className={Theme.components.input}
             onChange={(event) => {
-              onChange(event.target?.valueAsDate ?? null);
+              const val = event.target?.value ?? null;
+              const date = val ? new Date(val) : null;
+              setMyValue(date);
+              onChange(date);
             }
             }
         />

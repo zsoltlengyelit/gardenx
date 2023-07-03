@@ -55,7 +55,10 @@ export default function NewControllerCard() {
                             name="name"
                             control={control}
                             render={({ field: { onChange, value }, fieldState: { error } }) =>
-                                <Field label="Name">
+                                <Field
+                                    label="Name"
+                                    error={error}
+                                >
                                     <TextInput
                                         value={value}
                                         onChange={onChange}
@@ -67,7 +70,10 @@ export default function NewControllerCard() {
                             name="gpio"
                             control={control}
                             render={({ field: { onChange, value }, fieldState: { error } }) =>
-                                <Field label="GPIO">
+                                <Field
+                                    label="GPIO"
+                                    error={error}
+                                >
                                     <NumberInput
                                         value={value}
                                         onChange={onChange}

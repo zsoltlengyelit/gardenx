@@ -14,7 +14,10 @@ export default function NumberInput({
             <input
                 type="number"
                 value={value}
-                onChange={e => onChange(e.target.valueAsNumber)}
+                onChange={e => {
+                  const val = e.target.valueAsNumber;
+                  onChange(val);
+                }}
                 className={Theme.components.input}
             />
         </>

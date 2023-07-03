@@ -55,7 +55,7 @@ export default function DistributorEditor({ onSave, onClose }: Props) {
     start: joi.date().required(),
     duration: joi.number().required(),
     gap: joi.number().required(),
-    rrule: joi.string().optional()
+    rrule: joi.string().allow('')
   });
 
   const { control, handleSubmit } = useForm<DistributorEditorFormFields>({
@@ -136,7 +136,10 @@ export default function DistributorEditor({ onSave, onClose }: Props) {
                   }
 
                   return (
-                        <Field label={'Controller'}>
+                        <Field
+                            label={'Controller'}
+                            error={error}
+                        >
                             <SimpleSelect
                                 value={value}
                                 onChange={(data) => onChange(data)}
@@ -154,7 +157,10 @@ export default function DistributorEditor({ onSave, onClose }: Props) {
                 name="start"
                 control={control}
                 render={({ field: { onChange, value }, fieldState: { error } }) => (
-                    <Field label={'Start'}>
+                    <Field
+                        label={'Start'}
+                        error={error}
+                    >
                         <GDateTimeInput
                             value={typeof value === 'string' ? parseISO(value) : value}
                             onChange={onChange}
@@ -167,7 +173,10 @@ export default function DistributorEditor({ onSave, onClose }: Props) {
                 name="lineCount"
                 control={control}
                 render={({ field: { onChange, value }, fieldState: { error } }) => (
-                    <Field label={'Line Count'}>
+                    <Field
+                        label={'Line Count'}
+                        error={error}
+                    >
                         <NumberInput
                             value={value}
                             onChange={onChange}
@@ -180,7 +189,10 @@ export default function DistributorEditor({ onSave, onClose }: Props) {
                 name="duration"
                 control={control}
                 render={({ field: { onChange, value }, fieldState: { error } }) => (
-                    <Field label='Duration'>
+                    <Field
+                        label='Duration'
+                        error={error}
+                    >
                         <NumberInput
                             value={value}
                             onChange={onChange}
@@ -193,7 +205,10 @@ export default function DistributorEditor({ onSave, onClose }: Props) {
                 name="gap"
                 control={control}
                 render={({ field: { onChange, value }, fieldState: { error } }) => (
-                    <Field label='Gap'>
+                    <Field
+                        label='Gap'
+                        error={error}
+                    >
                         <NumberInput
                             value={value}
                             onChange={onChange}
@@ -206,7 +221,10 @@ export default function DistributorEditor({ onSave, onClose }: Props) {
                 name="rrule"
                 control={control}
                 render={({ field: { onChange, value }, fieldState: { error } }) => (
-                    <Field label="Repeat">
+                    <Field
+                        label="Repeat"
+                        error={error}
+                    >
                         <RruleEditor
                             rrule={value}
                             onChange={onChange}

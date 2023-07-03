@@ -164,7 +164,10 @@ export default function EventEditor({ draft, onClose, onSave, onDelete, onUpdate
                       }
 
                       return (
-                            <Field label='Controller'>
+                            <Field
+                                label='Controller'
+                                error={error}
+                            >
                                 <SimpleSelect
                                     value={value}
                                     onChange={(value) => onChange(value)}
@@ -182,7 +185,10 @@ export default function EventEditor({ draft, onClose, onSave, onDelete, onUpdate
                     name="start"
                     control={control}
                     render={({ field: { onChange, value, name }, fieldState: { error } }) => (
-                        <Field label="Start">
+                        <Field
+                            label="Start"
+                            error={error}
+                        >
                             <GDateTimeInput
                                 value={typeof value === 'string' ? parseISO(value) : value}
                                 onChange={handleDateChange(onChange, name, 'end')}
@@ -195,7 +201,10 @@ export default function EventEditor({ draft, onClose, onSave, onDelete, onUpdate
                     name="end"
                     control={control}
                     render={({ field: { onChange, value, name }, fieldState: { error } }) => (
-                        <Field label="End">
+                        <Field
+                            label="End"
+                            error={error}
+                        >
                             <GDateTimeInput
                                 value={typeof value === 'string' ? parseISO(value) : value}
                                 onChange={handleDateChange(onChange, name, 'start')}
@@ -208,7 +217,10 @@ export default function EventEditor({ draft, onClose, onSave, onDelete, onUpdate
                     name="rrule"
                     control={control}
                     render={({ field: { onChange, value }, fieldState: { error } }) => (
-                        <Field label="Repeat">
+                        <Field
+                            label="Repeat"
+                            error={error}
+                        >
                             <RruleEditor
                                 rrule={value}
                                 onChange={onChange}
