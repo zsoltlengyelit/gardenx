@@ -37,7 +37,6 @@ export function useLiveState() {
     });
 
     ws.addEventListener('close', () => {
-      console.log('dis');
       setIsConnected(false);
     });
 

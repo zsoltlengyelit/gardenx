@@ -1,8 +1,10 @@
 module.exports = {
     apps: [{
-        script: "npx static-server ./ -n index.html -p 80",
         name: 'frontend',
-        cwd: 'frontend'
+        script: "node frontend-server.mjs ./frontend",
+        env: {
+            PORT: '80'
+        }
     }, {
         name: 'backend',
         script: 'npx fastify start ./app.js',
