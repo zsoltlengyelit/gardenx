@@ -1,4 +1,4 @@
-import { Button, View } from '@instructure/ui';
+import { Button } from '@instructure/ui';
 import type { ButtonProps } from '@instructure/ui-buttons';
 import { useState } from 'react';
 
@@ -22,10 +22,7 @@ export default function ConfirmedButton({ onClick, ...buttonProps }: Props) {
                 />
             }
             {clicked && (
-                <View
-                    as="div"
-                    display="inline"
-                >
+                <div className="inline border-2 border-gray-200 rounded p-4 mx-3">
                     <Button onClick={() => setClicked(false)}>Cancel</Button>
                     <Button
                         margin="0 0 0 small"
@@ -33,7 +30,7 @@ export default function ConfirmedButton({ onClick, ...buttonProps }: Props) {
                         onClick={handleConfirm}
                     >I&apos;m sure
                     </Button>
-                </View>
+                </div>
             )}
         </>
   );
