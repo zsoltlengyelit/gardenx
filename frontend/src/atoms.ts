@@ -1,4 +1,3 @@
-import { atomWithStorage } from 'jotai/utils';
-import { Tab } from './api/nodered';
+import { atom } from 'jotai';
 
-export const selectedTabAtom = atomWithStorage<Tab | null>('selectedTab', null);
+export const editorModeAtom = atom(false);

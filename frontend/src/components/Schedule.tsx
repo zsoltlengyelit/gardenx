@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react';
-import { Calendar, dateFnsLocalizer, SlotInfo, Views } from 'react-big-calendar';
+import React, { useMemo, useState } from 'react';
+import { Calendar, dateFnsLocalizer, Views } from 'react-big-calendar';
 import withDragAndDrop, { withDragAndDropProps } from 'react-big-calendar/lib/addons/dragAndDrop';
 import format from 'date-fns/format';
 import parse from 'date-fns/parse';
+import parseISO from 'date-fns/parseISO';
 import startOfWeek from 'date-fns/startOfWeek';
 import getDay from 'date-fns/getDay';
 import hu from 'date-fns/locale/hu';
@@ -11,25 +12,17 @@ import 'react-big-calendar/lib/addons/dragAndDrop/styles.css';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 
 import { View } from '@instructure/ui';
-import { useAtom, useAtomValue, useSetAtom } from 'jotai';
-import * as ics from 'ics';
+import { useAtom, useAtomValue } from 'jotai';
 import EventEditor, { EventEditorFormFields } from './EventEditor';
-import { randomString } from '../api/random';
-import { axiosInstance } from '../api/axios';
-import useSWR from 'swr';
-import {
-  CalendarEvent,
-  currentRangeAtom,
-  eventsAtom,
-  eventsInCurrentRangeAtom,
-  icalAtom,
-  weekStartsOn
-} from '../api/events';
-import { useTabGpioNodeMap } from '../api/nodered';
-import { RRule, rrulestr } from 'rrule';
-import { setHours, setMinutes } from 'date-fns';
+import { currentRangeAtom, weekStartsOn } from '../api/events';
+import { rrulestr } from 'rrule';
+import { addDays, addMinutes, differenceInMinutes, setHours, setMinutes, startOfDay } from 'date-fns';
+import { Schedule as ScheduleType, ScheduledEvent } from '../api/types';
+import { useSchedules } from '../api/schedules';
+import { makeDate } from '../common/date';
+import ScheduleTemplates from './ScheduleTemplates';
+import { editorModeAtom } from '../atoms';
 
-const { convertTimestampToArray } = ics;
 const locales = {
   hu,
 };
@@ -44,112 +37,80 @@ const localizer = dateFnsLocalizer({
   locales,
 });
 
-function timestamptToArray(startTime: Date) {
-  return convertTimestampToArray(startTime.valueOf(), 'local');
-}
-
 // @ts-ignore
 const DnDCalendar = withDragAndDrop(Calendar);
 
-export default function Schedule() {
+export type Props = {
+    schedules: ScheduleType[];
+}
 
-  const setIcal = useSetAtom(icalAtom);
-  const events = useAtomValue(eventsAtom);
-  const eventsInCurrentRange = useAtomValue(eventsInCurrentRangeAtom);
+export default function Schedule({ schedules }: Props) {
+
   const [currentRange, setCurrentRange] = useAtom(currentRangeAtom);
+  const editorMode = useAtomValue(editorModeAtom);
 
-  const [slotInfoDraft, setSlotInfoDraft] = useState<SlotInfo | null | CalendarEvent>(null);
+  const { deleteSchedule, createSchedule, updateSchedule, deleteScheduleGroup } = useSchedules();
 
-  const { data: icalData, isLoading, error } = useSWR('/schedule-ical');
+  const eventsInCurrentRange = useMemo(() => {
 
-  const tabMap = useTabGpioNodeMap();
+    const rrulEvents = schedules.reduce((collection, schedule) => {
+      const startDate = parseISO(schedule.start);
+      const endDate = parseISO(schedule.end);
 
-  useEffect(() => {
+      if (schedule.rrule) {
 
-    if (!error && !isLoading) {
-      setIcal(icalData);
-    }
-  }, [icalData]);
+        const isWeekView = currentRange.view === Views.WEEK;
 
-  function saveIcal(content: string) {
-    setIcal(content);
-    axiosInstance.post('/schedule-ical', {
-      ical: content
-    });
-  }
+        const rangeStart = isWeekView ? startOfWeek(currentRange.date, { weekStartsOn }) : startOfDay(currentRange.date);
+        const rangeEnd = addDays(rangeStart, isWeekView ? 7 : 1);
 
-  const handleSelectSlot = (slotInfo: SlotInfo) => {
+        const dates = rrulestr(schedule.rrule, {
+          dtstart: startDate
+        }).between(rangeStart, rangeEnd, true);
+
+        const durationInMins = differenceInMinutes(endDate, startDate);
+
+        const newEvents = dates.map(date => {
+          return {
+            title: schedule.id,
+            start: date,
+            end: addMinutes(date, durationInMins),
+            resource: schedule
+          } as ScheduledEvent;
+        });
+        collection.push(...newEvents);
+
+      } else {
+        collection.push({
+          title: schedule.id,
+          start: startDate,
+          end: endDate,
+          resource: schedule
+        });
+      }
+
+      return collection;
+    }, [] as ScheduledEvent[]);
+
+    return rrulEvents;
+
+  }, [schedules, currentRange]);
+
+  const [slotInfoDraft, setSlotInfoDraft] = useState<null | ScheduleType>(null);
+
+  const handleSelectSlot = (slotInfo: any) => {
     setSlotInfoDraft(slotInfo);
   };
 
-  function calendarEventToEventAttributes(event: CalendarEvent) {
-    const startTimestamp = event.start!;
-    const endTimestamp = event.end!;
-    return {
-      start: timestamptToArray(startTimestamp),
-      end: timestamptToArray(endTimestamp),
-      recurrenceRule: event.rrule?.toString(),
-      uid: event.uid,
-      title: event.summary,
-      categories: event.categories
-    } as ics.EventAttributes;
-  }
+  async function handleSave(draft: EventEditorFormFields) {
 
-  function getEventAttributes() {
-    return events.map(event => calendarEventToEventAttributes(event));
-  }
-
-  function normalizeRrule(rrule: RRule, start: Date) {
-
-    const rruleClone = rrule.clone();
-
-    rruleClone.options = {
-      ...rruleClone.options,
-      dtstart: start,
-      byhour: [start.getUTCHours()],
-      byminute: [start.getUTCMinutes()]
-    };
-
-    rruleClone.origOptions = {
-      ...rruleClone.origOptions,
-      dtstart: start,
-      byhour: [start.getUTCHours()],
-      byminute: [start.getUTCMinutes()]
-    };
-
-    let rruleString = rruleClone.toString();
-    const parts = rruleString.split('\n');
-    rruleString = parts[parts.length - 1];
-
-    rruleString = rruleString.split(';').filter(part => !part.startsWith('DTSTART')).join(';');
-
-    const prefix = 'RRULE:';
-    return rruleString.startsWith(prefix) ? rruleString.substring(prefix.length) : rruleString;
-  }
-
-  function handleSave(draft: EventEditorFormFields) {
-    const existingEvents = getEventAttributes();
-    const parsedIcal = ics.createEvents([
-      ...existingEvents,
-      {
-        uid: randomString(32),
-        start: timestamptToArray(draft.start),
-        end: timestamptToArray(draft.end),
-        categories: [draft.flowId, draft.nodeId],
-        recurrenceRule: draft.rrule
-          ? normalizeRrule(rrulestr(draft.rrule, {
-            dtstart: draft.start
-          }), draft.start)
-          : undefined
-      }
-    ]);
-
-    if (parsedIcal.error) {
-
-      throw new Error((parsedIcal.error as any).errors.join('\n'));
-    }
-
-    saveIcal(parsedIcal.value as string);
+    await createSchedule({
+      start: draft.start.toISOString(),
+      end: draft.end.toISOString(),
+      active: true,
+      rrule: draft.rrule,
+      controllerId: draft.controllerId
+    });
 
     setSlotInfoDraft(null);
   }
@@ -169,68 +130,49 @@ export default function Schedule() {
   }
 
   function handleSelectEvent(e: object) {
-    const event = e as CalendarEvent & { sourceEvent: CalendarEvent };
-    const sourceEvent = event.sourceEvent ? event.sourceEvent : event;
+    const event = e as ScheduledEvent;
+    const sourceEvent = event.resource ? event.resource : event;
     setSlotInfoDraft(sourceEvent);
   }
 
-  function handleDelete(event: CalendarEvent) {
-    const existingEvents = getEventAttributes();
-    const parsedIcal = ics.createEvents([
-      ...existingEvents.filter(ee => ee.uid !== event.uid)
-    ]);
-
-    if (parsedIcal.error) {
-
-      throw new Error((parsedIcal.error as any).errors.join('\n'));
-    }
-
-    saveIcal(parsedIcal.value as string ?? '');
-
+  async function handleDelete(event: ScheduleType) {
+    await deleteSchedule(event);
     setSlotInfoDraft(null);
   }
 
-  function handleUpdate(event: CalendarEvent) {
-    const existingEvents = getEventAttributes();
+  async function handleDeleteGroup(groupId: string) {
+    await deleteScheduleGroup(groupId);
+    setSlotInfoDraft(null);
+  }
 
-    const mappedEvents = existingEvents.map(ee => {
-      if (ee.uid === event.uid) {
-        const startTime = event.start!;
-        const endTime = event.end!;
-        const recurrenceRule = event.rrule ? normalizeRrule(event.rrule as any, startTime!) : undefined;
-        return {
-          uid: event.uid,
-          start: timestamptToArray(startTime),
-          end: timestamptToArray(endTime),
-          categories: event.categories,
-          recurrenceRule
-        };
-      }
-      return ee;
+  async function handleUpdate(event: ScheduleType) {
+    // FIXME: wrong tipe
+    await updateSchedule({
+      start: event.start,
+      end: event.end,
+      active: event.active,
+      rrule: event.rrule,
+      controller: event.controller,
+      id: event.id
     });
-    const parsedIcal = ics.createEvents(mappedEvents);
-
-    if (parsedIcal.error) {
-
-      throw new Error((parsedIcal.error as any).errors.join('\n'));
-    }
-
-    saveIcal(parsedIcal.value as string ?? '');
-
     setSlotInfoDraft(null);
   }
 
-  const onEventResize: withDragAndDropProps['onEventResize'] = (data) => {
-    const { start, end, event } = data as any as { start: Date, end: Date, event: CalendarEvent };
+  const onEventResize: withDragAndDropProps['onEventResize'] = async (data) => {
+    const { start, end, event } = data as any as { start: Date, end: Date, event: ScheduledEvent };
 
-    const calendarEvent = event;
-    const sourceEvent: any = calendarEvent.sourceEvent ?? calendarEvent;
-    const isRecurring = !!calendarEvent.rrule;
+    const schedule: any = event.resource;
+    const isRecurring = !!schedule.rrule;
 
-    handleUpdate({
-      ...sourceEvent,
-      start: isRecurring ? setMinutes(setHours(sourceEvent.start, start.getHours()), start.getMinutes()) : start,
-      end: isRecurring ? setMinutes(setHours(sourceEvent.end, end.getHours()), end.getMinutes()) : end,
+    const scheduleStart = makeDate(schedule.start);
+    const scheduleEnd = makeDate(schedule.end);
+
+    const newStart = isRecurring ? setMinutes(setHours(scheduleStart, start.getHours()), start.getMinutes()) : start;
+    const newEnd = isRecurring ? setMinutes(setHours(scheduleEnd, end.getHours()), end.getMinutes()) : end;
+    await handleUpdate({
+      ...schedule,
+      start: newStart,
+      end: newEnd,
     });
   };
 
@@ -242,6 +184,16 @@ export default function Schedule() {
                 as="div"
                 margin="small 0"
             >
+                {editorMode &&
+                    <div className="py-2 mb-3">
+                        <ScheduleTemplates
+                            onDelete={handleDelete}
+                            onUpdate={handleUpdate}
+                            onSave={handleSave}
+                        />
+                    </div>
+                }
+
                 <DnDCalendar
                     date={currentRange.date}
                     defaultView={Views.WEEK}
@@ -257,25 +209,9 @@ export default function Schedule() {
                     onNavigate={handleNavigate}
                     onView={handleView}
                     onSelectEvent={handleSelectEvent}
-                    titleAccessor={event => {
-                      if (tabMap.length === 0) {
-                        return '';
-                      }
-                      const [flowId, nodeId] = (event as CalendarEvent).categories as string[] ?? [null, null];
-
-                      const tab = tabMap.find(tab => tab.tab.id === flowId);
-
-                      if (!tab) {
-                        return `Tab is removed: ${flowId}`;
-                      }
-                      const node = tab.nodes.find(node => node.info === nodeId);
-
-                      if (!node) {
-                        return `${tab.tab.label} - Node is removed: ${nodeId}`;
-                      }
-
-                      return `${tab.tab.label} - ${node.name}`;
-
+                    titleAccessor={(event) => {
+                      const resource = (event as ScheduledEvent).resource;
+                      return `${resource.controller.name}`;
                     }}
                 />
             </View>
@@ -287,6 +223,7 @@ export default function Schedule() {
                     onSave={handleSave}
                     onDelete={handleDelete}
                     onUpdate={handleUpdate}
+                    onDeleteGroup={handleDeleteGroup}
                 />
             }
 

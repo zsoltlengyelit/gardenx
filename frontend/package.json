@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --port 3030",
-    "build": "tsc && vite build",
+    "build": "tsc && vite build --mode production",
     "lint": "eslint --ext ts,tsx src",
     "preview": "vite preview"
   },
@@ -21,7 +21,6 @@
     "axios": "^1.2.1",
     "bootstrap": "^4.6.2",
     "date-fns": "^2.29.3",
-    "ical": "^0.8.0",
     "ics": "^2.41.0",
     "joi": "^17.8.3",
     "jotai": "^1.11.2",
@@ -37,8 +36,7 @@
     "react-rrule-generator": "^1.2.0",
     "reconnecting-websocket": "^4.4.0",
     "rrule": "^2.7.1",
-    "sort-by": "^1.2.0",
-    "swr": "^2.0.0"
+    "sort-by": "^1.2.0"
   },
   "devDependencies": {
     "@types/react": "^18.0.26",

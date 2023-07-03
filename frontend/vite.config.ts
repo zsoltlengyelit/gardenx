@@ -11,8 +11,7 @@ export default defineConfig({
     'process.env': {},
   },
   build: {
-    rollupOptions: {
-
-    }
+    minify: true,
+    rollupOptions: {}
   }
 });
