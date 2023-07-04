@@ -1,67 +1,13 @@
 import fp from 'fastify-plugin';
-import { BinaryValue, Gpio, ValueCallback } from 'onoff';
+import { Gpio } from 'onoff';
 import { isWithinInterval } from 'date-fns';
 import { Observable, ReplaySubject } from 'rxjs';
-import { Controller, Schedule } from './database';
-import { FastifyBaseLogger } from 'fastify';
+import { OnOffAuto } from './database';
 import { calculateSchedules } from './gpio/schedules-rrule';
-import fastifySchedule from '@fastify/schedule';
-import { AsyncTask, CRON_EVERY_MINUTE, CronJob } from 'toad-scheduler';
-
-function createMockGpio(controller: Controller, log: FastifyBaseLogger) {
-  return {
-    _callbacks: [],
-    unwatch() {
-      this._callbacks = [];
-    },
-    unexport() {
-    },
-    write(value: BinaryValue) {
-      log.info(`Mock GPIO#${controller.gpio} write: ${value}`);
-
-      // @ts-ignore
-      this._callbacks.forEach(cb => {
-        (cb as any)(null, value);
-      });
-      return Promise.resolve();
-    },
-    watch(callback: ValueCallback) {
-      this._callbacks.push(callback);
-    }
-  } as any as Gpio;
-}
-
-class MemoizedGpio {
-  // eslint-disable-next-line no-useless-constructor
-  constructor(private gpio: Gpio, public readonly controller: Controller, private _value: BinaryValue = Gpio.LOW) {
-  }
-
-  async write(value: BinaryValue) {
-    await this.gpio.write(value);
-    this._value = value;
-  }
-
-  get value() {
-    return this._value;
-  }
-
-  close() {
-    this.gpio.unexport();
-  }
-}
-
-type ControllerChange = {
-    type: 'controller'
-    controller: Controller;
-    set: boolean;
-}
-
-type ScheduleChange = {
-    schedule: Schedule;
-    type: 'schedule'
-}
-
-type Change = ScheduleChange | ControllerChange;
+import { AsyncTask, CRON_EVERY_MINUTE, CronJob, SimpleIntervalJob } from 'toad-scheduler';
+import { Change, MemoizedGpio, switchOffJobSuffix } from './gpio/types';
+import { publishChanges } from './gpio/publishChanges';
+import { createMockGpio } from './gpio/mockGpio';
 
 declare module 'fastify' {
     export interface FastifyInstance {
@@ -70,6 +16,9 @@ declare module 'fastify' {
         };
     }
 }
+
+const autoOffJobs = {} as Record<string, Date>;
+
 export default fp(async (fastify) => {
 
   const { Controller, Schedule } = fastify.db;
@@ -140,43 +89,88 @@ export default fp(async (fastify) => {
       }
     }
 
-    // publish controllers state
-    const changes = Object.values(decoration.gpios).reduce((acc, gpio) => {
-      acc.push({
-        type: 'controller',
-        controller: gpio.controller,
-        set: !!gpio.value
-      });
-      return acc;
-    }, [] as Change[]);
-
-    changes.push(...scheduleEntities.map(schedule => ({
-      type: 'schedule',
-      schedule
-    } as ScheduleChange)));
-
-    decoration.changes.next(changes);
-
+    publishChanges(scheduleEntities, fastify.scheduler, decoration.gpios, decoration.changes, autoOffJobs);
   }
 
-  await refreshState();
+  function handleStateChange(controllerId: string, state: OnOffAuto) {
+    fastify.log.info(`Handle controller ${controllerId} to ${state}`);
+
+    const jobId = `${controllerId}${switchOffJobSuffix}`;
+    const taskId = `${jobId}-task`;
+
+    if (state === 'on') {
+      // schedule off task
+      const task = new AsyncTask(
+        taskId,
+        async () => {
+          fastify.log.info(`Auto turn off ${controllerId} by ${jobId}`);
+          fastify.scheduler.removeById(jobId);
+          delete autoOffJobs[jobId];
+          
+          await Controller.update({
+            state: 'auto'
+          }, {
+            where: {
+              id: controllerId
+            }
+          });
+
+        },
+        (err) => {
+          fastify.log.error(err);
+        });
+
+      const job = new SimpleIntervalJob({ hours: 1 }, task, { id: jobId });
+      fastify.scheduler.addSimpleIntervalJob(job);
+      autoOffJobs[jobId] = new Date();
+
+    } else {
+
+      if (fastify.scheduler.existsById(jobId)) {
+        fastify.log.info(`Remove job with id: ${jobId}`);
+        fastify.scheduler.removeById(jobId);
+        delete autoOffJobs[jobId];
+      } else {
+        fastify.log.info(`No job with id: ${jobId}`);
+      }
+
+    }
+  }
 
   ([Schedule, Controller]).forEach(model => {
 
     // @ts-ignore
-    model.afterSave(async () => refreshState());
+    model.afterSave(async () => {
+      return refreshState();
+    });
     // @ts-ignore
-    model.afterDestroy(async () => refreshState());
+    model.afterDestroy(async () => {
+      return refreshState();
+    });
 
     // @ts-ignore
-    model.afterBulkDestroy(async () => refreshState());
+    model.afterBulkDestroy(async () => {
+      return refreshState();
+    });
     // @ts-ignore
-    model.afterBulkDestroy(async () => refreshState());
+    model.afterBulkDestroy(async () => {
+      return refreshState();
+    });
     // @ts-ignore
-    model.afterBulkUpdate(async () => refreshState());
+    model.afterBulkUpdate(async (options) => {
+      fastify.log.info(`${JSON.stringify(options)}: afterBulkUpdate`);
+
+      try {
+        if (model === Controller && options.fields?.includes('state')) {
+          await handleStateChange(options.where.id, options.attributes?.state);
+        }
+      } catch (e) {
+        fastify.log.error('Error while handling state change', e);
+      }
+
+      return refreshState();
+    });
   });
-
-  await fastify.register(fastifySchedule, {});
 
   const task = new AsyncTask(
     'refresh GPIO state task',
@@ -192,7 +186,13 @@ export default fp(async (fastify) => {
 
   // `fastify.scheduler` becomes available after initialization.
   // Therefore, you need to call `ready` method.
-  fastify.ready().then(() => {
+  fastify.ready().then(async () => {
+
+    await Controller.update({
+      state: 'auto'
+    }, { where: {} }); // reset all controllers on startup
+
+    await refreshState();
     fastify.scheduler.addCronJob(job);
   });
 });

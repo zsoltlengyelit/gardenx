@@ -1,19 +1,22 @@
 import {
-  Sequelize,
+  Association,
+  CreationOptional,
   DataTypes,
-  Model,
   InferAttributes,
   InferCreationAttributes,
-  CreationOptional,
-  NonAttribute, Association
+  Model,
+  NonAttribute,
+  Sequelize
 } from 'sequelize';
 import fp from 'fastify-plugin';
+
+export type OnOffAuto = 'on' | 'off' | 'auto';
 
 // eslint-disable-next-line no-use-before-define
 export class Controller extends Model<InferAttributes<Controller>, InferCreationAttributes<Controller>> {
   declare id: CreationOptional<string>;
   declare name: string;
-  declare state: 'on' | 'off' | 'auto';
+  declare state: OnOffAuto;
   declare gpio: number;
 }
 

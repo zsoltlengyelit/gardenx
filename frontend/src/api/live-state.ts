@@ -1,6 +1,6 @@
 import ReconnectingWebSocket from 'reconnecting-websocket';
 import { useEffect, useState } from 'react';
-import { Change, ControllerChange, ScheduleChange } from './types';
+import { Change, ControllerChange, OffIntervalChange, ScheduleChange } from './types';
 import { atom, useAtomValue, useSetAtom } from 'jotai';
 
 const ws = new ReconnectingWebSocket(import.meta.env.VITE_BACKEND_WS.replace('HOSTNAME', location.hostname));
@@ -13,6 +13,10 @@ function isControllerChange(change: Change): change is ControllerChange {
   return change.type === 'controller';
 }
 
+function isOffIntervalChange(change: Change): change is OffIntervalChange {
+  return change.type === 'off-interval';
+}
+
 const globalChangesAtom = atom<Change[]>([]);
 
 const scheduleChangesAtom = atom(get => {
@@ -23,12 +27,17 @@ const controllerChangesAtom = atom(get => {
   return get(globalChangesAtom).filter(isControllerChange);
 });
 
+const offIntervalChangesAtom = atom(get => {
+  return get(globalChangesAtom).filter(isOffIntervalChange);
+});
+
 export function useLiveState() {
 
   const [isConnected, setIsConnected] = useState(false);
   const setGlobal = useSetAtom(globalChangesAtom);
   const schedules = useAtomValue(scheduleChangesAtom);
   const controllers = useAtomValue(controllerChangesAtom);
+  const offIntervals = useAtomValue(offIntervalChangesAtom);
 
   useEffect(() => {
 
@@ -49,7 +58,7 @@ export function useLiveState() {
   }, []);
 
   return {
-    controllers, isConnected, schedules
+    controllers, isConnected, schedules, offIntervals
   };
 
 }

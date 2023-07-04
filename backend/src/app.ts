@@ -10,6 +10,7 @@ import gpioPlugin from './plugins/gpio';
 import controllerRoutes from './routes/controller';
 import scheduleRoutes from './routes/schedules';
 import liveStateRoutes from './routes/live-state';
+import toadScheduler from './plugins/toad-scheduler';
 
 export type AppOptions = {
     // Place your custom options for app below here.
@@ -57,6 +58,7 @@ const app: FastifyPluginAsync<AppOptions> = async (
   // This loads all plugins defined in plugins
   // those should be support plugins that are reused
   // through your application
+  fastify.register(toadScheduler, {});
   fastify.register(corsPlugin, {});
   fastify.register(sensiblePlugin, {});
   fastify.register(databasePlugin, {});

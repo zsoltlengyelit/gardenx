@@ -1,10 +1,21 @@
-import React from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useControllers } from '../api/controllers';
 import { Controller, OnOffAuto } from '../api/types';
 import { useAtomValue } from 'jotai';
 import { editorModeAtom } from '../atoms';
 import Button from './Button';
 import ConfirmedButton from './ConfirmedButton';
+import { useLiveState } from '../api/live-state';
+import {
+  addDays,
+  addHours,
+  addMilliseconds,
+  addMinutes,
+  addSeconds,
+  formatDistanceToNowStrict,
+  intervalToDuration
+} from 'date-fns';
+import parseISO from 'date-fns/parseISO';
 
 type Props = {
     controller: Controller;
@@ -15,6 +26,63 @@ export default function ControllerCard({ controller, set }: Props) {
 
   const { updateController, deleteController } = useControllers();
   const editorMode = useAtomValue(editorModeAtom);
+  const { offIntervals } = useLiveState();
+
+  const controllerOffInterval = useMemo(() => {
+    const intervals = offIntervals.filter(interval => interval.controllerId === controller.id);
+    const interval = intervals.length ? intervals[0] : null;
+
+    if (interval) {
+      let end = parseISO(interval.start);
+
+      const { days, hours, minutes, seconds, milliseconds } = interval.interval;
+
+      if (days) {
+        end = addDays(end, days);
+      }
+      if (hours) {
+        end = addHours(end, hours);
+      }
+      if (minutes) {
+        end = addMinutes(end, minutes);
+      }
+      if (seconds) {
+        end = addSeconds(end, seconds);
+      }
+      if (milliseconds) {
+        end = addMilliseconds(end, milliseconds);
+      }
+
+      return end;
+    }
+    return null;
+  }, [controller, offIntervals]);
+
+  const [autoOffIn, setAutoOffIn] = useState('');
+
+  useEffect(() => {
+
+    const timer = setInterval(() => {
+      if (controllerOffInterval) {
+
+        const duration = intervalToDuration({
+          start: new Date(),
+          end: controllerOffInterval
+        });
+        if (duration.hours === 0 && duration.minutes === 0) {
+
+          setAutoOffIn(formatDistanceToNowStrict(controllerOffInterval, { unit: 'second' }));
+        } else {
+          setAutoOffIn(formatDistanceToNowStrict(controllerOffInterval, { unit: 'minute' }));
+        }
+      } else {
+        setAutoOffIn('');
+      }
+    }, 1000);
+
+    return () => clearInterval(timer);
+
+  }, [controllerOffInterval]);
 
   function createStateHandler(state: OnOffAuto) {
     return () => {
@@ -32,13 +100,12 @@ export default function ControllerCard({ controller, set }: Props) {
                 <div className="grow">
                     <h3 className="text-2xl">{controller.name}</h3>
                 </div>
+                {autoOffIn && <div className="self-center italic text-sm">off in {autoOffIn}</div>}
+                {editorMode && <div className="self-center">GPIO: {controller.gpio}</div>}
             </div>
 
             {editorMode &&
-                <div className="my-4 border-y-2 py-2 border-gray-200">
-                    <div className="my-2">
-                        GPIO: {controller.gpio}
-                    </div>
+                <div className="my-2 border-y-2 py-1 border-gray-200">
                     <ConfirmedButton
                         color="danger"
                         onClick={() => deleteController(controller)}

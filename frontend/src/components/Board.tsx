@@ -19,7 +19,7 @@ export default function Board() {
         <>
             <div className="flex flex-col">
                 <div
-                    className="align-top shadow-xl rounded-lg rounded"
+                    className="align-top rounded-lg rounded"
                 >
                     <header className="bg-green-600 text-white py-3 px-3 pr-4">
                         <div className="flex flex-row">

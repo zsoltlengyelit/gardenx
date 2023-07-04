@@ -10,7 +10,7 @@ export type Controller = {
 };
 
 export type ChangeBase = {
-    type: 'schedule' | 'controller';
+    type: 'schedule' | 'controller' | 'off-interval';
 }
 
 export type ControllerChange = ChangeBase & {
@@ -32,6 +32,21 @@ export type ScheduleChange = ChangeBase & {
     schedule: Schedule;
 }
 
-export type Change = ControllerChange | ScheduleChange;
+export type SimpleIntervalSchedule = {
+    days?: number;
+    hours?: number;
+    minutes?: number;
+    seconds?: number;
+    milliseconds?: number;
+    runImmediately?: boolean;
+};
+
+export type OffIntervalChange = ChangeBase & {
+    controllerId: string;
+    interval: SimpleIntervalSchedule;
+    start: string;
+};
+
+export type Change = ControllerChange | ScheduleChange | OffIntervalChange;
 
 export type ScheduledEvent = Event & { resource: Schedule };

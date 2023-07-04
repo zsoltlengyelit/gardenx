@@ -12,7 +12,6 @@ export function useControllers() {
     },
     async updateController(controller: Controller, change: { name?: string, gpio?: number, state?: OnOffAuto }) {
       await axiosInstance.put(`/controllers/${controller.id}`, {
-        ...controller,
         ...change
       });
     },
