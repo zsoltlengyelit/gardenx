@@ -11,12 +11,12 @@ export default function Modal({ children, header, footer }: Props) {
   return (
         <>
             <div
-                className="w-screen md:h-auto justify-center overflow-auto items-center flex fixed inset-0 z-50 outline-none focus:outline-none"
+                className="safe-bottom safe-left safe-right safe-top justify-center overflow-hidden items-center flex fixed inset-0 z-50 outline-none focus:outline-none"
             >
-                <div className="flex flex-col md:w-1/2 lg:max-w-lg mx-auto">
+                <div className="flex flex-col md:w-1/2 lg:max-w-lg mx-auto my-4">
                     {/* content */}
                     <div
-                        className="border-0 h-auto md:h-auto py-10 w-screen md:w-auto md:rounded-lg shadow-lg relative flex flex-col bg-white outline-none focus:outline-none"
+                        className="border-0 h-auto md:h-auto h-screen w-screen md:w-auto md:rounded-lg shadow-lg relative flex flex-col bg-white outline-none focus:outline-none overflow-auto"
                     >
                         {/* header */}
                         <div

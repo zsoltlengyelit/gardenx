@@ -35,3 +35,15 @@ body {
         margin: .5rem 0;
     }
 }
+
+textarea,
+input.text,
+input[type="text"],
+input[type="button"],
+input[type="submit"],
+input[type="number"],
+input[type="datetime-local"],
+.input-checkbox {
+    -webkit-appearance: none;
+    border-radius: 0;
+}

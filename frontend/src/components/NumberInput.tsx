@@ -13,6 +13,8 @@ export default function NumberInput({
         <>
             <input
                 type="number"
+                pattern="[0-9]*"
+                inputMode="numeric"
                 value={value}
                 onChange={e => {
                   const val = e.target.valueAsNumber;

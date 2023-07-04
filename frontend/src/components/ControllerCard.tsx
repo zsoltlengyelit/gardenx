@@ -94,7 +94,7 @@ export default function ControllerCard({ controller, set }: Props) {
 
   return (
         <div
-            className={`flex flex-col justify-between shadow-sm border-2 rounded-md p-2 px-3 ${set ? 'bg-green-900 text-white' : ''}`}
+            className={`flex flex-col justify-between border-0 shadow-xl pt-2 drop-shadow-xl rounded-md p-2 px-3 ${set ? 'bg-green-900 text-white' : ''}`}
         >
             <div className="flex flex-row">
                 <div className="grow">
