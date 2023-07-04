@@ -103,7 +103,7 @@ export default fp(async (fastify) => {
       const task = new AsyncTask(
         taskId,
         async () => {
-          fastify.log.info(`Auto turn off ${controllerId} by ${jobId}`);
+          fastify.log.info(`Auto turn to auto ${controllerId} by ${jobId}`);
           fastify.scheduler.removeById(jobId);
           delete autoOffJobs[jobId];
           
