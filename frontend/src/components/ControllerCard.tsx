@@ -100,7 +100,7 @@ export default function ControllerCard({ controller, set }: Props) {
                 <div className="grow">
                     <h3 className="text-2xl">{controller.name}</h3>
                 </div>
-                {autoOffIn && <div className="self-center italic text-sm">off in {autoOffIn}</div>}
+                {autoOffIn && <div className="self-center italic text-sm">auto in {autoOffIn}</div>}
                 {editorMode && <div className="self-center">GPIO: {controller.gpio}</div>}
             </div>
 
