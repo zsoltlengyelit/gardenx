@@ -5,9 +5,9 @@ import { Controller, SubmitErrorHandler, useForm } from 'react-hook-form';
 import { joiResolver } from '@hookform/resolvers/joi/dist/joi';
 import TextInput from './TextInput';
 import NumberInput from './NumberInput';
-import Button from './Button';
 import { PlusIcon } from '@heroicons/react/20/solid';
 import Field from './Field';
+import { Button, Card } from 'react-daisyui';
 
 type NewControllerFields = {
     name: string;
@@ -45,12 +45,10 @@ export default function NewControllerCard() {
   const submit = handleSubmit(handleFormSubmit, handleFormError);
 
   return (
-        <div
-            className={'shadow-sm border-2 rounded-md p-2 px-3'}
-        >
+        <Card>
             {activated
               ? (
-                    <>
+                    <Card.Body>
                         <Controller
                             name="name"
                             control={control}
@@ -85,7 +83,7 @@ export default function NewControllerCard() {
                         <div className="mt-3 clex align-middle justify-items-center">
                             <div className="grow text-center align-middle">
                                 <Button
-                                    color="primary"
+                                    color="success"
                                     className="w-full"
                                     type="submit"
                                     onClick={() => submit()}
@@ -95,7 +93,7 @@ export default function NewControllerCard() {
 
                             </div>
                         </div>
-                    </>
+                    </Card.Body>
                 )
               : (
                     <div
@@ -104,14 +102,14 @@ export default function NewControllerCard() {
                         <div className="grow align-middle justify-center">
                             <Button
                                 onClick={() => setActivated(true)}
-                                color="transparent"
+                                color="ghost"
                             >
                                 <PlusIcon className="w-10 h-10"/>
                             </Button>
                         </div>
                     </div>
                 )}
-        </div>
+        </Card>
   )
   ;
 }

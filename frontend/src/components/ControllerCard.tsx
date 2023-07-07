@@ -3,8 +3,6 @@ import { useControllers } from '../api/controllers';
 import { Controller, OnOffAuto } from '../api/types';
 import { useAtomValue } from 'jotai';
 import { editorModeAtom } from '../atoms';
-import Button from './Button';
-import ConfirmedButton from './ConfirmedButton';
 import { useLiveState } from '../api/live-state';
 import {
   addDays,
@@ -16,6 +14,8 @@ import {
   intervalToDuration
 } from 'date-fns';
 import parseISO from 'date-fns/parseISO';
+import { Badge, Button, ButtonGroup, Card } from 'react-daisyui';
+import ConfirmedButton from './ConfirmedButton';
 
 type Props = {
     controller: Controller;
@@ -59,18 +59,29 @@ export default function ControllerCard({ controller, set }: Props) {
   }, [controller, offIntervals]);
 
   const [autoOffIn, setAutoOffIn] = useState('');
+  const [leftMinutes, setLeftMinutes] = useState(0);
 
   useEffect(() => {
+    if (!set) {
+      setLeftMinutes(0);
+      setAutoOffIn('');
+    } else if (set && controller.state === 'auto') {
+      setLeftMinutes(60);
+    }
+  }, [set]);
 
-    const timer = setInterval(() => {
+  useEffect(() => {
+    const updateAutoOffIn = () => {
       if (controllerOffInterval) {
 
         const duration = intervalToDuration({
           start: new Date(),
           end: controllerOffInterval
         });
-        if (duration.hours === 0 && duration.minutes === 0) {
 
+        setLeftMinutes(duration.minutes ?? 0);
+
+        if (duration.hours === 0 && duration.minutes === 0) {
           setAutoOffIn(formatDistanceToNowStrict(controllerOffInterval, { unit: 'second' }));
         } else {
           setAutoOffIn(formatDistanceToNowStrict(controllerOffInterval, { unit: 'minute' }));
@@ -78,7 +89,10 @@ export default function ControllerCard({ controller, set }: Props) {
       } else {
         setAutoOffIn('');
       }
-    }, 1000);
+    };
+
+    updateAutoOffIn();
+    const timer = setInterval(updateAutoOffIn, 1000);
 
     return () => clearInterval(timer);
 
@@ -93,46 +107,69 @@ export default function ControllerCard({ controller, set }: Props) {
   }
 
   return (
-        <div
-            className={`flex flex-col justify-between border-0 shadow-xl pt-2 drop-shadow-xl rounded-md p-2 px-3 ${set ? 'bg-green-900 text-white' : ''}`}
+        <Card
+            compact={true}
+            className="dark:bg-gray-950"
         >
-            <div className="flex flex-row">
-                <div className="grow">
-                    <h3 className="text-2xl">{controller.name}</h3>
-                </div>
-                {autoOffIn && <div className="self-center italic text-sm">auto in {autoOffIn}</div>}
-                {editorMode && <div className="self-center">GPIO: {controller.gpio}</div>}
+            <div
+                className={'rounded transform-gpu opacity-90 bg-green-600 absolute h-full z-0'} style={{
+                  width: `${100 * leftMinutes / 60}%`
+                }}
+            >
             </div>
+            <Card.Body className={`z-0 ${set ? 'text-white' : ''}`}>
+                <Card.Title className="flex">
+                    <div className="grow">
+                        {controller.name}
+                    </div>
 
-            {editorMode &&
-                <div className="my-2 border-y-2 py-1 border-gray-200">
-                    <ConfirmedButton
-                        color="danger"
-                        onClick={() => deleteController(controller)}
-                    >Delete
-                    </ConfirmedButton>
-                </div>
-            }
+                    {autoOffIn && <div className="indicator-item indicator-center">
+                        <Badge
+                            color="info"
+                            className="italic text-sm"
+                        >auto in {autoOffIn}
+                        </Badge>
+                                  </div>
+                    }
+                </Card.Title>
 
-            <div className="mt-3">
-                <div className="grid grid-cols-3 gap-1">
-                    <Button
-                        color={controller.state === 'off' ? 'danger' : (set ? 'transparentOnDark' : 'transparent')}
-                        onClick={createStateHandler('off')}
-                    >OFF
-                    </Button>
-                    <Button
-                        color={controller.state === 'auto' ? 'warning' : (set ? 'transparentOnDark' : 'transparent')}
-                        onClick={createStateHandler('auto')}
-                    >AUTO
-                    </Button>
-                    <Button
-                        color={controller.state === 'on' ? 'success' : (set ? 'transparentOnDark' : 'transparent')}
-                        onClick={createStateHandler('on')}
-                    >ON
-                    </Button>
-                </div>
-            </div>
-        </div>
+                <Card.Actions className="content-center mt-4">
+                    {editorMode &&
+                        <div className="self-center mb-2">GPIO: {controller.gpio}</div>
+                    }
+
+                    <ButtonGroup className="w-full flex">
+                        <Button
+                            className="grow"
+                            color={controller.state === 'off' ? 'success' : undefined}
+                            onClick={createStateHandler('off')}
+                        >OFF
+                        </Button>
+                        <Button
+                            className="grow"
+                            color={controller.state === 'auto' ? 'success' : undefined}
+                            onClick={createStateHandler('auto')}
+                        >AUTO
+                        </Button>
+                        <Button
+                            className="grow"
+                            color={controller.state === 'on' ? 'success' : undefined}
+                            onClick={createStateHandler('on')}
+                        >ON
+                        </Button>
+                    </ButtonGroup>
+
+                    {editorMode &&
+                        <ConfirmedButton
+                            className="w-full"
+                            color="error"
+                            onClick={() => deleteController(controller)}
+                        >Delete
+                        </ConfirmedButton>
+                    }
+                </Card.Actions>
+            </Card.Body>
+
+        </Card>
   );
 }

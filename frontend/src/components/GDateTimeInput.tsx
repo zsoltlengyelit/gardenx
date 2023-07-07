@@ -1,6 +1,6 @@
-import { Theme } from '../theme';
 import { memo, useMemo, useState } from 'react';
 import format from 'date-fns/format';
+import { Input } from 'react-daisyui';
 
 type Props = {
     value: Date;
@@ -20,11 +20,12 @@ function GDateTimeInput({
   const fo = useMemo(() => formatDateTime(myValue), [myValue]);
 
   return (
-        <input
+        <Input
             type="datetime-local"
             value={fo}
             required
-            className={Theme.components.input}
+            bordered={true}
+            className="rounded"
             onChange={(event) => {
               const val = event.target?.value ?? null;
               const date = val ? new Date(val) : null;

@@ -1,5 +1,5 @@
 import React, { ComponentProps, useState } from 'react';
-import Button from './Button';
+import { Button } from 'react-daisyui';
 
 type Props = ComponentProps<typeof Button>;
 
@@ -21,15 +21,16 @@ export default function ConfirmedButton({ onClick, ...buttonProps }: Props) {
                 />
             }
             {clicked && (
-                <div className="inline">
+                <div className="flex w-full">
                     <Button
-                        color="secondary"
+                        className="grow"
+                        color="ghost"
                         onClick={() => setClicked(false)}
                     >Cancel
                     </Button>
                     <Button
                         className="ml-1"
-                        color="danger"
+                        color="error"
                         onClick={handleConfirm}
                     >I&apos;m sure
                     </Button>

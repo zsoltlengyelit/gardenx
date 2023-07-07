@@ -1,4 +1,4 @@
-import { Theme } from '../theme';
+import { Input } from 'react-daisyui';
 
 type Props = {
     value?: string;
@@ -8,10 +8,9 @@ type Props = {
 export default function TextInput({ value, onChange }: Props) {
 
   return (
-        <input
+        <Input
             type="text"
             onChange={e => onChange(e.target.value)}
-            className={Theme.components.input}
         />
   );
 }

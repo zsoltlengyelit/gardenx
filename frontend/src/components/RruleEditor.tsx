@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import Button from './Button';
+import { Button } from 'react-daisyui';
 
 type RButtonProps = {
     active?: boolean;
@@ -12,8 +12,8 @@ function RButton({ active, onClick, children, className }: RButtonProps) {
   return (
         <Button
             onClick={onClick}
-            color={active ? 'success' : 'secondary'}
-            className={`${className ?? ''}`}
+            color={active ? 'success' : 'neutral'}
+            className={` rounded-none ${className ?? ''}`}
         >
             {children}
         </Button>
@@ -97,6 +97,7 @@ export default function RruleEditor({ rrule: defaultRrule, onChange }: Props) {
             <div className="mt-4 grid grid-cols-4 w-full">
                 <RButton
                     onClick={() => handleNoRepeat()}
+                    className="rounded-l-lg"
                 >
                     No Repeat
                 </RButton>
@@ -114,6 +115,7 @@ export default function RruleEditor({ rrule: defaultRrule, onChange }: Props) {
                 </RButton>
 
                 <RButton
+                    className="rounded-r-lg"
                     onClick={() => handleWeekend()}
                 >
                     Weekend

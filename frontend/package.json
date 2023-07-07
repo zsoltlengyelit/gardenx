@@ -18,17 +18,20 @@
     "@types/react-big-calendar": "^0.38.2",
     "@types/react-calendar": "^3.9.0",
     "axios": "^1.2.1",
+    "daisyui": "^3.1.10",
     "date-fns": "^2.29.3",
     "joi": "^17.8.3",
     "jotai": "^1.11.2",
     "lodash-es": "^4.17.21",
     "react": "^18.2.0",
     "react-big-calendar": "^1.5.2",
+    "react-daisyui": "^4.0.0",
     "react-datetime-picker": "^4.1.1",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.40.0",
     "reconnecting-websocket": "^4.4.0",
-    "rrule": "^2.7.1"
+    "rrule": "^2.7.1",
+    "sass": "^1.63.6"
   },
   "devDependencies": {
     "@types/react": "^18.0.26",

@@ -8,19 +8,18 @@ import startOfWeek from 'date-fns/startOfWeek';
 import getDay from 'date-fns/getDay';
 import hu from 'date-fns/locale/hu';
 
-import 'react-big-calendar/lib/addons/dragAndDrop/styles.css';
-import 'react-big-calendar/lib/css/react-big-calendar.css';
+import './Schedule.scss';
 
 import { useAtom, useAtomValue } from 'jotai';
-import EventEditor, { EventEditorFormFields } from './EventEditor';
-import { currentRangeAtom, weekStartsOn } from '../api/events';
+import EventEditor, { EventEditorFormFields } from '../EventEditor';
+import { currentRangeAtom, weekStartsOn } from '../../api/events';
 import { rrulestr } from 'rrule';
 import { addDays, addMinutes, differenceInMinutes, setHours, setMinutes, startOfDay } from 'date-fns';
-import { Schedule as ScheduleType, ScheduledEvent } from '../api/types';
-import { useSchedules } from '../api/schedules';
-import { makeDate } from '../common/date';
-import ScheduleTemplates from './ScheduleTemplates';
-import { editorModeAtom } from '../atoms';
+import { Schedule as ScheduleType, ScheduledEvent } from '../../api/types';
+import { useSchedules } from '../../api/schedules';
+import { makeDate } from '../../common/date';
+import ScheduleTemplates from '../ScheduleTemplates';
+import { editorModeAtom } from '../../atoms';
 
 const locales = {
   hu,

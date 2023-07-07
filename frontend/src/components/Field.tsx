@@ -10,18 +10,16 @@ type Props = {
 export default function Field({ children, label, error }: Props) {
 
   return (
-        <label className="block my-2">
-            <span className="font-bold text-md font-sans">{label}</span>
-
-            <div className="py-2">
-                {children}
-            </div>
-
+        <div className="form-control w-full">
+            <label className="label">
+                <span className="label-text">{label}</span>
+            </label>
+            {children}
             {error && (
-                <div className={'text-red-800'}>
-                    {error.message}
-                </div>
+                <label className="label">
+                    <span className="label-text text-error">{error.message}</span>
+                </label>
             )}
-        </label>
+        </div>
   );
 }

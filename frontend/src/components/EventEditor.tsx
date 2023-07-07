@@ -13,10 +13,8 @@ import parseISO from 'date-fns/parseISO';
 import { getDayOfYear, setDayOfYear } from 'date-fns';
 import { makeDate } from '../common/date';
 import RruleEditor from './RruleEditor';
-import Button from './Button';
-import Modal from './Modal';
-import SimpleSelect from './SimpleSelect';
 import Field from './Field';
+import { Button, Modal, Select } from 'react-daisyui';
 
 export type EventEditorFormFields = {
     id?: string;
@@ -109,125 +107,134 @@ export default function EventEditor({ draft, onClose, onSave, onDelete, onUpdate
   return (
         <>
 
-            <Modal
-                header={<h3>Schedule</h3>}
-                footer={
-                    <div className='flex items-center'>
-                        <div className="grow justify-start items-start">
-                            {isSaved &&
-                                <ConfirmedButton
-                                    color="danger"
-                                    onClick={() => onDelete(draft)}
+            <Modal open={true}>
+                <Modal.Header>
+                    <h3>Schedule</h3>
+                </Modal.Header>
+
+                <Modal.Body>
+
+                    <Controller
+                        name="controllerId"
+                        control={control}
+                        render={({ field: { onChange, value }, fieldState: { error } }) => {
+                          if (controllers.length === 0) {
+                            return <>No controllers</>;
+                          }
+
+                          return (
+                                <Field
+                                    label='Controller'
+                                    error={error}
                                 >
-                                    Delete
-                                </ConfirmedButton>
-                            }
-
-                            {isSaved && draft.group_id &&
-                                <div>
-                                    <ConfirmedButton
-                                        color="danger"
-                                        onClick={() => onDeleteGroup(draft.group_id!)}
+                                    <Select
+                                        value={value}
+                                        onChange={(e) => onChange(e.target.value)}
                                     >
-                                        Delete Group
-                                    </ConfirmedButton>
-                                </div>
-                            }
-                        </div>
+                                        {controllers.map((c) => (
+                                            <Select.Option
+                                                value={c.id}
+                                                key={c.id}
+                                            >{c.name}
+                                            </Select.Option>
+                                        ))}
+                                    </Select>
+                                </Field>
+                          );
+                        }}
+                    />
 
-                        <div>
-                            <Button
-                                color="primary-inverse"
-                                onClick={() => onClose()}
-                                className="mr-2"
-                            >
-                                Cancel
-                            </Button>
-
-                            <Button
-                                color="primary"
-                                type="submit"
-                                onClick={() => submit()}
-                            >
-                                Save
-                            </Button>
-                        </div>
-                    </div>
-                }
-            >
-                <Controller
-                    name="controllerId"
-                    control={control}
-                    render={({ field: { onChange, value }, fieldState: { error } }) => {
-                      if (controllers.length === 0) {
-                        return <>No controllers</>;
-                      }
-
-                      return (
+                    <Controller
+                        name="start"
+                        control={control}
+                        render={({ field: { onChange, value, name }, fieldState: { error } }) => (
                             <Field
-                                label='Controller'
+                                label="Start"
                                 error={error}
                             >
-                                <SimpleSelect
-                                    value={value}
-                                    onChange={(value) => onChange(value)}
-                                    options={controllers.map(c => ({
-                                      value: c.id,
-                                      label: c.name
-                                    }))}
+                                <GDateTimeInput
+                                    value={typeof value === 'string' ? parseISO(value) : value}
+                                    onChange={handleDateChange(onChange, name, 'end')}
                                 />
                             </Field>
-                      );
-                    }}
-                />
+                        )}
+                    />
 
-                <Controller
-                    name="start"
-                    control={control}
-                    render={({ field: { onChange, value, name }, fieldState: { error } }) => (
-                        <Field
-                            label="Start"
-                            error={error}
-                        >
-                            <GDateTimeInput
-                                value={typeof value === 'string' ? parseISO(value) : value}
-                                onChange={handleDateChange(onChange, name, 'end')}
-                            />
-                        </Field>
-                    )}
-                />
+                    <Controller
+                        name="end"
+                        control={control}
+                        render={({ field: { onChange, value, name }, fieldState: { error } }) => (
+                            <Field
+                                label="End"
+                                error={error}
+                            >
+                                <GDateTimeInput
+                                    value={typeof value === 'string' ? parseISO(value) : value}
+                                    onChange={handleDateChange(onChange, name, 'start')}
+                                />
+                            </Field>
+                        )}
+                    />
 
-                <Controller
-                    name="end"
-                    control={control}
-                    render={({ field: { onChange, value, name }, fieldState: { error } }) => (
-                        <Field
-                            label="End"
-                            error={error}
-                        >
-                            <GDateTimeInput
-                                value={typeof value === 'string' ? parseISO(value) : value}
-                                onChange={handleDateChange(onChange, name, 'start')}
-                            />
-                        </Field>
-                    )}
-                />
+                    <Controller
+                        name="rrule"
+                        control={control}
+                        render={({ field: { onChange, value }, fieldState: { error } }) => (
+                            <Field
+                                label="Repeat"
+                                error={error}
+                            >
+                                <RruleEditor
+                                    rrule={value}
+                                    onChange={onChange}
+                                />
+                            </Field>
+                        )}
+                    />
 
-                <Controller
-                    name="rrule"
-                    control={control}
-                    render={({ field: { onChange, value }, fieldState: { error } }) => (
-                        <Field
-                            label="Repeat"
-                            error={error}
+                </Modal.Body>
+
+                <Modal.Actions className="flex justify-between items-center">
+                    <div className="grow justify-start items-start">
+                        {isSaved &&
+                            <ConfirmedButton
+                                color="error"
+                                onClick={() => onDelete(draft)}
+                            >
+                                Delete
+                            </ConfirmedButton>
+                        }
+
+                        {isSaved && draft.group_id &&
+                            <div>
+                                <ConfirmedButton
+                                    color="error"
+                                    onClick={() => onDeleteGroup(draft.group_id!)}
+                                >
+                                    Delete Group
+                                </ConfirmedButton>
+                            </div>
+                        }
+                    </div>
+
+                    <div>
+                        <Button
+                            color="ghost"
+                            onClick={() => onClose()}
+                            className="mr-2"
                         >
-                            <RruleEditor
-                                rrule={value}
-                                onChange={onChange}
-                            />
-                        </Field>
-                    )}
-                />
+                            Cancel
+                        </Button>
+
+                        <Button
+                            color="success"
+                            type="submit"
+                            onClick={() => submit()}
+                        >
+                            Save
+                        </Button>
+                    </div>
+                </Modal.Actions>
             </Modal>
 
         </>

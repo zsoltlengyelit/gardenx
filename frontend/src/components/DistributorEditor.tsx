@@ -8,11 +8,9 @@ import GDateTimeInput from './GDateTimeInput';
 import parseISO from 'date-fns/parseISO';
 import { NewSchedule } from '../api/schedules';
 import RruleEditor from './RruleEditor';
-import Modal from './Modal';
-import Button from './Button';
-import SimpleSelect from './SimpleSelect';
 import NumberInput from './NumberInput';
 import Field from './Field';
+import { Button, Modal, Select } from 'react-daisyui';
 
 type DistributorEditorFormFields = {
     controllerId: string | undefined;
@@ -101,137 +99,145 @@ export default function DistributorEditor({ onSave, onClose }: Props) {
   const submit = handleSubmit(handleFormSubmit, handleFormError);
 
   return (
-        <Modal
-            header={<h3>Schedule</h3>} footer={(
-            <div
-                className="flex justify-end w-full"
-            >
-                <div className="align-middle">
-                    <Button
-                        color="primary-inverse"
-                        onClick={() => onClose()}
-                        className="mr-4"
-                    >
-                        Cancel
-                    </Button>
+        <Modal open={true}>
+            <Modal.Header>
+                <h3>Schedule</h3>
+            </Modal.Header>
 
-                    <Button
-                        color="primary"
-                        type="submit"
-                        onClick={() => submit()}
-                    >
-                        Save
-                    </Button>
-                </div>
-            </div>
-        )}
-        >
+            <Modal.Body>
+                <Controller
+                    name="controllerId"
+                    control={control}
+                    render={({ field: { onChange, value }, fieldState: { error } }) => {
+                      if (controllers.length === 0) {
+                        return <>No controllers</>;
+                      }
 
-            <Controller
-                name="controllerId"
-                control={control}
-                render={({ field: { onChange, value }, fieldState: { error } }) => {
-                  if (controllers.length === 0) {
-                    return <>No controllers</>;
-                  }
+                      return (
+                            <Field
+                                label={'Controller'}
+                                error={error}
+                            >
+                                <Select
+                                    value={value}
+                                    onChange={(e) => onChange(e.target.value)}
+                                >
+                                    {controllers.map(c => (
+                                        <Select.Option
+                                            key={c.id}
+                                            value={c.id}
+                                        >{c.name}
+                                        </Select.Option>
+                                    ))}
+                                </Select>
+                            </Field>
+                      );
+                    }}
+                />
 
-                  return (
+                <Controller
+                    name="start"
+                    control={control}
+                    render={({ field: { onChange, value }, fieldState: { error } }) => (
                         <Field
-                            label={'Controller'}
+                            label={'Start'}
                             error={error}
                         >
-                            <SimpleSelect
-                                value={value}
-                                onChange={(data) => onChange(data)}
-                                options={controllers.map(c => ({
-                                  value: c.id,
-                                  label: c.name
-                                }))}
+                            <GDateTimeInput
+                                value={typeof value === 'string' ? parseISO(value) : value}
+                                onChange={onChange}
                             />
                         </Field>
-                  );
-                }}
-            />
+                    )}
+                />
 
-            <Controller
-                name="start"
-                control={control}
-                render={({ field: { onChange, value }, fieldState: { error } }) => (
-                    <Field
-                        label={'Start'}
-                        error={error}
-                    >
-                        <GDateTimeInput
-                            value={typeof value === 'string' ? parseISO(value) : value}
-                            onChange={onChange}
-                        />
-                    </Field>
-                )}
-            />
+                <Controller
+                    name="lineCount"
+                    control={control}
+                    render={({ field: { onChange, value }, fieldState: { error } }) => (
+                        <Field
+                            label={'Line Count'}
+                            error={error}
+                        >
+                            <NumberInput
+                                value={value}
+                                onChange={onChange}
+                            />
+                        </Field>
+                    )}
+                />
 
-            <Controller
-                name="lineCount"
-                control={control}
-                render={({ field: { onChange, value }, fieldState: { error } }) => (
-                    <Field
-                        label={'Line Count'}
-                        error={error}
-                    >
-                        <NumberInput
-                            value={value}
-                            onChange={onChange}
-                        />
-                    </Field>
-                )}
-            />
+                <Controller
+                    name="duration"
+                    control={control}
+                    render={({ field: { onChange, value }, fieldState: { error } }) => (
+                        <Field
+                            label='Duration'
+                            error={error}
+                        >
+                            <NumberInput
+                                value={value}
+                                onChange={onChange}
+                            />
+                        </Field>
+                    )}
+                />
 
-            <Controller
-                name="duration"
-                control={control}
-                render={({ field: { onChange, value }, fieldState: { error } }) => (
-                    <Field
-                        label='Duration'
-                        error={error}
-                    >
-                        <NumberInput
-                            value={value}
-                            onChange={onChange}
-                        />
-                    </Field>
-                )}
-            />
+                <Controller
+                    name="gap"
+                    control={control}
+                    render={({ field: { onChange, value }, fieldState: { error } }) => (
+                        <Field
+                            label='Gap'
+                            error={error}
+                        >
+                            <NumberInput
+                                value={value}
+                                onChange={onChange}
+                            />
+                        </Field>
+                    )}
+                />
 
-            <Controller
-                name="gap"
-                control={control}
-                render={({ field: { onChange, value }, fieldState: { error } }) => (
-                    <Field
-                        label='Gap'
-                        error={error}
-                    >
-                        <NumberInput
-                            value={value}
-                            onChange={onChange}
-                        />
-                    </Field>
-                )}
-            />
+                <Controller
+                    name="rrule"
+                    control={control}
+                    render={({ field: { onChange, value }, fieldState: { error } }) => (
+                        <Field
+                            label="Repeat"
+                            error={error}
+                        >
+                            <RruleEditor
+                                rrule={value}
+                                onChange={onChange}
+                            />
+                        </Field>
+                    )}
+                />
+            </Modal.Body>
+            <Modal.Actions>
+                <div
+                    className="flex justify-end w-full"
+                >
+                    <div className="align-middle">
+                        <Button
+                            color="ghost"
+                            onClick={() => onClose()}
+                            className="mr-4"
+                        >
+                            Cancel
+                        </Button>
 
-            <Controller
-                name="rrule"
-                control={control}
-                render={({ field: { onChange, value }, fieldState: { error } }) => (
-                    <Field
-                        label="Repeat"
-                        error={error}
-                    >
-                        <RruleEditor
-                            rrule={value}
-                            onChange={onChange}
-                        />
-                    </Field>
-                )}
-            />
+                        <Button
+                            color="success"
+                            type="submit"
+                            onClick={() => submit()}
+                        >
+                            Save
+                        </Button>
+                    </div>
+                </div>
+            </Modal.Actions>
         </Modal>
   );
 }

@@ -4,7 +4,7 @@ import { Schedule } from '../api/types';
 import { addMinutes, startOfHour } from 'date-fns';
 import { NewSchedule, useSchedules } from '../api/schedules';
 import DistributorEditor from './DistributorEditor';
-import Button from './Button';
+import { Button } from 'react-daisyui';
 
 type Props = {
     onSave(event: EventEditorFormFields): void;
