@@ -7,7 +7,7 @@ function App() {
   return (
         <Theme
             dataTheme="lemonade"
-            className="h-screen bg-white dark:bg-gray-700"
+            className="min-h-screen bg-white dark:bg-gray-700"
         >
             <Board/>
         </Theme>

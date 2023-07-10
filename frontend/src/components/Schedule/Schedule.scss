@@ -1,6 +1,72 @@
-@import 'react-big-calendar/lib/sass/variables';
+@media (prefers-color-scheme: dark) {
 
-$border-color: #000;
+  $border-color: #000;
+  $out-of-range-color: lighten(#333, 40%);
+  $out-of-range-bg-color: lighten(#333, 70%);
 
-@import 'react-big-calendar/lib/sass/styles';
-@import 'react-big-calendar/lib/addons/dragAndDrop/styles'; // if using DnD
+  $calendar-border: #282828;
+  $cell-border: #282828;
+
+  $border-color: #282828;
+
+  // Each calendar segment is 1/7th.
+  $segment-width: 0.14286%;
+
+  $time-selection-color: white;
+  $time-selection-bg-color: rgba(0, 0, 0, 0.5);
+  $date-selection-bg-color: rgba(0, 0, 0, 0.1);
+
+  $event-bg: #16a34a;
+  $event-border: darken(#3174ad, 10%);
+  $event-outline: darken($event-bg, 20%);
+  $event-color: #d3d3d3;
+  $event-border-radius: 5px;
+  $event-padding: 2px 5px;
+  $event-zindex: 4;
+
+  $btn-color: #c5c5c5;
+  $btn-bg: #111111;
+  $btn-border: #565656;
+
+  $current-time-color: #3d7300;
+
+  $rbc-css-prefix: rbc-i;
+
+  $today-highlight-bg: #022C22;
+
+
+  @import 'react-big-calendar/lib/sass/styles';
+  @import 'react-big-calendar/lib/addons/dragAndDrop/styles'; // if using DnD
+}
+
+.rbc-time-view {
+  border-radius: 1rem;
+}
+
+@media (max-width: 600px) {
+  .rbc-header {
+    padding: 5px;
+
+  }
+
+  .rbc-toolbar {
+    padding: 5px;
+
+    .rbc-btn-group {
+      display: flex;
+
+      button {
+        flex-grow: 1;
+      }
+
+    }
+
+  }
+
+  .rbc-toolbar-label {
+    font-size: 1.4rem;
+    margin: 6px 0;
+  }
+
+
+}
