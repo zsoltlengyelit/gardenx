@@ -8,7 +8,9 @@ import startOfWeek from 'date-fns/startOfWeek';
 import getDay from 'date-fns/getDay';
 import hu from 'date-fns/locale/hu';
 
-import './Schedule.scss';
+import 'react-big-calendar/lib/css/react-big-calendar.css';
+import 'react-big-calendar/lib/addons/dragAndDrop/styles.css';
+import './Schedule.css';
 
 import { useAtom, useAtomValue } from 'jotai';
 import EventEditor, { EventEditorFormFields } from '../EventEditor';
@@ -143,7 +145,7 @@ export default function Schedule({ schedules }: Props) {
     setSlotInfoDraft(null);
   }
 
-  async function handleUpdate(event: ScheduleType) {
+  async function handleUpdate(event: ScheduleType, diffInMinutes?: number) {
     // FIXME: wrong tipe
     await updateSchedule({
       start: event.start,
@@ -153,6 +155,22 @@ export default function Schedule({ schedules }: Props) {
       controller: event.controller,
       id: event.id
     });
+
+    if (event.group_id && diffInMinutes) {
+      const otherEventss = schedules.filter(sch => sch.group_id === event.group_id && sch !== event);
+      for (const otherEvents of otherEventss) {
+        updateSchedule({
+          start: addMinutes(makeDate(otherEvents.start), diffInMinutes).toISOString(),
+          end: addMinutes(makeDate(otherEvents.end), diffInMinutes).toISOString(),
+          active: otherEvents.active,
+          rrule: otherEvents.rrule,
+          controller: otherEvents.controller,
+          id: otherEvents.id,
+          group_id: otherEvents.group_id
+        });
+      }
+    }
+
     setSlotInfoDraft(null);
   }
 
@@ -167,11 +185,13 @@ export default function Schedule({ schedules }: Props) {
 
     const newStart = isRecurring ? setMinutes(setHours(scheduleStart, start.getHours()), start.getMinutes()) : start;
     const newEnd = isRecurring ? setMinutes(setHours(scheduleEnd, end.getHours()), end.getMinutes()) : end;
+    const diffInMinutes = differenceInMinutes(newStart, makeDate(schedule.start));
+    
     await handleUpdate({
       ...schedule,
       start: newStart,
       end: newEnd,
-    });
+    }, diffInMinutes);
   };
 
   const onEventDrop: withDragAndDropProps['onEventDrop'] = data => onEventResize(data);

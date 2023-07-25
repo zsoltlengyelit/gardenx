@@ -194,45 +194,47 @@ export default function EventEditor({ draft, onClose, onSave, onDelete, onUpdate
 
                 </Modal.Body>
 
-                <Modal.Actions className="flex justify-between items-center">
-                    <div className="grow justify-start items-start">
-                        {isSaved &&
+                <Modal.Actions className="flex-col">
+                    {isSaved && draft.group_id &&
+                        <div className="block flex mb-4 justify-center">
                             <ConfirmedButton
                                 color="error"
-                                onClick={() => onDelete(draft)}
+                                onClick={() => onDeleteGroup(draft.group_id!)}
                             >
-                                Delete
+                                Delete Group
                             </ConfirmedButton>
-                        }
-
-                        {isSaved && draft.group_id &&
-                            <div>
+                        </div>
+                    }
+                    
+                    <div className="flex justify-between items-center w-full">
+                        <div className="grow justify-start items-start">
+                            {isSaved &&
                                 <ConfirmedButton
                                     color="error"
-                                    onClick={() => onDeleteGroup(draft.group_id!)}
+                                    onClick={() => onDelete(draft)}
                                 >
-                                    Delete Group
+                                    Delete
                                 </ConfirmedButton>
-                            </div>
-                        }
-                    </div>
+                            }
+                        </div>
 
-                    <div>
-                        <Button
-                            color="ghost"
-                            onClick={() => onClose()}
-                            className="mr-2"
-                        >
-                            Cancel
-                        </Button>
+                        <div>
+                            <Button
+                                color="ghost"
+                                onClick={() => onClose()}
+                                className="mr-2"
+                            >
+                                Cancel
+                            </Button>
 
-                        <Button
-                            color="success"
-                            type="submit"
-                            onClick={() => submit()}
-                        >
-                            Save
-                        </Button>
+                            <Button
+                                color="success"
+                                type="submit"
+                                onClick={() => submit()}
+                            >
+                                Save
+                            </Button>
+                        </div>
                     </div>
                 </Modal.Actions>
             </Modal>

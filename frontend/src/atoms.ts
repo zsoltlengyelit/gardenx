@@ -1,3 +1,3 @@
 import { atom } from 'jotai';
 
-export const editorModeAtom = atom(false);
+export const editorModeAtom = atom(true);

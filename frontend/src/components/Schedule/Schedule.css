@@ -1,0 +1,86 @@
+
+
+@media (prefers-color-scheme: dark) {
+    .rbc-time-content > * + * > * {
+        border-left: 1px solid #565656;
+    }
+
+    .rbc-today {
+        background-color: rgb(2, 44, 34);
+    }
+
+    .rbc-time-header-content {
+        border-left: 1px solid #4f4f4f;
+    }
+
+    .rbc-header {
+        border-bottom: 1px solid #222;
+    }
+
+    .rbc-header + .rbc-header {
+        border-left: 1px solid #333;
+    }
+
+    .rbc-day-bg + .rbc-day-bg {
+        border-left: 1px solid #333;
+    }
+
+    .rbc-timeslot-group {
+        border-bottom: 1px solid #333;
+    }
+
+    .rbc-day-slot .rbc-time-slot {
+        border-top: 1px solid #333;
+    }
+
+    .rbc-time-view {
+        border: 2px solid #363636;
+    }
+
+    .rbc-time-content {
+        border-top: 2px solid #070707;
+    }
+
+    .rbc-event, .rcb-event.rbc-selected {
+        background: rgb(54, 211, 153);
+        border: 1px solid rgb(25, 173, 119);
+    }
+
+    .rbc-toolbar button {
+        color: #d3d3d3;
+    }
+
+    .rbc-toolbar button.rbc-active {
+        color: gray;
+    }
+}
+
+.rbc-time-view {
+    border-radius: 1rem;
+}
+
+@media (max-width: 600px) {
+    .rbc-header {
+        padding: 5px;
+
+    }
+
+    .rbc-toolbar {
+        padding: 5px;
+    }
+
+    .rbc-btn-group {
+        display: flex;
+    }
+
+    button {
+        flex-grow: 1;
+    }
+
+}
+
+
+.rbc-toolbar-label {
+    font-size: 1.4rem;
+    margin: 6px 0;
+}
