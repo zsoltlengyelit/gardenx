@@ -3,9 +3,9 @@ import { JobStatus, ToadScheduler } from 'toad-scheduler';
 import { Schedule } from '../database';
 import { Change, MemoizedGpio, OffIntervalChange, ScheduleChange, switchOffJobSuffix } from './types';
 
-export function publishChanges(scheduleEntities: Schedule[], scheduler: ToadScheduler, gpios: Record<string, MemoizedGpio>, changeSubject: Subject<Change[]>, autoOffJobs: Record<string, Date>) {
+export function publishChanges(scheduleEntities: Schedule[], scheduler: ToadScheduler, gpios: MemoizedGpio[], changeSubject: Subject<Change[]>, autoOffJobs: Record<string, Date>) {
   // publish controllers state
-  const changes = Object.values(gpios).reduce((acc, gpio) => {
+  const changes = gpios.reduce((acc, gpio) => {
     acc.push({
       type: 'controller',
       controller: gpio.controller,

@@ -9,7 +9,7 @@ import { Button, Modal, Navbar } from 'react-daisyui';
 
 export default function Board() {
 
-  const { controllers, schedules: scheduleChanges, isConnected } = useLiveState();
+  const { controllers, schedules: scheduleChanges, isConnected, isConnectionLoading } = useLiveState();
   const [editorMode, setEditorMode] = useAtom(editorModeAtom);
 
   const schedules = useMemo(() => scheduleChanges.map(s => s.schedule), [scheduleChanges]);
@@ -50,7 +50,7 @@ export default function Board() {
                 </div>
             </div>
 
-            {!isConnected &&
+            {!isConnected && !isConnectionLoading &&
                 <Modal open={true}>
                     <Modal.Header>
                         <h3>Connection lost...</h3>

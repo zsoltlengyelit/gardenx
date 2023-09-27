@@ -4,7 +4,7 @@ import { isWithinInterval } from 'date-fns';
 import { Observable, ReplaySubject } from 'rxjs';
 import { OnOffAuto } from './database';
 import { calculateSchedules } from './gpio/schedules-rrule';
-import { AsyncTask, CRON_EVERY_MINUTE, CronJob, SimpleIntervalJob } from 'toad-scheduler';
+import { AsyncTask, CronJob, SimpleIntervalJob } from 'toad-scheduler';
 import { Change, MemoizedGpio, switchOffJobSuffix } from './gpio/types';
 import { publishChanges } from './gpio/publishChanges';
 import { createMockGpio } from './gpio/mockGpio';
@@ -19,38 +19,43 @@ declare module 'fastify' {
 
 const autoOffJobs = {} as Record<string, Date>;
 
+// in-memory map of used GPIOS
+const GPIOS = {} as Record<string, MemoizedGpio>;
+
 export default fp(async (fastify) => {
 
   const { Controller, Schedule } = fastify.db;
 
   const log = fastify.log;
   const decoration = {
-    gpios: {} as Record<string, MemoizedGpio>,
     changes: new ReplaySubject<Change[]>(1)
   };
 
   fastify.decorate('gpio', decoration);
 
+  async function buildUpGPIOS() {
+    // create gpios
+    const controllers = await Controller.findAll();
+    controllers.forEach((controller) => {
+
+      if (!GPIOS[controller.gpio]) {
+        const gpio = Gpio.accessible ? new Gpio(controller.gpio, 'out') : createMockGpio(controller, log);
+        GPIOS[controller.gpio] = new MemoizedGpio(gpio, controller);
+      }
+    });
+
+    return controllers;
+  }
+
   async function refreshState() {
 
     log.info('Refresh state');
 
-    Object.values(decoration.gpios).forEach(gpio => {
-      gpio.close();
-    });
-
-    const controllers = await Controller.findAll();
+    const controllers = await buildUpGPIOS();
 
     if (!Gpio.accessible) {
       fastify.log.info('GPIO is not available. Using mocks');
     }
-
-    // create gpios
-    decoration.gpios = controllers.reduce((acc, controller) => {
-      const gpio = Gpio.accessible ? new Gpio(controller.gpio, 'out') : createMockGpio(controller, log);
-      acc[controller.id] = new MemoizedGpio(gpio, controller);
-      return acc;
-    }, {} as Record<string, MemoizedGpio>);
 
     const scheduleEntities = await Schedule.findAll({
       include: {
@@ -64,11 +69,11 @@ export default fp(async (fastify) => {
     for (const controller of controllers) {
       if (controller.state === 'on') {
 
-        await decoration.gpios[controller.id].write(Gpio.HIGH);
+        await GPIOS[controller.gpio].write(Gpio.HIGH);
 
       } else if (controller.state === 'off') {
 
-        await decoration.gpios[controller.id].write(Gpio.LOW);
+        await GPIOS[controller.gpio].write(Gpio.LOW);
 
       } else if (controller.state === 'auto') {
 
@@ -79,17 +84,24 @@ export default fp(async (fastify) => {
             start: event.start,
             end: event.end
           })) {
-            log.info(`Activate GPIO by Schedule ${JSON.stringify(event.schedule, null, 4)}`);
+            log.info('Activate GPIO by Schedule');
             return true;
           }
           return false;
         });
 
-        await decoration.gpios[controller.id].write(isOnBySchedule ? Gpio.HIGH : Gpio.LOW);
+        const desiredValue = isOnBySchedule ? Gpio.HIGH : Gpio.LOW;
+        const valueNow = GPIOS[controller.gpio].value;
+        if (valueNow !== desiredValue) {
+          log.info(`Change GPIO by auto ${valueNow} !== ${desiredValue}`);
+          await GPIOS[controller.gpio].write(desiredValue);
+        } else {
+          log.info(`GPIO is already set to state ${desiredValue}`);
+        }
       }
     }
 
-    publishChanges(scheduleEntities, fastify.scheduler, decoration.gpios, decoration.changes, autoOffJobs);
+    publishChanges(scheduleEntities, fastify.scheduler, Object.values(GPIOS), decoration.changes, autoOffJobs);
   }
 
   function handleStateChange(controllerId: string, state: OnOffAuto) {
@@ -106,7 +118,7 @@ export default fp(async (fastify) => {
           fastify.log.info(`Auto turn to auto ${controllerId} by ${jobId}`);
           fastify.scheduler.removeById(jobId);
           delete autoOffJobs[jobId];
-          
+
           await Controller.update({
             state: 'auto'
           }, {
@@ -182,7 +194,8 @@ export default fp(async (fastify) => {
       fastify.log.error(err);
     }
   );
-  const job = new CronJob({ cronExpression: CRON_EVERY_MINUTE }, task);
+
+  const job = new CronJob({ cronExpression: '*/10 * * * * *' }, task);
 
   // `fastify.scheduler` becomes available after initialization.
   // Therefore, you need to call `ready` method.

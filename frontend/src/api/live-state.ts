@@ -36,6 +36,7 @@ const offIntervalChangesAtom = atom(get => {
 export function useLiveState() {
 
   const [isConnected, setIsConnected] = useState(false);
+  const [isConnectionLoading, setIsConnectionLoading] = useState(true);
   const setGlobal = useSetAtom(globalChangesAtom);
   const schedules = useAtomValue(scheduleChangesAtom);
   const controllers = useAtomValue(controllerChangesAtom);
@@ -45,10 +46,12 @@ export function useLiveState() {
 
     ws.addEventListener('open', () => {
       setIsConnected(true);
+      setIsConnectionLoading(false);
     });
 
     ws.addEventListener('close', () => {
       setIsConnected(false);
+      setIsConnectionLoading(false);
     });
 
     ws.addEventListener('message', (event) => {
@@ -60,7 +63,7 @@ export function useLiveState() {
   }, []);
 
   return {
-    controllers, isConnected, schedules, offIntervals
+    controllers, isConnected, schedules, offIntervals, isConnectionLoading
   };
 
 }

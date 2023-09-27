@@ -39,7 +39,8 @@ export default function ScheduleTemplates({ onSave, onDelete, onUpdate }: Props)
                 <Button
                     className="block w-full"
                     onClick={handleCreateNew}
-                >New Schedule
+                >
+                    Single Schedule
                 </Button>
             </div>
             <div className="grow">
@@ -47,7 +48,7 @@ export default function ScheduleTemplates({ onSave, onDelete, onUpdate }: Props)
                     className="block w-full"
                     onClick={() => setDistributorOpen(true)}
                 >
-                    Distributor
+                    Distributor Schedule
                 </Button>
             </div>
 

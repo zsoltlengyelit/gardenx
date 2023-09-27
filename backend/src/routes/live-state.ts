@@ -10,7 +10,9 @@ export default fp(async (fastify) => {
     fastify.get('/live-state', { websocket: true }, (connection, req) => {
 
       const changesSubScription = fastify.gpio.changes
-        .pipe(distinctUntilChanged(isEqual))
+        .pipe(
+          distinctUntilChanged(isEqual),
+        )
         .subscribe(change => {
           connection.socket.send(JSON.stringify(change));
         });

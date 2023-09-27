@@ -8,8 +8,9 @@ export class MemoizedGpio {
   }
 
   async write(value: BinaryValue) {
-    await this.gpio.write(value);
+    console.log(`Change from ${this._value} to ${value}`);
     this._value = value;
+    await this.gpio.write(value);
   }
 
   get value() {
