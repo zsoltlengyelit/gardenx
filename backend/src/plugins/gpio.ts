@@ -67,13 +67,18 @@ export default fp(async (fastify) => {
 
     // set states
     for (const controller of controllers) {
+      const currentGpio = GPIOS[controller.gpio];
+
+      // refresh controller binding
+      currentGpio.controller = controller;
+      
       if (controller.state === 'on') {
 
-        await GPIOS[controller.gpio].write(Gpio.HIGH);
+        await currentGpio.write(Gpio.HIGH);
 
       } else if (controller.state === 'off') {
 
-        await GPIOS[controller.gpio].write(Gpio.LOW);
+        await currentGpio.write(Gpio.LOW);
 
       } else if (controller.state === 'auto') {
 
@@ -91,10 +96,10 @@ export default fp(async (fastify) => {
         });
 
         const desiredValue = isOnBySchedule ? Gpio.HIGH : Gpio.LOW;
-        const valueNow = GPIOS[controller.gpio].value;
+        const valueNow = currentGpio.value;
         if (valueNow !== desiredValue) {
           log.info(`Change GPIO by auto ${valueNow} !== ${desiredValue}`);
-          await GPIOS[controller.gpio].write(desiredValue);
+          await currentGpio.write(desiredValue);
         } else {
           log.info(`GPIO is already set to state ${desiredValue}`);
         }
