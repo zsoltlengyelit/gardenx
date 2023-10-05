@@ -4,7 +4,7 @@ import { Change, ControllerChange, OffIntervalChange, ScheduleChange } from './t
 import { atom, useAtomValue, useSetAtom } from 'jotai';
 
 const ws = new ReconnectingWebSocket(import.meta.env.VITE_BACKEND_WS.replace('HOSTNAME', location.hostname), undefined, {
-
+  maxReconnectionDelay: 1000
 });
 
 function isScheduleChange(change: Change): change is ScheduleChange {
