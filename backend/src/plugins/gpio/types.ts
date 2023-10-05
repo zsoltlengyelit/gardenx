@@ -4,7 +4,7 @@ import { SimpleIntervalSchedule } from 'toad-scheduler';
 
 export class MemoizedGpio {
   // eslint-disable-next-line no-useless-constructor
-  constructor(private gpio: Gpio, public controller: Controller, private _value: BinaryValue = Gpio.LOW) {
+  constructor(private gpio: Gpio, public controller: Controller | null, private _value: BinaryValue = Gpio.LOW) {
   }
 
   async write(value: BinaryValue) {

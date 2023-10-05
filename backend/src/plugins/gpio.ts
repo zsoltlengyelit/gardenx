@@ -33,6 +33,10 @@ export default fp(async (fastify) => {
 
   fastify.decorate('gpio', decoration);
 
+  if (!Gpio.accessible) {
+    log.info('GPIO is not available. Using mocks');
+  }
+
   async function buildUpGPIOS() {
     // create gpios
     const controllers = await Controller.findAll();
@@ -49,13 +53,7 @@ export default fp(async (fastify) => {
 
   async function refreshState() {
 
-    log.info('Refresh state');
-
     const controllers = await buildUpGPIOS();
-
-    if (!Gpio.accessible) {
-      fastify.log.info('GPIO is not available. Using mocks');
-    }
 
     const scheduleEntities = await Schedule.findAll({
       include: {
@@ -65,13 +63,18 @@ export default fp(async (fastify) => {
 
     const schedules = calculateSchedules(scheduleEntities);
 
+    for (const gpio of Object.values(GPIOS)) {
+      // reset controllers
+      gpio.controller = null;
+    }
+
     // set states
     for (const controller of controllers) {
       const currentGpio = GPIOS[controller.gpio];
 
       // refresh controller binding
       currentGpio.controller = controller;
-      
+
       if (controller.state === 'on') {
 
         await currentGpio.write(Gpio.HIGH);
@@ -98,10 +101,7 @@ export default fp(async (fastify) => {
         const desiredValue = isOnBySchedule ? Gpio.HIGH : Gpio.LOW;
         const valueNow = currentGpio.value;
         if (valueNow !== desiredValue) {
-          log.info(`Change GPIO by auto ${valueNow} !== ${desiredValue}`);
           await currentGpio.write(desiredValue);
-        } else {
-          log.info(`GPIO is already set to state ${desiredValue}`);
         }
       }
     }
@@ -110,7 +110,7 @@ export default fp(async (fastify) => {
   }
 
   function handleStateChange(controllerId: string, state: OnOffAuto) {
-    fastify.log.info(`Handle controller ${controllerId} to ${state}`);
+    log.info(`Handle controller ${controllerId} to ${state}`);
 
     const jobId = `${controllerId}${switchOffJobSuffix}`;
     const taskId = `${jobId}-task`;
@@ -120,7 +120,7 @@ export default fp(async (fastify) => {
       const task = new AsyncTask(
         taskId,
         async () => {
-          fastify.log.info(`Auto turn to auto ${controllerId} by ${jobId}`);
+          log.info(`Auto turn to auto ${controllerId} by ${jobId}`);
           fastify.scheduler.removeById(jobId);
           delete autoOffJobs[jobId];
 
@@ -134,7 +134,7 @@ export default fp(async (fastify) => {
 
         },
         (err) => {
-          fastify.log.error(err);
+          log.error(err);
         });
 
       const job = new SimpleIntervalJob({ hours: 1 }, task, { id: jobId });
@@ -144,11 +144,11 @@ export default fp(async (fastify) => {
     } else {
 
       if (fastify.scheduler.existsById(jobId)) {
-        fastify.log.info(`Remove job with id: ${jobId}`);
+        log.info(`Remove job with id: ${jobId}`);
         fastify.scheduler.removeById(jobId);
         delete autoOffJobs[jobId];
       } else {
-        fastify.log.info(`No job with id: ${jobId}`);
+        log.info(`No job with id: ${jobId}`);
       }
 
     }
@@ -175,14 +175,14 @@ export default fp(async (fastify) => {
     });
     // @ts-ignore
     model.afterBulkUpdate(async (options) => {
-      fastify.log.info(`${JSON.stringify(options)}: afterBulkUpdate`);
+      log.info(`${JSON.stringify(options)}: afterBulkUpdate`);
 
       try {
         if (model === Controller && options.fields?.includes('state')) {
           await handleStateChange(options.where.id, options.attributes?.state);
         }
       } catch (e) {
-        fastify.log.error('Error while handling state change', e);
+        log.error('Error while handling state change', e);
       }
 
       return refreshState();
@@ -192,11 +192,11 @@ export default fp(async (fastify) => {
   const task = new AsyncTask(
     'refresh GPIO state task',
     async () => {
-      fastify.log.info('Execute CRON job to sync GPIO state');
+      log.info('Execute CRON job to sync GPIO state');
       await refreshState();
     },
     (err) => {
-      fastify.log.error(err);
+      log.error(err);
     }
   );
 

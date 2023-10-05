@@ -16,7 +16,7 @@ module.exports = {
             NODE_ENV: 'production',
             DB_PATH: '/home/pi/gardenx/data/db.sqlite',
             DB_NAME: 'gardenx',
-            FASTIFY_LOG_LEVEL: 'debug'
+            FASTIFY_LOG_LEVEL: 'info'
         }
     }]
 }

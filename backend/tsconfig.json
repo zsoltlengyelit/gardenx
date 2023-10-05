@@ -6,5 +6,6 @@
     "allowSyntheticDefaultImports": true,
     "declaration": false
   },
+  "exclude": ["data"],
   "include": ["src/**/*.ts"]
 }

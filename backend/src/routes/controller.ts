@@ -12,10 +12,11 @@ export default fp(async (fastify) => {
       gpio: Type.Integer()
     });
     type CreateControllerBodyType = Static<typeof CreateControllerBody>;
+    const { Controller } = fastify.db;
 
     fastify.get('/controllers', async () => {
 
-      const controllers = await fastify.db.Controller.findAll();
+      const controllers = await Controller.findAll();
 
       return controllers;
     });
@@ -26,7 +27,7 @@ export default fp(async (fastify) => {
       }
     }, async (req, reply) => {
 
-      const controller = await fastify.db.Controller.create({
+      const controller = await Controller.create({
         name: req.body.name,
         state: 'auto',
         gpio: req.body.gpio
@@ -63,11 +64,11 @@ export default fp(async (fastify) => {
         updates.gpio = body.gpio;
       }
 
-      await fastify.db.Controller.update(updates, {
+      await Controller.update(updates, {
         where: { id }
       });
 
-      return await fastify.db.Controller.findByPk(id);
+      return await Controller.findByPk(id);
     });
 
     fastify.delete<{ Params: IdParamsType }>('/controllers/:id', {
@@ -77,10 +78,16 @@ export default fp(async (fastify) => {
     }, async req => {
       const { id } = req.params;
 
-      const count = await fastify.db.Controller.destroy({
-        where: { id }
-      });
+      fastify.log.info(`Delete controller ${id}`);
 
+      const controller = await Controller.findByPk(id);
+
+      let count = 0;
+      if (controller !== null) {
+        count = await controller.destroy({ force: true }) as any as number;
+      }
+
+      fastify.log.info(`Deleted controller count ${count}`);
       return count === 1;
     });
 }, {

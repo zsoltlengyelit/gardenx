@@ -11,7 +11,7 @@
     "watch:ts": "tsc -w",
     "predev": "rm -rf dist",
     "dev": "npm run build:ts && concurrently -k -p \"[{name}]\" -n \"TypeScript,App\" -c \"yellow.bold,cyan.bold\" \"npm:watch:ts\" \"npm:dev:start\"",
-    "dev:start": "export $(grep -v '^#' .env | xargs); fastify start --debug --debug-port -P --ignore-watch=.ts$ -w -l info -P dist/app.js",
+    "dev:start": "export $(grep -v '^#' .env | xargs); fastify start --debug --debug-port -P --ignore-watch='.ts$ data' -w -l info -P dist/app.js",
     "migrate": "export $(grep -v '^#' .env | xargs); npx sequelize-cli db:migrate",
     "lint": "eslint ."
   },

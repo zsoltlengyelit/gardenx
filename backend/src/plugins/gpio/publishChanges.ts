@@ -6,11 +6,13 @@ import { Change, MemoizedGpio, OffIntervalChange, ScheduleChange, switchOffJobSu
 export function publishChanges(scheduleEntities: Schedule[], scheduler: ToadScheduler, gpios: MemoizedGpio[], changeSubject: Subject<Change[]>, autoOffJobs: Record<string, Date>) {
   // publish controllers state
   const changes = gpios.reduce((acc, gpio) => {
-    acc.push({
-      type: 'controller',
-      controller: gpio.controller,
-      set: !!gpio.value
-    });
+    if (gpio.controller) {
+      acc.push({
+        type: 'controller',
+        controller: gpio.controller,
+        set: !!gpio.value
+      }); 
+    }
     return acc;
   }, [] as Change[]);
 

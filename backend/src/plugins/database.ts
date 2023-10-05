@@ -39,7 +39,8 @@ export class Schedule extends Model<InferAttributes<Schedule>, InferCreationAttr
 
 type DbType = {
     Controller: typeof Controller,
-    Schedule: typeof Schedule
+    Schedule: typeof Schedule,
+    sequelize: Sequelize,
 };
 
 declare module 'fastify' {
@@ -121,7 +122,8 @@ export default fp(async (fastify) => {
   Schedule.belongsTo(Controller, {
     as: 'controller',
     foreignKey: 'controller_id',
-    onDelete: 'cascade'
+    onDelete: 'cascade',
+    hooks: true
   });
 
   try {
@@ -133,6 +135,7 @@ export default fp(async (fastify) => {
 
   fastify.decorate<DbType>('db', {
     Controller,
-    Schedule
+    Schedule,
+    sequelize
   });
 });
