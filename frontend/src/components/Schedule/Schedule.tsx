@@ -22,6 +22,7 @@ import { useSchedules } from '../../api/schedules';
 import { makeDate } from '../../common/date';
 import ScheduleTemplates from '../ScheduleTemplates';
 import { editorModeAtom } from '../../atoms';
+import { useControllerColor } from '../../common/useControllerColor';
 
 const locales = {
   hu,
@@ -50,6 +51,7 @@ export default function Schedule({ schedules }: Props) {
   const editorMode = useAtomValue(editorModeAtom);
 
   const { deleteSchedule, createSchedule, updateSchedule, deleteScheduleGroup } = useSchedules();
+  const getControllerColor = useControllerColor();
 
   const eventsInCurrentRange = useMemo(() => {
 
@@ -69,13 +71,12 @@ export default function Schedule({ schedules }: Props) {
         }).between(rangeStart, rangeEnd, true);
 
         const durationInMins = differenceInMinutes(endDate, startDate);
-
         const newEvents = dates.map(date => {
           return {
             title: schedule.id,
             start: date,
             end: addMinutes(date, durationInMins),
-            resource: schedule
+            resource: schedule,
           } as ScheduledEvent;
         });
         collection.push(...newEvents);
@@ -186,7 +187,7 @@ export default function Schedule({ schedules }: Props) {
     const newStart = isRecurring ? setMinutes(setHours(scheduleStart, start.getHours()), start.getMinutes()) : start;
     const newEnd = isRecurring ? setMinutes(setHours(scheduleEnd, end.getHours()), end.getMinutes()) : end;
     const diffInMinutes = differenceInMinutes(newStart, makeDate(schedule.start));
-    
+
     await handleUpdate({
       ...schedule,
       start: newStart,
@@ -195,6 +196,15 @@ export default function Schedule({ schedules }: Props) {
   };
 
   const onEventDrop: withDragAndDropProps['onEventDrop'] = data => onEventResize(data);
+
+  function getEventProps(event: object) {
+    const { controller } = (event as ScheduledEvent).resource;
+    const color = getControllerColor(controller);
+
+    return {
+      className: color
+    };
+  }
 
   if (!editorMode) {
     return <></>;
@@ -214,10 +224,11 @@ export default function Schedule({ schedules }: Props) {
                 </div>
 
                 <DnDCalendar
+                    events={eventsInCurrentRange}
+                    eventPropGetter={getEventProps}
                     date={currentRange.date}
                     defaultView={Views.WEEK}
                     views={[Views.WEEK, Views.DAY]}
-                    events={eventsInCurrentRange}
                     localizer={localizer}
                     onEventDrop={onEventDrop}
                     onEventResize={onEventResize}

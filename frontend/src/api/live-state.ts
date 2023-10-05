@@ -26,7 +26,9 @@ const scheduleChangesAtom = atom(get => {
 });
 
 const controllerChangesAtom = atom(get => {
-  return get(globalChangesAtom).filter(isControllerChange);
+  const controllers = get(globalChangesAtom).filter(isControllerChange);
+  controllers.sort((c1, c2) => c1.controller.name.localeCompare(c2.controller.name));
+  return controllers;
 });
 
 const offIntervalChangesAtom = atom(get => {

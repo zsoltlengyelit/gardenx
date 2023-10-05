@@ -20,9 +20,10 @@ import ConfirmedButton from './ConfirmedButton';
 type Props = {
     controller: Controller;
     set: boolean;
+    color: string;
 };
 
-export default function ControllerCard({ controller, set }: Props) {
+export default function ControllerCard({ controller, set, color }: Props) {
 
   const { updateController, deleteController } = useControllers();
   const editorMode = useAtomValue(editorModeAtom);
@@ -118,6 +119,10 @@ export default function ControllerCard({ controller, set }: Props) {
             >
             </div>
             <Card.Body className={`z-0 ${set ? 'text-white' : ''}`}>
+                {editorMode && <Card.Actions className="justify-end">
+                    <div className={`${set ? 'loading loading-infinity loading-lg' : 'badge'} ${color} badge-lg`}></div>
+                               </Card.Actions>
+                }
                 <Card.Title className="flex">
                     <div className="grow">
                         {controller.name}
