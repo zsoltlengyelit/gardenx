@@ -3,9 +3,9 @@ import { useLiveState } from '../api/live-state';
 import { useMemo } from 'react';
 
 const colors = [
-  'primary', 'secondary', 'accent', 'info', 'success', 'warning',
-  'primary', 'secondary', 'accent', 'info', 'success', 'warning',
-  'primary', 'secondary', 'accent', 'info', 'success', 'warning',
+  'primary', 'secondary', 'accent', 'info', 'success', 'warning', 'neutral', 'error',
+  'primary', 'secondary', 'accent', 'info', 'success', 'warning', 'neutral', 'error',
+  'primary', 'secondary', 'accent', 'info', 'success', 'warning', 'neutral', 'error',
 ].map(color => `bg-${color}`);
 
 export function useControllerColor() {
