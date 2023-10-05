@@ -8,6 +8,7 @@ import NumberInput from './NumberInput';
 import { PlusIcon } from '@heroicons/react/20/solid';
 import Field from './Field';
 import { Button, Card } from 'react-daisyui';
+import { useLiveState } from '../api/live-state';
 
 type NewControllerFields = {
     name: string;
@@ -17,12 +18,20 @@ type NewControllerFields = {
 export default function NewControllerCard() {
 
   const { createController } = useControllers();
+  const { controllers } = useLiveState();
 
   const [activated, setActivated] = useState(false);
 
   const formSchema = joi.object<NewControllerFields>({
     name: joi.string().required(),
-    gpio: joi.number().required()
+    gpio: joi.number().required().custom((value, helpers) => {
+      if (controllers.map(c => c.controller.gpio).includes(value)) {
+        return helpers.error('custom.gpio');
+      }
+      return value;
+    }, 'GPIO is reserved').messages({
+      'custom.gpio': 'GPIO is already used by other controller.'
+    })
   });
 
   const { control, handleSubmit } = useForm<NewControllerFields>({
