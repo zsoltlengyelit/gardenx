@@ -112,7 +112,7 @@ export default function ControllerCard({ controller, set }: Props) {
             className="dark:bg-gray-950"
         >
             <div
-                className={'rounded transform-gpu opacity-90 bg-green-600 absolute h-full z-0'} style={{
+                className={'card transform-gpu opacity-90 bg-green-600 absolute h-full z-0'} style={{
                   width: `${100 * leftMinutes / 60}%`
                 }}
             >
