@@ -14,7 +14,7 @@ import {
   intervalToDuration
 } from 'date-fns';
 import parseISO from 'date-fns/parseISO';
-import { Badge, Button, ButtonGroup, Card } from 'react-daisyui';
+import { Badge, Button, Card } from 'react-daisyui';
 import ConfirmedButton from './ConfirmedButton';
 
 type Props = {
@@ -110,7 +110,8 @@ export default function ControllerCard({ controller, set, color }: Props) {
   return (
         <Card
             compact={true}
-            className="dark:bg-gray-950"
+            className="dark:bg-gray-950 border-accent bordered"
+            bordered
         >
             <div
                 className={'card transform-gpu opacity-90 bg-green-600 absolute h-full z-0'} style={{
@@ -143,7 +144,7 @@ export default function ControllerCard({ controller, set, color }: Props) {
                         <div className="self-center mb-2">GPIO: {controller.gpio}</div>
                     }
 
-                    <ButtonGroup className="w-full flex">
+                    <div className="w-full flex gap-3">
                         <Button
                             className="grow"
                             color={controller.state === 'off' ? 'success' : undefined}
@@ -162,7 +163,7 @@ export default function ControllerCard({ controller, set, color }: Props) {
                             onClick={createStateHandler('on')}
                         >ON
                         </Button>
-                    </ButtonGroup>
+                    </div>
 
                     {editorMode &&
                         <ConfirmedButton
