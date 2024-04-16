@@ -1,20 +1,28 @@
 import ControllerCardList from './ControllerCardList';
 import Schedule from './Schedule/Schedule';
-import { useLiveState } from '../api/live-state';
-import { useMemo } from 'react';
-import { useAtom } from 'jotai';
-import { editorModeAtom } from '../atoms';
-import { WifiIcon, WrenchScrewdriverIcon } from '@heroicons/react/24/solid';
-import { Button, Modal, Navbar } from 'react-daisyui';
+import {useLiveState} from '../api/live-state';
+import {useEffect, useMemo} from 'react';
+import {useAtom} from 'jotai';
+import {editorModeAtom} from '../atoms';
+import {WifiIcon, WrenchScrewdriverIcon} from '@heroicons/react/24/solid';
+import {Button, Modal, Navbar} from 'react-daisyui';
 
 export default function Board() {
 
-  const { controllers, schedules: scheduleChanges, isConnected, isConnectionLoading } = useLiveState();
-  const [editorMode, setEditorMode] = useAtom(editorModeAtom);
+    const {controllers, schedules: scheduleChanges, isConnected, isConnectionLoading} = useLiveState();
+    const [editorMode, setEditorMode] = useAtom(editorModeAtom);
 
-  const schedules = useMemo(() => scheduleChanges.map(s => s.schedule), [scheduleChanges]);
 
-  return (
+    useEffect(() => {
+        const {host} = new URL(location.href);
+
+        setEditorMode(host.includes('127.0.0.1') || host.includes('localhost'));
+
+    }, []);
+
+    const schedules = useMemo(() => scheduleChanges.map(s => s.schedule), [scheduleChanges]);
+
+    return (
         <>
             <div className="flex flex-col">
                 <div
@@ -69,5 +77,5 @@ export default function Board() {
                 </Modal>
             }
         </>
-  );
+    );
 }

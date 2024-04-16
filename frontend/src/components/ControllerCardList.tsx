@@ -26,7 +26,7 @@ export default function ControllerCardList({ controllers }: Props) {
                 />
             ))}
 
-            {editorMode && <NewControllerCard/>}
+            {editorMode && <NewControllerCard />}
         </div>
   );
 }
