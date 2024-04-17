@@ -1,5 +1,5 @@
 import { FastifyPluginAsync } from 'fastify';
-import * as fastifyEnv from '@fastify/env';
+import fastifyEnv from '@fastify/env';
 import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox';
 
 import corsPlugin from './plugins/cors';
@@ -11,6 +11,7 @@ import controllerRoutes from './routes/controller';
 import scheduleRoutes from './routes/schedules';
 import liveStateRoutes from './routes/live-state';
 import toadScheduler from './plugins/toad-scheduler';
+import onlineness from "./plugins/onlineness";
 
 export type AppOptions = {
     // Place your custom options for app below here.
@@ -53,19 +54,14 @@ const app: FastifyPluginAsync<AppOptions> = async (
   }
   );
 
-  // Do not touch the following lines
 
-  // This loads all plugins defined in plugins
-  // those should be support plugins that are reused
-  // through your application
+  fastify.register(onlineness, {});
   fastify.register(toadScheduler, {});
   fastify.register(corsPlugin, {});
   fastify.register(sensiblePlugin, {});
   fastify.register(databasePlugin, {});
   fastify.register(gpioPlugin, {});
 
-  // This loads all plugins defined in routes
-  // define your routes in one of these
   fastify.register(controllerRoutes, {});
   fastify.register(scheduleRoutes, {});
   fastify.register(liveStateRoutes, {});
