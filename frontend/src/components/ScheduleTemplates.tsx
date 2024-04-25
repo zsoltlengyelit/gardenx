@@ -7,9 +7,9 @@ import DistributorEditor from './DistributorEditor';
 import { Button } from 'react-daisyui';
 
 type Props = {
-    onSave(event: EventEditorFormFields): void;
+    onSave(event: EventEditorFormFields): Promise<void>;
     onDelete: (event: Schedule) => void;
-    onUpdate: (event: Schedule) => void;
+    onUpdate: (event: Schedule) => Promise<void>;
 };
 
 export default function ScheduleTemplates({ onSave, onDelete, onUpdate }: Props) {
@@ -56,9 +56,9 @@ export default function ScheduleTemplates({ onSave, onDelete, onUpdate }: Props)
                 <EventEditor
                     draft={draft as Schedule}
                     onClose={() => setDraft(null)}
-                    onSave={onSave}
+                    onSave={(draft) => onSave(draft).then(() => setDraft(null))}
                     onDelete={onDelete}
-                    onUpdate={onUpdate}
+                    onUpdate={schedule => onUpdate(schedule).then(() => setDraft(null))}
                     onDeleteGroup={() => {
                     }}
                 />
