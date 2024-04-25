@@ -40,6 +40,7 @@ module.exports = {
     ],
     settings: {},
     rules: {
+        "indent": ["error", 2],
         semi: ['error', 'always'],
         'space-before-function-paren': 0,
         'comma-dangle': ['error', 'only-multiline'],

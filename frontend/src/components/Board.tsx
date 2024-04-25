@@ -12,13 +12,9 @@ export default function Board() {
     const {controllers, schedules: scheduleChanges, isConnected, isConnectionLoading} = useLiveState();
     const [editorMode, setEditorMode] = useAtom(editorModeAtom);
 
-
     useEffect(() => {
-        const {host} = new URL(location.href);
-
-        setEditorMode(host.includes('127.0.0.1') || host.includes('localhost'));
-
-    }, []);
+        setEditorMode(import.meta.env.MODE !== 'production');
+    }, [import.meta.env.MODE]);
 
     const schedules = useMemo(() => scheduleChanges.map(s => s.schedule), [scheduleChanges]);
 
@@ -60,22 +56,13 @@ export default function Board() {
 
             {!isConnected && !isConnectionLoading &&
                 <Modal open={true}>
-                    <Modal.Header>
-                        <h3>Connection lost...</h3>
-                    </Modal.Header>
-                    <Modal.Body>
-                        <div className="flex flex-row align-middle justify-content-center">
-                            <div className="justify-content-center mr-5">
-                                <WifiIcon className="h-10 w-10 text-red-800"/>
-
-                            </div>
-                            <div className="grow align-middle justify-content-center">
-                                <h1>Oooops</h1>
-                            </div>
-                        </div>
-                    </Modal.Body>
+                    <h3>
+                        <WifiIcon className="h-10 w-10 text-green-800 inline"/>
+                        {' '}Connecting to server...
+                    </h3>
                 </Modal>
             }
         </>
+
     );
 }
