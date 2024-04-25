@@ -4,9 +4,7 @@
     "outDir": "dist",
     "sourceMap": false,
     "allowSyntheticDefaultImports": true,
-    "declaration": false,
-    "esModuleInterop": true,
-    "module": "es2020"
+    "declaration": false
   },
   "exclude": ["data"],
   "include": ["src/**/*.ts"]
