@@ -161,11 +161,14 @@ export default function ControllerCard({ controller, set, color }: Props) {
                         {/* Name display */}
                         {!isNameEdit && <>
                             {controller.name}
-                            {' '}
-                            <PencilIcon
-                                className="h-6 w-6 inline"
-                                onClick={() => setIsNameEdit(true)}
-                            />
+
+                            {editorMode && <>
+                                {' '}
+                                <PencilIcon
+                                    className="h-6 w-6 inline"
+                                    onClick={() => setIsNameEdit(true)}
+                                />
+                                           </>}
                                         </>
                         }
                     </div>
