@@ -1,20 +1,24 @@
 import ControllerCardList from './ControllerCardList';
 import Schedule from './Schedule/Schedule';
-import { useLiveState } from '../api/live-state';
-import { useMemo } from 'react';
-import { useAtom } from 'jotai';
-import { editorModeAtom } from '../atoms';
-import { WifiIcon, WrenchScrewdriverIcon } from '@heroicons/react/24/solid';
-import { Button, Modal, Navbar } from 'react-daisyui';
+import {useLiveState} from '../api/live-state';
+import {useEffect, useMemo} from 'react';
+import {useAtom} from 'jotai';
+import {editorModeAtom} from '../atoms';
+import {WifiIcon, WrenchScrewdriverIcon} from '@heroicons/react/24/solid';
+import {Button, Modal, Navbar} from 'react-daisyui';
 
 export default function Board() {
 
-  const { controllers, schedules: scheduleChanges, isConnected, isConnectionLoading } = useLiveState();
-  const [editorMode, setEditorMode] = useAtom(editorModeAtom);
+    const {controllers, schedules: scheduleChanges, isConnected, isConnectionLoading} = useLiveState();
+    const [editorMode, setEditorMode] = useAtom(editorModeAtom);
 
-  const schedules = useMemo(() => scheduleChanges.map(s => s.schedule), [scheduleChanges]);
+    useEffect(() => {
+        setEditorMode(import.meta.env.MODE !== 'production');
+    }, [import.meta.env.MODE]);
 
-  return (
+    const schedules = useMemo(() => scheduleChanges.map(s => s.schedule), [scheduleChanges]);
+
+    return (
         <>
             <div className="flex flex-col">
                 <div
@@ -52,22 +56,13 @@ export default function Board() {
 
             {!isConnected && !isConnectionLoading &&
                 <Modal open={true}>
-                    <Modal.Header>
-                        <h3>Connection lost...</h3>
-                    </Modal.Header>
-                    <Modal.Body>
-                        <div className="flex flex-row align-middle justify-content-center">
-                            <div className="justify-content-center mr-5">
-                                <WifiIcon className="h-10 w-10 text-red-800"/>
-
-                            </div>
-                            <div className="grow align-middle justify-content-center">
-                                <h1>Oooops</h1>
-                            </div>
-                        </div>
-                    </Modal.Body>
+                    <h3>
+                        <WifiIcon className="h-10 w-10 text-green-800 inline"/>
+                        {' '}Connecting to server...
+                    </h3>
                 </Modal>
             }
         </>
-  );
+
+    );
 }

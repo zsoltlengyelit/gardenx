@@ -6,7 +6,7 @@ GPIO controller with iCal Calendar for Raspberry PI
 
 ```bash
 npm install
-npm run start
+npm run dev
 ```
 
 Access: 

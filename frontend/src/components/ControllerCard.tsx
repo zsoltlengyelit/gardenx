@@ -14,13 +14,14 @@ import {
   intervalToDuration
 } from 'date-fns';
 import parseISO from 'date-fns/parseISO';
-import { Badge, Button, Card } from 'react-daisyui';
+import { Badge, Button, Card, Input } from 'react-daisyui';
 import ConfirmedButton from './ConfirmedButton';
+import { PencilIcon } from '@heroicons/react/24/solid';
 
 type Props = {
-    controller: Controller;
-    set: boolean;
-    color: string;
+    controller: Controller,
+    set: boolean,
+    color: string,
 };
 
 export default function ControllerCard({ controller, set, color }: Props) {
@@ -28,6 +29,8 @@ export default function ControllerCard({ controller, set, color }: Props) {
   const { updateController, deleteController } = useControllers();
   const editorMode = useAtomValue(editorModeAtom);
   const { offIntervals } = useLiveState();
+  const [isNameEdit, setIsNameEdit] = useState(false);
+  const [newName, setNewName] = useState(controller.name);
 
   const controllerOffInterval = useMemo(() => {
     const intervals = offIntervals.filter(interval => interval.controllerId === controller.id);
@@ -107,6 +110,15 @@ export default function ControllerCard({ controller, set, color }: Props) {
     };
   }
 
+  async function handleSaveNameChange() {
+    await updateController(controller, { name: newName });
+    setIsNameEdit(false);
+  }
+
+  function handleNewName(event: React.ChangeEvent<HTMLInputElement>) {
+    setNewName(event.target.value);
+  }
+
   return (
         <Card
             compact={true}
@@ -126,7 +138,39 @@ export default function ControllerCard({ controller, set, color }: Props) {
                 }
                 <Card.Title className="flex">
                     <div className="grow">
-                        {controller.name}
+                        {/* Name edit */}
+                        {isNameEdit && <>
+                            <Input
+                                className="w-full"
+                                defaultValue={controller.name}
+                                onChange={handleNewName}
+                            />
+                            <div className="w-full flex gap-2 mt-2">
+                                <Button onClick={handleSaveNameChange}>Rename</Button>
+                                <Button
+                                    color="warning"
+                                    onClick={() => {
+                                      setNewName(controller.name);
+                                      setIsNameEdit(false);
+                                    }}
+                                >Cancel
+                                </Button>
+                            </div>
+                                       </>}
+
+                        {/* Name display */}
+                        {!isNameEdit && <>
+                            {controller.name}
+
+                            {editorMode && <>
+                                {' '}
+                                <PencilIcon
+                                    className="h-6 w-6 inline"
+                                    onClick={() => setIsNameEdit(true)}
+                                />
+                                           </>}
+                                        </>
+                        }
                     </div>
 
                     {autoOffIn && <div className="indicator-item indicator-center">
