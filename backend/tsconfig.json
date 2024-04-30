@@ -4,8 +4,16 @@
     "outDir": "dist",
     "sourceMap": false,
     "allowSyntheticDefaultImports": true,
-    "declaration": false
+    "declaration": false,
+    "lib": [
+      "ESNext",
+      "ESNext.Array"
+    ]
   },
-  "exclude": ["data"],
-  "include": ["src/**/*.ts"]
+  "exclude": [
+    "data"
+  ],
+  "include": [
+    "src/**/*.ts"
+  ]
 }

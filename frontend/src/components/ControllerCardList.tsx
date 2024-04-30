@@ -23,12 +23,13 @@ export default function ControllerCardList({ controllers }: Props) {
 
             <AllControllerCard controllerChanges={controllers}/>
 
-            {controllers.map(({ controller, set }, index) => (
+            {controllers.map(({ controller, set, nextStart }, index) => (
                 <ControllerCard
                     key={controller.id}
                     controller={controller}
                     set={set}
                     color={getColor(controller)}
+                    nextStart={nextStart ? new Date(nextStart) : undefined}
                 />
             ))}
 

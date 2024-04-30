@@ -16,6 +16,7 @@ export type ChangeBase = {
 export type ControllerChange = ChangeBase & {
     controller: Controller;
     set: boolean;
+    nextStart?: string;
 }
 
 export type Schedule = {

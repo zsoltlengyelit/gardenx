@@ -17,14 +17,16 @@ import parseISO from 'date-fns/parseISO';
 import { Badge, Button, Card, Input } from 'react-daisyui';
 import ConfirmedButton from './ConfirmedButton';
 import { PencilIcon } from '@heroicons/react/24/solid';
+import format from 'date-fns/format';
 
 type Props = {
     controller: Controller,
     set: boolean,
     color: string,
+    nextStart?: Date;
 };
 
-export default function ControllerCard({ controller, set, color }: Props) {
+export default function ControllerCard({ controller, set, color, nextStart }: Props) {
 
   const { updateController, deleteController } = useControllers();
   const editorMode = useAtomValue(editorModeAtom);
@@ -169,6 +171,10 @@ export default function ControllerCard({ controller, set, color }: Props) {
                                     onClick={() => setIsNameEdit(true)}
                                 />
                                            </>}
+
+                            <div className="float-end text-xs pt-1">
+                                {nextStart && <>next: {format(nextStart, 'MMMM dd, HH:mm')} </>}
+                            </div>
                                         </>
                         }
                     </div>

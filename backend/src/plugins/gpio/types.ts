@@ -26,6 +26,7 @@ export type ControllerChange = {
     type: 'controller'
     controller: Controller;
     set: boolean;
+    nextStart?: Date;
 }
 
 export type ScheduleChange = {
