@@ -88,14 +88,19 @@ export default fp(async (fastify) => {
         const ownSchedules = schedules.filter(sch => sch.schedule.controller.id === controller.id && sch.schedule.active);
 
         const isOnBySchedule = ownSchedules.some(event => {
-          if (isWithinInterval(new Date(), {
-            start: event.start,
-            end: event.end
-          })) {
-            log.info('Activate GPIO by Schedule');
-            return true;
+          try {
+            if (isWithinInterval(new Date(), {
+              start: event.start,
+              end: event.end
+            })) {
+              log.info('Activate GPIO by Schedule');
+              return true;
+            }
+            return false;
+          } catch (e) {
+            fastify.log.error(e);
+            return false;
           }
-          return false;
         });
 
         const desiredValue = isOnBySchedule ? Gpio.HIGH : Gpio.LOW;
