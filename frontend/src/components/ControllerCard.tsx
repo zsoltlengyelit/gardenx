@@ -191,7 +191,7 @@ export default function ControllerCard({ controller, set, color, nextStart }: Pr
 
                 <Card.Actions className="content-center mt-4">
                     {editorMode &&
-                        <div className="self-center mb-2">GPIO: {controller.gpio}</div>
+                        <div className="self-center mb-2">CH: {controller.modbusChannel}</div>
                     }
 
                     <div className="w-full flex gap-3">

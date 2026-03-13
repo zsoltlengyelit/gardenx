@@ -4,10 +4,16 @@ import viteCompression from 'vite-plugin-compression';
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react(), viteCompression({
-    algorithm: 'gzip',
-    deleteOriginFile: true
-  })],
+  plugins: [
+    // @ts-ignore
+    react(),
+    // @ts-ignore
+    viteCompression({
+      algorithm: 'gzip',
+      deleteOriginFile: true
+    })
+  ],
+  clearScreen: false,
   define: {
     // specify some special constants that are used by dependencies, mostly InstUI
     'global.PREVENT_CODEMIRROR_RENDER': undefined,

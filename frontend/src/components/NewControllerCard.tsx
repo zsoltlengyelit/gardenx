@@ -1,70 +1,73 @@
-import React, {useState} from 'react';
-import {useControllers} from '../api/controllers';
+import React, { useState } from 'react';
+import { useControllers } from '../api/controllers';
 import * as joi from 'joi';
-import {Controller, SubmitErrorHandler, useForm} from 'react-hook-form';
-import {joiResolver} from '@hookform/resolvers/joi/dist/joi';
+import { Controller, SubmitErrorHandler, useForm } from 'react-hook-form';
+import { joiResolver } from '@hookform/resolvers/joi/dist/joi';
 import TextInput from './TextInput';
 import NumberInput from './NumberInput';
-import {PlusIcon} from '@heroicons/react/20/solid';
+import { PlusIcon } from '@heroicons/react/20/solid';
 import Field from './Field';
-import {Button, Card} from 'react-daisyui';
-import {useLiveState} from '../api/live-state';
+import { Button, Card } from 'react-daisyui';
+import { useLiveState } from '../api/live-state';
 
 type NewControllerFields = {
     name: string;
-    gpio: number;
+    modbusChannel: number;
 }
 
 export default function NewControllerCard() {
 
-    const {createController} = useControllers();
-    const {controllers} = useLiveState();
+  const { createController } = useControllers();
+  const { controllers } = useLiveState();
 
-    const [activated, setActivated] = useState(false);
+  const [activated, setActivated] = useState(false);
 
-    const formSchema = joi.object<NewControllerFields>({
-        name: joi.string().required(),
-        gpio: joi.number().required().custom((value, helpers) => {
-            if (controllers.map(c => c.controller.gpio).includes(value)) {
-                return helpers.error('custom.gpio');
-            }
-            return value;
-        }, 'GPIO is reserved').messages({
-            'custom.gpio': 'GPIO is already used by other controller.'
-        })
-    });
+  const formSchema = joi.object<NewControllerFields>({
+    name: joi.string().required(),
+    modbusChannel: joi.number().required().custom((value, helpers) => {
+      if (controllers.map(c => c.controller.modbusChannel).includes(value)) {
+        return helpers.error('custom.modbusChannel');
+      }
+      return value;
+    }, 'Modbus Channel is reserved').messages({
+      'custom.modbusChannel': 'Modbus Channel index is already used by other controller.'
+    })
+  });
 
-    const {control, handleSubmit} = useForm<NewControllerFields>({
-        resolver: joiResolver(formSchema),
-        defaultValues: {
-            name: '',
-            gpio: 1
-        }
-    });
-
-    async function handleFormSubmit(data: NewControllerFields) {
-        await createController(data);
-        setActivated(false);
+  const { control, handleSubmit } = useForm<NewControllerFields>({
+    resolver: joiResolver(formSchema),
+    defaultValues: {
+      name: '',
+      modbusChannel: 0
     }
+  });
 
-    const handleFormError: SubmitErrorHandler<NewControllerFields> = (errors) => {
-        console.warn(errors);
-    };
+  async function handleFormSubmit(data: NewControllerFields) {
+    await createController(data);
+    setActivated(false);
+  }
 
-    const submit = handleSubmit(handleFormSubmit, handleFormError);
+  const handleFormError: SubmitErrorHandler<NewControllerFields> = (errors) => {
+    console.warn(errors);
+  };
 
-    return (
+  const submit = handleSubmit(handleFormSubmit, handleFormError);
+
+  return (
         <Card>
             {activated
-                ? (
+              ? (
                     <Card.Body>
-                        <Card.Actions className="justify-end cursor-pointer" onClick={() => setActivated(false)}>
-                            <div className={`badge accent badge-lg`}>Ⓧ</div>
+                        <Card.Actions
+                            className="justify-end cursor-pointer"
+                            onClick={() => setActivated(false)}
+                        >
+                            <div className={'badge accent badge-lg'}>Ⓧ</div>
                         </Card.Actions>
                         <Controller
                             name="name"
                             control={control}
-                            render={({field: {onChange, value}, fieldState: {error}}) =>
+                            render={({ field: { onChange, value }, fieldState: { error } }) =>
                                 <Field
                                     label="Name"
                                     error={error}
@@ -77,11 +80,11 @@ export default function NewControllerCard() {
                         />
 
                         <Controller
-                            name="gpio"
+                            name="modbusChannel"
                             control={control}
-                            render={({field: {onChange, value}, fieldState: {error}}) =>
+                            render={({ field: { onChange, value }, fieldState: { error } }) =>
                                 <Field
-                                    label="GPIO"
+                                    label="Channel"
                                     error={error}
                                 >
                                     <NumberInput
@@ -107,7 +110,7 @@ export default function NewControllerCard() {
                         </div>
                     </Card.Body>
                 )
-                : (
+              : (
                     <div
                         className="w-full h-full align-middle items-center justify-items-center flex text-center"
                     >
@@ -122,6 +125,6 @@ export default function NewControllerCard() {
                     </div>
                 )}
         </Card>
-    )
-        ;
+  )
+  ;
 }

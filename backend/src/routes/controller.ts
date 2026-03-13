@@ -9,7 +9,7 @@ export default fp(async (fastify) => {
 
     const CreateControllerBody = Type.Object({
       name: Type.String(),
-      gpio: Type.Integer()
+      modbusChannel: Type.Integer()
     });
     type CreateControllerBodyType = Static<typeof CreateControllerBody>;
     const { Controller } = fastify.db;
@@ -30,7 +30,7 @@ export default fp(async (fastify) => {
       const controller = await Controller.create({
         name: req.body.name,
         state: 'auto',
-        gpio: req.body.gpio
+        modbusChannel: req.body.modbusChannel
       });
 
       return reply.code(constants.HTTP_STATUS_CREATED).send(controller);
@@ -38,7 +38,7 @@ export default fp(async (fastify) => {
 
     const UpdateControllerBody = Type.Object({
       name: Type.Optional(Type.String()),
-      gpio: Type.Optional(Type.Integer()),
+      modbusChannel: Type.Optional(Type.Integer()),
       state: Type.Optional(Type.String())
     });
     type UpdateControllerBodyType = Static<typeof UpdateControllerBody>;
@@ -52,7 +52,7 @@ export default fp(async (fastify) => {
 
       const body = req.body;
 
-      const updates = {} as Record<any, any>;
+      const updates = {} as Record<string, any>;
 
       if (body.name) {
         updates.name = body.name;
@@ -60,8 +60,8 @@ export default fp(async (fastify) => {
       if (body.state) {
         updates.state = body.state as 'on' | 'off' | 'auto';
       }
-      if (typeof body.gpio !== 'undefined') {
-        updates.gpio = body.gpio;
+      if (typeof body.modbusChannel !== 'undefined') {
+        updates.modbusChannel = body.modbusChannel;
       }
 
       await Controller.update(updates, {

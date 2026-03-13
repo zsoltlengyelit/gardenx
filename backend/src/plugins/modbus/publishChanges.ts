@@ -1,16 +1,17 @@
 import { Subject } from 'rxjs';
 import { JobStatus, ToadScheduler } from 'toad-scheduler';
 import { Schedule } from '../database';
-import { Change, MemoizedGpio, OffIntervalChange, ScheduleChange, switchOffJobSuffix } from './types';
+import { Change, OffIntervalChange, ScheduleChange, switchOffJobSuffix } from './types';
+import { ModbusChannelController } from './controller';
 
-export function publishChanges(scheduleEntities: Schedule[], scheduler: ToadScheduler, gpios: MemoizedGpio[], changeSubject: Subject<Change[]>, autoOffJobs: Record<string, Date>) {
+export function publishChanges(scheduleEntities: Schedule[], scheduler: ToadScheduler, mbCtrls: ModbusChannelController[], changeSubject: Subject<Change[]>, autoOffJobs: Record<string, Date>) {
   // publish controllers state
-  const changes = gpios.reduce((acc, gpio) => {
-    if (gpio.controller) {
+  const changes = mbCtrls.reduce((acc, mbCtrl) => {
+    if (mbCtrl.controller) {
       acc.push({
         type: 'controller',
-        controller: gpio.controller,
-        set: !!gpio.value
+        controller: mbCtrl.controller,
+        set: mbCtrl.value === ModbusChannelController.ON
       }); 
     }
     return acc;

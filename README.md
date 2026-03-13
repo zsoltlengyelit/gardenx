@@ -1,6 +1,6 @@
 # GardenX
 
-GPIO controller with iCal Calendar for Raspberry PI
+Modbus controller with iCal Calendar for Raspberry PI
 
 # Start
 

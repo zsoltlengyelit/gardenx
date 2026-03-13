@@ -5,7 +5,7 @@ export type OnOffAuto = 'on' | 'off' | 'auto';
 export type Controller = {
     id: string;
     name: string;
-    gpio: number;
+    modbusChannel: number;
     state: OnOffAuto;
 };
 

@@ -5,7 +5,7 @@ import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox';
 import corsPlugin from './plugins/cors';
 import sensiblePlugin from './plugins/sensible';
 import databasePlugin from './plugins/database';
-import gpioPlugin from './plugins/gpio';
+import modbusPlugin from './plugins/modbus/modbus';
 
 import controllerRoutes from './routes/controller';
 import scheduleRoutes from './routes/schedules';
@@ -24,6 +24,8 @@ declare module 'fastify' {
         config: {
             DB_PATH: string;
             DB_NAME: string;
+            MODBUS_SERVER_HOST: string;
+            MODBUS_SERVER_PORT: number;
         };
     }
 }
@@ -46,6 +48,12 @@ const app: FastifyPluginAsync<AppOptions> = async (
         },
         DB_NAME: {
           type: 'string'
+        },
+        MODBUS_SERVER_HOST: {
+          type: 'string'
+        },
+        MODBUS_SERVER_PORT: {
+          type: 'number'
         }
       }
     } as any,
@@ -62,7 +70,7 @@ const app: FastifyPluginAsync<AppOptions> = async (
   fastify.register(corsPlugin, {});
   fastify.register(sensiblePlugin, {});
   fastify.register(databasePlugin, {});
-  fastify.register(gpioPlugin, {});
+  fastify.register(modbusPlugin, {});
 
   // This loads all plugins defined in routes
   // define your routes in one of these

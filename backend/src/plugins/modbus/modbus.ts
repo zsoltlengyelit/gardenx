@@ -1,17 +1,17 @@
 import fp from 'fastify-plugin';
-import { Gpio } from 'onoff';
 import { isWithinInterval } from 'date-fns';
 import { Observable, ReplaySubject } from 'rxjs';
-import { OnOffAuto } from './database';
-import { calculateSchedules } from './gpio/schedules-rrule';
+import { Controller, OnOffAuto } from '../database';
+import { calculateSchedules } from './schedules-rrule';
 import { AsyncTask, CronJob, SimpleIntervalJob } from 'toad-scheduler';
-import { Change, MemoizedGpio, switchOffJobSuffix } from './gpio/types';
-import { publishChanges } from './gpio/publishChanges';
-import { createMockGpio } from './gpio/mockGpio';
+import { Change, switchOffJobSuffix } from './types';
+import { publishChanges } from './publishChanges';
+import { ModbusChannelController } from './controller';
+import { createModbusClient } from './modbus-client';
 
 declare module 'fastify' {
     export interface FastifyInstance {
-        gpio: {
+        modbus: {
             changes: Observable<Change[]>
         };
     }
@@ -19,8 +19,12 @@ declare module 'fastify' {
 
 const autoOffJobs = {} as Record<string, Date>;
 
-// in-memory map of used GPIOS
-const GPIOS = {} as Record<string, MemoizedGpio>;
+// in-memory map of used Channels
+const CHANNELS = {} as Record<string, ModbusChannelController>;
+
+const getChannelCtrlOf = (controller: Controller): ModbusChannelController => {
+  return CHANNELS[controller.modbusChannel];
+};
 
 export default fp(async (fastify) => {
 
@@ -31,29 +35,26 @@ export default fp(async (fastify) => {
     changes: new ReplaySubject<Change[]>(1)
   };
 
-  fastify.decorate('gpio', decoration);
+  fastify.decorate('modbus', decoration);
 
-  if (!Gpio.accessible) {
-    log.info('GPIO is not available. Using mocks');
-  }
+  const modbusClient = createModbusClient(fastify);
 
-  async function buildUpGPIOS() {
-    // create gpios
+  async function initModbusControllers() {
     const controllers = await Controller.findAll();
-    controllers.forEach((controller) => {
-
-      if (!GPIOS[controller.gpio]) {
-        const gpio = Gpio.accessible ? new Gpio(controller.gpio, 'out') : createMockGpio(controller, log);
-        GPIOS[controller.gpio] = new MemoizedGpio(gpio, controller);
+    for (const controller of controllers) {
+      if (!CHANNELS[controller.modbusChannel]) {
+        const modbusChannelController = new ModbusChannelController(modbusClient, controller, log);
+        CHANNELS[controller.modbusChannel] = modbusChannelController;
+        await modbusChannelController.turnOff(); // reset all channels on startup
       }
-    });
+    }
 
     return controllers;
   }
 
   async function refreshState() {
 
-    const controllers = await buildUpGPIOS();
+    const controllers = await initModbusControllers();
 
     const scheduleEntities = await Schedule.findAll({
       include: {
@@ -63,25 +64,27 @@ export default fp(async (fastify) => {
 
     const schedules = calculateSchedules(scheduleEntities);
 
-    for (const gpio of Object.values(GPIOS)) {
-      // reset controllers
-      gpio.controller = null;
-    }
+    // for (const mbCtrl of Object.values(CHANNELS)) {
+    //   // reset controllers
+    //   mbCtrl.controller = null;
+    // }
+
+    fastify.log.info(`Refresh live state controllers count: ${controllers.length}`);
 
     // set states
     for (const controller of controllers) {
-      const currentGpio = GPIOS[controller.gpio];
+      const mbCtrl = getChannelCtrlOf(controller);
 
       // refresh controller binding
-      currentGpio.controller = controller;
+      mbCtrl.controller = controller;
 
       if (controller.state === 'on') {
 
-        await currentGpio.write(Gpio.HIGH);
+        await mbCtrl.turnOn();
 
       } else if (controller.state === 'off') {
 
-        await currentGpio.write(Gpio.LOW);
+        await mbCtrl.turnOff();
 
       } else if (controller.state === 'auto') {
 
@@ -93,7 +96,7 @@ export default fp(async (fastify) => {
               start: event.start,
               end: event.end
             })) {
-              log.info('Activate GPIO by Schedule');
+              log.info('Activate Modbus by Schedule');
               return true;
             }
             return false;
@@ -103,15 +106,15 @@ export default fp(async (fastify) => {
           }
         });
 
-        const desiredValue = isOnBySchedule ? Gpio.HIGH : Gpio.LOW;
-        const valueNow = currentGpio.value;
+        const desiredValue = isOnBySchedule ? ModbusChannelController.ON : ModbusChannelController.OFF;
+        const valueNow = mbCtrl.value;
         if (valueNow !== desiredValue) {
-          await currentGpio.write(desiredValue);
+          await mbCtrl.write(desiredValue);
         }
       }
     }
 
-    publishChanges(scheduleEntities, fastify.scheduler, Object.values(GPIOS), decoration.changes, autoOffJobs);
+    publishChanges(scheduleEntities, fastify.scheduler, Object.values(CHANNELS), decoration.changes, autoOffJobs);
   }
 
   function handleStateChange(controllerId: string, state: OnOffAuto) {
@@ -184,7 +187,7 @@ export default fp(async (fastify) => {
 
       try {
         if (model === Controller && options.fields?.includes('state')) {
-          await handleStateChange(options.where.id, options.attributes?.state);
+          handleStateChange(options.where.id, options.attributes?.state);
         }
       } catch (e) {
         log.error('Error while handling state change', e);
@@ -195,9 +198,9 @@ export default fp(async (fastify) => {
   });
 
   const task = new AsyncTask(
-    'refresh GPIO state task',
+    'refresh Modbus state task',
     async () => {
-      log.info('Execute CRON job to sync GPIO state');
+      log.info('Execute CRON job to sync Modbus state');
       await refreshState();
     },
     (err) => {

@@ -2,7 +2,7 @@ import websocket from '@fastify/websocket';
 import fp from 'fastify-plugin';
 import { distinctUntilChanged, map } from 'rxjs';
 import isEqual from 'lodash/isEqual';
-import { Change, ScheduleChange } from '../plugins/gpio/types';
+import { Change, ScheduleChange } from '../plugins/modbus/types';
 import { Controller, Schedule } from '../plugins/database';
 import { addDays, isAfter } from 'date-fns';
 import { rrulestr } from 'rrule';
@@ -52,7 +52,7 @@ export default fp(async (fastify) => {
 
     fastify.get('/live-state', { websocket: true }, (connection, req) => {
 
-      const changesSubScription = fastify.gpio.changes
+      const changesSubScription = fastify.modbus.changes
         .pipe(
           distinctUntilChanged(isEqual),
 

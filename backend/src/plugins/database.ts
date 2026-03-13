@@ -17,7 +17,7 @@ export class Controller extends Model<InferAttributes<Controller>, InferCreation
   declare id: CreationOptional<string>;
   declare name: string;
   declare state: OnOffAuto;
-  declare gpio: number;
+  declare modbusChannel: number;
 }
 
 // eslint-disable-next-line no-use-before-define
@@ -75,8 +75,8 @@ export default fp(async (fastify) => {
       allowNull: false,
       defaultValue: 'auto'
     },
-    gpio: {
-      type: DataTypes.INTEGER,
+    modbusChannel: {
+      type: DataTypes.SMALLINT,
       allowNull: false,
       unique: true
     }
@@ -129,6 +129,9 @@ export default fp(async (fastify) => {
   try {
     await sequelize.authenticate();
     console.log('Connection has been established successfully.');
+
+    await sequelize.sync({force: true, alter: true});
+    console.log('Database synchronized successfully.');
   } catch (error) {
     console.error('Unable to connect to the database:', error);
   }

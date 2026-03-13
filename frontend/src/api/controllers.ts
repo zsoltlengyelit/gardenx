@@ -7,10 +7,10 @@ export function useControllers() {
     async createController(controller: Omit<Controller, 'id' | 'state'>) {
       await axiosInstance.post('/controllers', {
         name: controller.name,
-        gpio: controller.gpio
+        modbusChannel: controller.modbusChannel
       });
     },
-    async updateController(controller: Controller, change: { name?: string, gpio?: number, state?: OnOffAuto }) {
+    async updateController(controller: Controller, change: { name?: string, modbusChannel?: number, state?: OnOffAuto }) {
       await axiosInstance.put(`/controllers/${controller.id}`, {
         ...change
       });

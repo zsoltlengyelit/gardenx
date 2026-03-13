@@ -1,0 +1,11 @@
+{
+  "name": "mockmodbus",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "tsx watch --clear-screen=false server.ts"
+  },
+  "dependencies": {
+    "tsx": "^4.21.0",
+    "jsmodbus": "^4.0.0"
+  }
+}
