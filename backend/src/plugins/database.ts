@@ -130,8 +130,9 @@ export default fp(async (fastify) => {
     await sequelize.authenticate();
     console.log('Connection has been established successfully.');
 
-    await sequelize.sync({force: true, alter: true});
-    console.log('Database synchronized successfully.');
+// only in dev mode
+//     await sequelize.sync({force: true, alter: true});
+//     console.log('Database synchronized successfully.');
   } catch (error) {
     console.error('Unable to connect to the database:', error);
   }

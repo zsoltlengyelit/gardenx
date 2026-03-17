@@ -53,68 +53,72 @@ export default fp(async (fastify) => {
   }
 
   async function refreshState() {
+    try{
+        const controllers = await initModbusControllers();
 
-    const controllers = await initModbusControllers();
-
-    const scheduleEntities = await Schedule.findAll({
-      include: {
-        model: Controller, as: 'controller'
-      }
-    });
-
-    const schedules = calculateSchedules(scheduleEntities);
-
-    // for (const mbCtrl of Object.values(CHANNELS)) {
-    //   // reset controllers
-    //   mbCtrl.controller = null;
-    // }
-
-    fastify.log.info(`Refresh live state controllers count: ${controllers.length}`);
-
-    // set states
-    for (const controller of controllers) {
-      const mbCtrl = getChannelCtrlOf(controller);
-
-      // refresh controller binding
-      mbCtrl.controller = controller;
-
-      if (controller.state === 'on') {
-
-        await mbCtrl.turnOn();
-
-      } else if (controller.state === 'off') {
-
-        await mbCtrl.turnOff();
-
-      } else if (controller.state === 'auto') {
-
-        const ownSchedules = schedules.filter(sch => sch.schedule.controller.id === controller.id && sch.schedule.active);
-
-        const isOnBySchedule = ownSchedules.some(event => {
-          try {
-            if (isWithinInterval(new Date(), {
-              start: event.start,
-              end: event.end
-            })) {
-              log.info('Activate Modbus by Schedule');
-              return true;
-            }
-            return false;
-          } catch (e) {
-            fastify.log.error(e);
-            return false;
+        const scheduleEntities = await Schedule.findAll({
+          include: {
+            model: Controller, as: 'controller'
           }
         });
 
-        const desiredValue = isOnBySchedule ? ModbusChannelController.ON : ModbusChannelController.OFF;
-        const valueNow = mbCtrl.value;
-        if (valueNow !== desiredValue) {
-          await mbCtrl.write(desiredValue);
-        }
-      }
-    }
+        const schedules = calculateSchedules(scheduleEntities);
 
-    publishChanges(scheduleEntities, fastify.scheduler, Object.values(CHANNELS), decoration.changes, autoOffJobs);
+        // for (const mbCtrl of Object.values(CHANNELS)) {
+        //   // reset controllers
+        //   mbCtrl.controller = null;
+
+
+        fastify.log.info(`Refresh live state controllers count: ${controllers.length}`);
+
+        // set states
+        for (const controller of controllers) {
+          const mbCtrl = getChannelCtrlOf(controller);
+
+          // refresh controller binding
+          mbCtrl.controller = controller;
+
+          if (controller.state === 'on') {
+
+            await mbCtrl.turnOn();
+
+          } else if (controller.state === 'off') {
+
+            await mbCtrl.turnOff();
+
+          } else if (controller.state === 'auto') {
+
+            const ownSchedules = schedules.filter(sch => sch.schedule.controller.id === controller.id && sch.schedule.active);
+
+            const isOnBySchedule = ownSchedules.some(event => {
+              try {
+                if (isWithinInterval(new Date(), {
+                  start: event.start,
+                  end: event.end
+                })) {
+                  log.info('Activate Modbus by Schedule');
+                  return true;
+                }
+                return false;
+              } catch (e) {
+                fastify.log.error(e);
+                return false;
+              }
+            });
+
+            const desiredValue = isOnBySchedule ? ModbusChannelController.ON : ModbusChannelController.OFF;
+            const valueNow = mbCtrl.value;
+            if (valueNow !== desiredValue) {
+              await mbCtrl.write(desiredValue);
+            }
+          }
+        }
+
+        publishChanges(scheduleEntities, fastify.scheduler, Object.values(CHANNELS), decoration.changes, autoOffJobs);
+    } catch(e) {
+      fastify.log.error('Error while refreshing state.');
+      fastify.log.error(e);
+    }
   }
 
   function handleStateChange(controllerId: string, state: OnOffAuto) {

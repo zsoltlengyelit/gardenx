@@ -5,6 +5,8 @@ const host = `pi@raspberrypi.local`;
 const targetFolder = `/home/pi/gardenx/`;
 
 await within(async () => {
+    await $`ssh ${host} 'mkdir -p ${targetFolder}; cd ${targetFolder}'`
+//     await $`ssh ${host} 'sudo npm install -g pm2'`
     await $`ssh ${host} 'cd ${targetFolder}; pm2 stop all; mkdir -p ${targetFolder}; mkdir -p ${path.join(targetFolder, 'data')}'`
     await $`scp -r ./build/* ${host}:${targetFolder}`
 
@@ -12,6 +14,7 @@ await within(async () => {
         `cd ${path.join(targetFolder, 'backend')}`,
         `npm init -y`,
         'node ./server-setup.js',
+        `export $(grep -v '^#' .env.production | xargs); NODE_ENV=production npx sequelize-cli init`,
         `export $(grep -v '^#' .env.production | xargs); NODE_ENV=production npx sequelize-cli db:migrate`,
         `cd ${targetFolder}`,
         `pm2 reload ecosystem.config.js`,
