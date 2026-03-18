@@ -8,6 +8,7 @@
     "dev:backend": "cd backend && npm run dev",
     "dev:frontend": "cd frontend && npm run dev",
     "dev:mockmodbus": "cd mockmodbus && npm run dev",
+    "dev:migrate": "cd backend && npm run migrate",
     "build": "zx ./tools/build.mjs",
     "deploy": "zx ./tools/deploy.mjs",
     "bd": "npm run build && npm run deploy"

@@ -6,9 +6,8 @@ module.exports = {
       return Promise.all([
 
         queryInterface.addColumn('controller', 'modbusChannel', {
-          type: DataTypes.SMALLINT,
-          allowNull: true,
-          unique: true
+          type:  DataTypes.SMALLINT,
+          allowNull: false,
         },
         { transaction }),
 

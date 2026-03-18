@@ -33,4 +33,6 @@ sudo apt-get install -y nodejs
 ```bash
 sudo apt-get install iptables
 sudo iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 80 -j REDIRECT --to-port 3000
+sudo apt install iptables-persistent
+sudo netfilter-persistent save
 ```

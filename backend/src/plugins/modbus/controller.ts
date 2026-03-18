@@ -40,6 +40,9 @@ export class ModbusChannelController {
         if (val === this.value) {
             this.log.info('Channel %d already in desired state %d', this._controller.modbusChannel, val);
         }
+
+        this._value = val; // hope best
+
         if (!this.isOnline) {
             this.log.info('Modbus');
             return;
@@ -58,5 +61,9 @@ export class ModbusChannelController {
     // eslint-disable-next-line accessor-pairs
     set controller(val: Controller) {
         this._controller = val;
+    }
+
+    get controller() {
+        return this._controller;
     }
 }
