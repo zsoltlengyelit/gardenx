@@ -64,9 +64,10 @@ export default fp(async (fastify) => {
 
         const schedules = calculateSchedules(scheduleEntities);
 
-        // for (const mbCtrl of Object.values(CHANNELS)) {
-        //   // reset controllers
-        //   mbCtrl.controller = null;
+        for (const mbCtrl of Object.values(CHANNELS)) {
+          // reset controllers
+          mbCtrl.controller = null;
+        }
 
 
         fastify.log.info(`Refresh live state controllers count: ${controllers.length}`);
