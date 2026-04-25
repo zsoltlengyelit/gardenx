@@ -17,9 +17,9 @@ module.exports = {
             NODE_ENV: 'production',
             DB_PATH: '/home/pi/gardenx/data/db.sqlite',
             DB_NAME: 'gardenx',
-            FASTIFY_LOG_LEVEL: 'trace',
-            MODBUS_SERVER_HOST: 'wireshare.local',
-            MODBUS_SERVER_PORT: '8502'
+            FASTIFY_LOG_LEVEL: 'info',
+            MODBUS_SERVER_HOST: '192.168.0.200',
+            MODBUS_SERVER_PORT: '4196'
         }
     }]
 }

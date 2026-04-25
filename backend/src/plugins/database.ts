@@ -55,7 +55,7 @@ export default fp(async (fastify) => {
     dialect: 'sqlite',
     storage: fastify.config.DB_PATH,
     database: fastify.config.DB_NAME,
-    logging: true
+    logging: false
   });
 
   Controller.init({

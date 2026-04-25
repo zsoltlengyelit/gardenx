@@ -75,6 +75,7 @@ export default function NewControllerCard() {
                                     <TextInput
                                         value={value}
                                         onChange={onChange}
+                                        autoFocus
                                     />
                                 </Field>}
                         />
@@ -114,14 +115,13 @@ export default function NewControllerCard() {
                     <div
                         className="w-full h-full align-middle items-center justify-items-center flex text-center"
                     >
-                        <div className="grow align-middle justify-center">
                             <Button
                                 onClick={() => setActivated(true)}
+                                className="grow align-middle justify-center"
                                 color="ghost"
                             >
                                 <PlusIcon className="w-10 h-10"/>
                             </Button>
-                        </div>
                     </div>
                 )}
         </Card>

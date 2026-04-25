@@ -44,7 +44,8 @@ export class ModbusChannelController {
         this._value = val; // hope best
 
         if (!this.isOnline) {
-            this.log.info('Modbus');
+            this.log.info('Modbus is not online, cannot write to channel. Try once more.');
+            setTimeout(() => this.write(val), 1000);
             return;
         }
 

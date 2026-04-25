@@ -21,6 +21,8 @@ export function createModbusClient(fastify: FastifyInstance) {
         host: fastify.config.MODBUS_SERVER_HOST,
         port: fastify.config.MODBUS_SERVER_PORT,
     };
+
+    log.info('Modbus connection', options)
     const client = new Modbus.client.TCP(socket, 0);
 
     let reconnectCount = 0;

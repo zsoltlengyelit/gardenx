@@ -1,4 +1,4 @@
-import { FastifyPluginAsync } from 'fastify';
+import {FastifyPluginAsync, FastifyPluginOptions} from 'fastify';
 import * as fastifyEnv from '@fastify/env';
 import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox';
 
@@ -12,12 +12,16 @@ import scheduleRoutes from './routes/schedules';
 import liveStateRoutes from './routes/live-state';
 import toadScheduler from './plugins/toad-scheduler';
 
-export type AppOptions = {
+export interface AppOptions extends FastifyPluginOptions {
     // Place your custom options for app below here.
-};
+}
 
 // Pass --options via CLI arguments in command to enable these options.
-const options: AppOptions = {};
+const options: AppOptions = {
+    logger: {
+        timestamp: () => `,"time":"${new Date(Date.now()).toISOString()}"`
+    }
+};
 
 declare module 'fastify' {
     export interface FastifyInstance {
