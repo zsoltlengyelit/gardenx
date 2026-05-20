@@ -8,7 +8,7 @@ await Promise.all([
         await cd('./backend');
         await $`npm run lint`;
         await $`rm -rf dist`;
-        await $`npx esbuild src/app.ts --outdir=dist --bundle --platform=node --external:pg-hstore --external:onoff --sourcemap=inline`;
+        await $`npx esbuild src/app.ts --outdir=dist --bundle --platform=node --external:pg-hstore --external:onoff --sourcemap`;
         await $`cp -r config ./dist`;
         await $`cp -r migrations ./dist`;
     })

@@ -10,7 +10,6 @@ type Props = {
 export function AllControllerCard({ controllerChanges }: Props) {
 
   const { updateController } = useControllers();
-
   async function handleAllSet(state: Omit<OnOffAuto, 'on'>) {
     for (const controller of controllerChanges) {
       await updateController(controller.controller, { state: state as OnOffAuto });

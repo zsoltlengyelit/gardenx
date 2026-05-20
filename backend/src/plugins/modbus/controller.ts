@@ -1,6 +1,8 @@
 import {Controller} from '../database';
 import {FastifyBaseLogger} from 'fastify';
 import {ModbusTCPClient} from 'jsmodbus';
+import {Subject} from "rxjs";
+import {SystemStatus} from "./types";
 
 export class ModbusChannelController {
 
@@ -9,7 +11,7 @@ export class ModbusChannelController {
 
     private _value: boolean = ModbusChannelController.OFF;
 
-    constructor(private modbusClient: ModbusTCPClient, private _controller: Controller | null, private log: FastifyBaseLogger) {
+    constructor(private modbusClient: ModbusTCPClient, private _controller: Controller | null, private log: FastifyBaseLogger, private systemStatus$: Subject<SystemStatus[]>) {
         this.log.info('Initiate channel _controller for channel %d', _controller?.modbusChannel);
 
         if (this.isOnline && _controller?.modbusChannel != null) {
@@ -45,8 +47,17 @@ export class ModbusChannelController {
 
         if (!this.isOnline) {
             this.log.info('Modbus is not online, cannot write to channel. Try once more.');
+            this.systemStatus$.next([{
+                status: 'error',
+                message: `Modbus is not online, cannot write to channel. Try once more.`,
+            }])
             setTimeout(() => this.write(val), 1000);
             return;
+        } else {
+            this.systemStatus$.next([{
+                status: "ok",
+                message: "Modbus is online."
+            }]);
         }
 
         this.log.info('Write value %d to channel %d', val, this._controller?.modbusChannel);

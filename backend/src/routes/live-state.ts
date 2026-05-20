@@ -1,6 +1,6 @@
 import websocket from '@fastify/websocket';
 import fp from 'fastify-plugin';
-import { distinctUntilChanged, map } from 'rxjs';
+import {combineLatest, distinctUntilChanged, map} from 'rxjs';
 import isEqual from 'lodash/isEqual';
 import { Change, ScheduleChange } from '../plugins/modbus/types';
 import { Controller, Schedule } from '../plugins/database';
@@ -52,32 +52,38 @@ export default fp(async (fastify) => {
 
     fastify.get('/live-state', { websocket: true }, (connection, req) => {
 
-      const changesSubScription = fastify.modbus.changes
-        .pipe(
-          distinctUntilChanged(isEqual),
+      let changes$ = fastify.modbus.changes
+          .pipe(
+              distinctUntilChanged(isEqual),
 
-          // filter out non-active schedules
-          map((changes: Change[]) => {
-            return changes.filter(change => {
-              const inactivesSchedule = change.type === 'schedule' && !isActiveSchedule(change.schedule);
-              return !inactivesSchedule;
-            });
-          }),
+              // filter out non-active schedules
+              map((changes: Change[]) => {
+                return changes.filter(change => {
+                  const inactivesSchedule = change.type === 'schedule' && !isActiveSchedule(change.schedule);
+                  return !inactivesSchedule;
+                });
+              }),
 
-          // add meta info to controllers about next scheduled start
-          map(changes => {
-            return changes.map(change => {
-              if (change.type === 'controller') {
-                change.nextStart = calculateNextStart(change.controller, changes);
-              }
+              // add meta info to controllers about next scheduled start
+              map(changes => {
+                return changes.map(change => {
+                  if (change.type === 'controller') {
+                    change.nextStart = calculateNextStart(change.controller, changes);
+                  }
 
-              return change;
+                  return change;
 
-            });
-          })
-        )
-        .subscribe(change => {
-          connection.socket.send(JSON.stringify(change));
+                });
+              })
+          );
+
+
+      const changesSubScription = combineLatest(changes$, fastify.modbus.systemStatus)
+        .subscribe(([changes, systemStatus]) => {
+          connection.socket.send(JSON.stringify({
+            changes,
+            systemStatus
+          }));
         });
 
       connection.socket.on('close', () => {

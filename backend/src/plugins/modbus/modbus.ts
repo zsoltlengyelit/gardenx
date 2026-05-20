@@ -4,7 +4,7 @@ import { Observable, ReplaySubject } from 'rxjs';
 import { Controller, OnOffAuto } from '../database';
 import { calculateSchedules } from './schedules-rrule';
 import { AsyncTask, CronJob, SimpleIntervalJob } from 'toad-scheduler';
-import { Change, switchOffJobSuffix } from './types';
+import {Change, switchOffJobSuffix, SystemStatus} from './types';
 import { publishChanges } from './publishChanges';
 import { ModbusChannelController } from './controller';
 import { createModbusClient } from './modbus-client';
@@ -12,7 +12,8 @@ import { createModbusClient } from './modbus-client';
 declare module 'fastify' {
     export interface FastifyInstance {
         modbus: {
-            changes: Observable<Change[]>
+            changes: Observable<Change[]>,
+            systemStatus: Observable<SystemStatus[]>,
         };
     }
 }
@@ -32,7 +33,8 @@ export default fp(async (fastify) => {
 
   const log = fastify.log;
   const decoration = {
-    changes: new ReplaySubject<Change[]>(1)
+    changes: new ReplaySubject<Change[]>(1),
+    systemStatus: new ReplaySubject<SystemStatus[]>(1)
   };
 
   fastify.decorate('modbus', decoration);
@@ -43,7 +45,7 @@ export default fp(async (fastify) => {
     const controllers = await Controller.findAll();
     for (const controller of controllers) {
       if (!CHANNELS[controller.modbusChannel]) {
-        const modbusChannelController = new ModbusChannelController(modbusClient, controller, log);
+        const modbusChannelController = new ModbusChannelController(modbusClient, controller, log, decoration.systemStatus);
         CHANNELS[controller.modbusChannel] = modbusChannelController;
         await modbusChannelController.turnOff(); // reset all channels on startup
       }

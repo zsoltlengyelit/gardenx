@@ -1,6 +1,6 @@
 import ReconnectingWebSocket from 'reconnecting-websocket';
 import { useEffect, useState } from 'react';
-import { Change, ControllerChange, OffIntervalChange, ScheduleChange } from './types';
+import {Change, ControllerChange, OffIntervalChange, ScheduleChange, SystemStatus} from './types';
 import { atom, useAtomValue, useSetAtom } from 'jotai';
 
 const ws = new ReconnectingWebSocket(import.meta.env.VITE_BACKEND_WS.replace('HOSTNAME', location.hostname), undefined, {
@@ -20,6 +20,7 @@ function isOffIntervalChange(change: Change): change is OffIntervalChange {
 }
 
 const globalChangesAtom = atom<Change[]>([]);
+const globalSystemStatusAtom = atom<SystemStatus[]>([]);
 
 const scheduleChangesAtom = atom(get => {
   return get(globalChangesAtom).filter(isScheduleChange);
@@ -39,10 +40,12 @@ export function useLiveState() {
 
   const [isConnected, setIsConnected] = useState(false);
   const [isConnectionLoading, setIsConnectionLoading] = useState(true);
-  const setGlobal = useSetAtom(globalChangesAtom);
+  const setGlobalChanges = useSetAtom(globalChangesAtom);
+  const setGlobalSystemStatus = useSetAtom(globalSystemStatusAtom);
   const schedules = useAtomValue(scheduleChangesAtom);
   const controllers = useAtomValue(controllerChangesAtom);
   const offIntervals = useAtomValue(offIntervalChangesAtom);
+  const systemStatusMessages = useAtomValue(globalSystemStatusAtom);
 
   useEffect(() => {
 
@@ -57,15 +60,16 @@ export function useLiveState() {
     });
 
     ws.addEventListener('message', (event) => {
-      const changesFromWs = JSON.parse(event.data) as Change[];
+      const {changes: changesFromWs, systemStatus} = JSON.parse(event.data) as {changes: Change[], systemStatus: SystemStatus[]};
 
-      setGlobal(changesFromWs);
+      setGlobalChanges(changesFromWs);
+      setGlobalSystemStatus(systemStatus);
     });
 
   }, []);
 
   return {
-    controllers, isConnected, schedules, offIntervals, isConnectionLoading
+    controllers, isConnected, schedules, offIntervals, isConnectionLoading, systemStatusMessages
   };
 
 }

@@ -8,7 +8,7 @@ await within(async () => {
     await $`ssh ${host} 'mkdir -p ${targetFolder}; cd ${targetFolder}'`
 //     await $`ssh ${host} 'sudo npm install -g pm2'`
     await $`ssh ${host} 'cd ${targetFolder}; pm2 stop all; mkdir -p ${targetFolder}; mkdir -p ${path.join(targetFolder, 'data')}'`
-    await $`scp -r ./build/* ${host}:${targetFolder}`
+    await $`scp -v -r ./build/* ${host}:${targetFolder}`
 
     const commands = [
         `cd ${path.join(targetFolder, 'backend')}`,

@@ -48,6 +48,11 @@ export type OffIntervalChange = ChangeBase & {
     start: string;
 };
 
+export type SystemStatus = {
+    status: 'ok' | 'error';
+    message?: string;
+}
+
 export type Change = ControllerChange | ScheduleChange | OffIntervalChange;
 
 export type ScheduledEvent = Event & { resource: Schedule };

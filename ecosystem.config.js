@@ -7,7 +7,7 @@ module.exports = {
         }
     }, {
         name: 'backend',
-        script: 'npx fastify start ./dist/app.js',
+        script: 'npx fastify start ./app.js',
         cwd: 'backend/dist',
         env: {
             NODE_OPTIONS: '--enable-source-maps',

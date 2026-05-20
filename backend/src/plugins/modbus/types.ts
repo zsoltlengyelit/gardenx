@@ -20,6 +20,11 @@ export type OffIntervalChange = {
     start: Date;
 }
 
+export type SystemStatus = {
+    status: 'ok' | 'error';
+    message?: string;
+}
+
 export type Change = ScheduleChange | ControllerChange | OffIntervalChange;
 
 export const switchOffJobSuffix = '-switch-off';

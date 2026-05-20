@@ -1,15 +1,21 @@
 import ControllerCardList from './ControllerCardList';
 import Schedule from './Schedule/Schedule';
 import {useLiveState} from '../api/live-state';
-import {useEffect, useMemo} from 'react';
+import React, {useEffect, useMemo} from 'react';
 import {useAtom} from 'jotai';
 import {editorModeAtom} from '../atoms';
 import {WifiIcon, WrenchScrewdriverIcon} from '@heroicons/react/24/solid';
-import {Button, Modal, Navbar} from 'react-daisyui';
+import {Button, Card, Modal, Navbar} from 'react-daisyui';
 
 export default function Board() {
 
-    const {controllers, schedules: scheduleChanges, isConnected, isConnectionLoading} = useLiveState();
+    const {
+        controllers,
+        schedules: scheduleChanges,
+        isConnected,
+        isConnectionLoading,
+        systemStatusMessages
+    } = useLiveState();
     const [editorMode, setEditorMode] = useAtom(editorModeAtom);
 
     useEffect(() => {
@@ -47,6 +53,20 @@ export default function Board() {
                     </Navbar>
 
                     <ControllerCardList controllers={controllers}/>
+
+                    {systemStatusMessages && systemStatusMessages.length > 0 && (
+                        <Card compact={true} bordered={false}>
+                            <Card.Body>
+                                {systemStatusMessages.map((systemStatus, index) => (
+                                    <div
+                                        key={index}
+                                        className={'alert ' + (systemStatus.status === 'ok' ? 'alert-success' : 'alert-warning')}>
+                                        <span>{systemStatus.message}</span>
+                                    </div>
+                                ))}
+                            </Card.Body>
+                        </Card>
+                    )}
                 </div>
 
                 <div className="flex-grow pt-3 mx-4">
