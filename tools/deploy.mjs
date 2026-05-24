@@ -18,7 +18,7 @@ await within(async () => {
         `NODE_ENV=production npx sequelize-cli db:migrate`,
         `cd ${targetFolder}`,
         `pm2 install pm2-logrotate`,
-        `pm2 set pm2-logrotate:max_size 1K`,
+        `pm2 set pm2-logrotate:max_size 100M`,
         `pm2 reload ecosystem.config.js`,
         `pm2 restart ecosystem.config.js`,
         `pm2 save`

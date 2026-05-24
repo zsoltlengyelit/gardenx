@@ -72,8 +72,6 @@ export default fp(async (fastify) => {
         }
 
 
-        fastify.log.info(`Refresh live state controllers count: ${controllers.length}`);
-
         // set states
         for (const controller of controllers) {
           const mbCtrl = getChannelCtrlOf(controller);
