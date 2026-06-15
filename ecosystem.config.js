@@ -9,6 +9,8 @@ module.exports = {
         name: 'backend',
         script: 'npx fastify start ./app.js',
         cwd: 'backend/dist',
+        out_file: '/dev/null',
+        error_file: '/dev/null',
         env: {
             NODE_OPTIONS: '--enable-source-maps',
             FASTIFY_PORT: '1880',
