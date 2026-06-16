@@ -10,7 +10,7 @@ import {
 } from 'sequelize';
 import fp from 'fastify-plugin';
 
-export type OnOffAuto = 'on' | 'off' | 'auto';
+export type OnOffAuto = 'on' | 'off' | 'auto' | 'error';
 
 // eslint-disable-next-line no-use-before-define
 export class Controller extends Model<InferAttributes<Controller>, InferCreationAttributes<Controller>> {

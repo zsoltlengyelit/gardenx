@@ -139,6 +139,7 @@ export default function ControllerCard({ controller, set, color, nextStart }: Pr
                                </Card.Actions>
                 }
                 <Card.Title className="flex">
+                    {controller.state === 'error' && <Badge color="error" className="mr-2">Error</Badge>}
                     <div className="grow">
                         {/* Name edit */}
                         {isNameEdit && <>

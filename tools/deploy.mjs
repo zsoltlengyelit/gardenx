@@ -12,8 +12,12 @@ await within(async () => {
         `cd ${path.join(targetFolder, 'backend')}`,
         `npm init -y`,
         'node ./server-setup.js',
-        `export $(grep -v '^#' .env.production | xargs); NODE_ENV=production npx sequelize-cli db:migrate`,
+        `cd ${path.join(targetFolder, 'backend', 'dist')}`,
+        `NODE_ENV=production npx sequelize-cli@6.6.1 db:migrate --config config/config.js`,
         `cd ${targetFolder}`,
+        `pm2 install pm2-logrotate`,
+        `pm2 set pm2-logrotate:max_size 10M`,
+        `pm2 set pm2-logrotate:retain 3`,
         `pm2 reload ecosystem.config.js`,
         `pm2 restart ecosystem.config.js`,
         `pm2 save`

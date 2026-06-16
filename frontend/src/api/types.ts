@@ -1,6 +1,6 @@
 import type { Event } from 'react-big-calendar';
 
-export type OnOffAuto = 'on' | 'off' | 'auto';
+export type OnOffAuto = 'on' | 'off' | 'auto' | 'error';
 
 export type Controller = {
     id: string;

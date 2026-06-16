@@ -3,13 +3,14 @@ module.exports = {
         name: 'frontend',
         script: "node frontend-server.mjs ./frontend",
         env: {
-            PORT: '80'
+            PORT: '3000' // redirected with iptables
         }
     }, {
         name: 'backend',
-        script: 'npx fastify start ./app.js',
+        script: 'npx fastify start ./dist/app.js',
         cwd: 'backend',
         env: {
+            NODE_OPTIONS: '--enable-source-maps',
             FASTIFY_PORT: '1880',
             FASTIFY_ADDRESS: '0.0.0.0',
             FASTIFY_PRETTY_LOGS: 'true',
